@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#142033" />
+    <title>JP Match · 五十音配對</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body data-screen="setup" data-players="2" data-turn="0">
+    <div id="app" class="app">
+      <!-- SETUP -->
+      <section id="setup-screen" class="screen setup">
+        <div class="setup-bg" aria-hidden="true"></div>
+        <header class="brand">
+          <p class="brand-mark">JP MATCH</p>
+          <h1 class="brand-title">五十音配對</h1>
+          <p class="brand-sub">掀開兩張，找到同一音的另一種寫法</p>
+        </header>
+
+        <div class="setup-panel">
+          <div class="field">
+            <span class="field-label">人數</span>
+            <div class="opt-row" data-group="players">
+              <button type="button" class="opt" data-value="1">單人練習</button>
+              <button type="button" class="opt is-active" data-value="2">雙人對戰</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="field-label">配對模式</span>
+            <div class="opt-row opt-wrap" data-group="mode"></div>
+          </div>
+
+          <div class="field">
+            <span class="field-label">盤面大小</span>
+            <div class="opt-row opt-wrap" data-group="grid"></div>
+          </div>
+
+          <button type="button" id="btn-start" class="btn-primary">開始遊戲</button>
+        </div>
+      </section>
+
+      <!-- GAME -->
+      <section id="game-screen" class="screen game" hidden>
+        <header class="game-top">
+          <button type="button" id="btn-menu" class="btn-ghost">選單</button>
+          <div id="turn-banner" class="turn-banner">玩家 1 的回合</div>
+          <div id="mode-chip" class="mode-chip">羅馬拼音 ↔ 平假名</div>
+        </header>
+
+        <div id="hud-dual" class="hud-dual">
+          <div id="score-p1" class="score-pill is-active">
+            <span class="turn-arrow turn-arrow-left" aria-hidden="true">◀</span>
+            <span class="score-name">玩家 1</span>
+            <span class="score-num">0</span>
+          </div>
+          <div class="remaining-wrap">
+            <span class="remaining-label">剩餘</span>
+            <span id="remaining" class="remaining-num">16</span>
+          </div>
+          <div id="score-p2" class="score-pill score-pill-flip">
+            <span class="score-name">玩家 2</span>
+            <span class="score-num">0</span>
+            <span class="turn-arrow turn-arrow-right" aria-hidden="true">▶</span>
+          </div>
+        </div>
+
+        <div id="hud-solo" class="hud-solo" hidden>
+          <div class="score-pill">
+            <span class="score-name">已配對</span>
+            <span id="score-solo" class="score-num">0</span>
+          </div>
+          <div class="remaining-wrap">
+            <span class="remaining-label">剩餘</span>
+            <span id="remaining-solo" class="remaining-num">16</span>
+          </div>
+        </div>
+
+        <div id="board" class="board" role="grid" aria-label="配對卡牌盤面"></div>
+      </section>
+
+      <!-- RESULT -->
+      <section id="result-screen" class="screen result" hidden>
+        <div class="result-card">
+          <p class="result-kicker">GAME OVER</p>
+          <h2 id="result-title" class="result-title">獲勝</h2>
+          <p id="result-detail" class="result-detail"></p>
+          <div class="result-actions">
+            <button type="button" id="btn-restart" class="btn-primary">再玩一局</button>
+            <button type="button" id="btn-to-setup" class="btn-ghost">回到首頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- IN-GAME MENU -->
+      <div id="menu-overlay" class="menu-overlay" hidden>
+        <div
+          class="menu-panel"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="menu-title"
+        >
+          <header class="menu-head">
+            <h2 id="menu-title" class="menu-title">選單</h2>
+            <button type="button" id="btn-menu-close" class="btn-ghost">關閉</button>
+          </header>
+
+          <div class="menu-body">
+            <label class="menu-row">
+              <span>翻牌發音</span>
+              <input id="opt-voice" type="checkbox" checked />
+            </label>
+            <label class="menu-row">
+              <span>翻牌音效</span>
+              <input id="opt-sfx" type="checkbox" checked />
+            </label>
+            <label class="menu-row">
+              <span>背景音樂</span>
+              <input id="opt-bgm" type="checkbox" checked />
+            </label>
+            <label class="menu-row menu-row-volume">
+              <span>背景音樂音量</span>
+              <input
+                id="opt-bgm-volume"
+                type="range"
+                min="0"
+                max="100"
+                value="35"
+                step="1"
+              />
+            </label>
+          </div>
+
+          <div class="menu-actions">
+            <button type="button" id="btn-menu-restart" class="btn-primary">重新開始</button>
+            <button type="button" id="btn-menu-home" class="btn-ghost">回到首頁</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./js/kana.js"></script>
+    <script src="./js/audio.js"></script>
+    <script src="./js/game.js"></script>
+  </body>
+</html>
