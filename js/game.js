@@ -192,6 +192,7 @@
 
     if (name === "setup") {
       Sound.stopBgm();
+      if (Sound.stopReading) Sound.stopReading();
     }
   }
 
@@ -322,13 +323,26 @@
       btn.setAttribute("aria-label", faceDownLabel(index));
 
       const isPic = card.display === "pic" || card.side === "pic";
-      const contentHtml = isPic
-        ? '<span class="card-emoji" aria-hidden="true">' + card.text + "</span>"
-        : '<span class="card-text' +
+      const isSymbol = card.display === "symbol";
+      let contentHtml;
+      if (isSymbol) {
+        contentHtml =
+          '<span class="card-symbol' +
+          (card.text.length > 2 ? " is-compact" : "") +
+          '">' +
+          card.text +
+          "</span>";
+      } else if (isPic) {
+        contentHtml =
+          '<span class="card-emoji" aria-hidden="true">' + card.text + "</span>";
+      } else {
+        contentHtml =
+          '<span class="card-text' +
           (card.text.length > 1 ? " is-compact" : "") +
           '">' +
           card.text +
           "</span>";
+      }
 
       btn.innerHTML =
         '<span class="card-inner">' +

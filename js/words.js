@@ -65,6 +65,39 @@ window.JPMatchWords = (() => {
     { key: "hon", hira: "ほん", romaji: "hon", pic: "📖", label: "書", category: "daily" },
     { key: "kasa", hira: "かさ", romaji: "kasa", pic: "☂️", label: "傘", category: "daily" },
     { key: "tokei", hira: "とけい", romaji: "tokei", pic: "🕒", label: "鐘", category: "daily" },
+
+    // 月分・星期・一到十（圖案側用數字／曜日記號）
+    { key: "ichi", hira: "いち", romaji: "ichi", pic: "1", label: "一", category: "calendar", picKind: "symbol" },
+    { key: "ni", hira: "に", romaji: "ni", pic: "2", label: "二", category: "calendar", picKind: "symbol" },
+    { key: "san", hira: "さん", romaji: "san", pic: "3", label: "三", category: "calendar", picKind: "symbol" },
+    { key: "yon", hira: "よん", romaji: "yon", pic: "4", label: "四", category: "calendar", picKind: "symbol" },
+    { key: "go", hira: "ご", romaji: "go", pic: "5", label: "五", category: "calendar", picKind: "symbol" },
+    { key: "roku", hira: "ろく", romaji: "roku", pic: "6", label: "六", category: "calendar", picKind: "symbol" },
+    { key: "nana", hira: "なな", romaji: "nana", pic: "7", label: "七", category: "calendar", picKind: "symbol" },
+    { key: "hachi", hira: "はち", romaji: "hachi", pic: "8", label: "八", category: "calendar", picKind: "symbol" },
+    { key: "kyuu", hira: "きゅう", romaji: "kyuu", pic: "9", label: "九", category: "calendar", picKind: "symbol" },
+    { key: "juu", hira: "じゅう", romaji: "juu", pic: "10", label: "十", category: "calendar", picKind: "symbol" },
+
+    { key: "getsuyoubi", hira: "げつようび", romaji: "getsuyoubi", pic: "月", label: "星期一", category: "calendar", picKind: "symbol" },
+    { key: "kayoubi", hira: "かようび", romaji: "kayoubi", pic: "火", label: "星期二", category: "calendar", picKind: "symbol" },
+    { key: "suiyoubi", hira: "すいようび", romaji: "suiyoubi", pic: "水", label: "星期三", category: "calendar", picKind: "symbol" },
+    { key: "mokuyoubi", hira: "もくようび", romaji: "mokuyoubi", pic: "木", label: "星期四", category: "calendar", picKind: "symbol" },
+    { key: "kinyoubi", hira: "きんようび", romaji: "kinyoubi", pic: "金", label: "星期五", category: "calendar", picKind: "symbol" },
+    { key: "doyoubi", hira: "どようび", romaji: "doyoubi", pic: "土", label: "星期六", category: "calendar", picKind: "symbol" },
+    { key: "nichiyoubi", hira: "にちようび", romaji: "nichiyoubi", pic: "日", label: "星期日", category: "calendar", picKind: "symbol" },
+
+    { key: "ichigatsu", hira: "いちがつ", romaji: "ichigatsu", pic: "1月", label: "一月", category: "calendar", picKind: "symbol" },
+    { key: "nigatsu", hira: "にがつ", romaji: "nigatsu", pic: "2月", label: "二月", category: "calendar", picKind: "symbol" },
+    { key: "sangatsu", hira: "さんがつ", romaji: "sangatsu", pic: "3月", label: "三月", category: "calendar", picKind: "symbol" },
+    { key: "shigatsu", hira: "しがつ", romaji: "shigatsu", pic: "4月", label: "四月", category: "calendar", picKind: "symbol" },
+    { key: "gogatsu", hira: "ごがつ", romaji: "gogatsu", pic: "5月", label: "五月", category: "calendar", picKind: "symbol" },
+    { key: "rokugatsu", hira: "ろくがつ", romaji: "rokugatsu", pic: "6月", label: "六月", category: "calendar", picKind: "symbol" },
+    { key: "shichigatsu", hira: "しちがつ", romaji: "shichigatsu", pic: "7月", label: "七月", category: "calendar", picKind: "symbol" },
+    { key: "hachigatsu", hira: "はちがつ", romaji: "hachigatsu", pic: "8月", label: "八月", category: "calendar", picKind: "symbol" },
+    { key: "kugatsu", hira: "くがつ", romaji: "kugatsu", pic: "9月", label: "九月", category: "calendar", picKind: "symbol" },
+    { key: "juugatsu", hira: "じゅうがつ", romaji: "juugatsu", pic: "10月", label: "十月", category: "calendar", picKind: "symbol" },
+    { key: "juuichigatsu", hira: "じゅういちがつ", romaji: "juuichigatsu", pic: "11月", label: "十一月", category: "calendar", picKind: "symbol" },
+    { key: "juunigatsu", hira: "じゅうにがつ", romaji: "juunigatsu", pic: "12月", label: "十二月", category: "calendar", picKind: "symbol" },
   ];
 
   const CATEGORIES = [
@@ -73,6 +106,7 @@ window.JPMatchWords = (() => {
     { id: "food", label: "食物" },
     { id: "colors", label: "顏色" },
     { id: "daily", label: "日常" },
+    { id: "calendar", label: "月・曜・數" },
   ];
 
   const DEFAULT_CATEGORY = "animals";
@@ -123,12 +157,13 @@ window.JPMatchWords = (() => {
 
     const cards = [];
     selected.forEach((word) => {
+      const picDisplay = word.picKind === "symbol" ? "symbol" : "pic";
       cards.push({
         pairKey: word.key,
         side: sideA,
         text: word[sideA],
         kindLabel: mode.sideLabels[sideA],
-        display: sideA === "pic" ? "pic" : "text",
+        display: sideA === "pic" ? picDisplay : "text",
         voiceText: word.hira,
         label: word.label,
       });
@@ -137,7 +172,7 @@ window.JPMatchWords = (() => {
         side: sideB,
         text: word[sideB],
         kindLabel: mode.sideLabels[sideB],
-        display: sideB === "pic" ? "pic" : "text",
+        display: sideB === "pic" ? picDisplay : "text",
         voiceText: word.hira,
         label: word.label,
       });

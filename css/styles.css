@@ -905,6 +905,23 @@ body.turn-switched .score-pill.is-active {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
 }
 
+.card-symbol {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 42cqmin;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--card-text);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.card-symbol.is-compact {
+  font-size: 30cqmin;
+  letter-spacing: 0;
+}
+
 .card-kind {
   position: absolute;
   z-index: 2;

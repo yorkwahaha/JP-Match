@@ -9,9 +9,15 @@
  *   assets/audio/sfx/mismatch.mp3   配對失敗
  *   assets/audio/bgm/*.mp3          背景音樂（會隨機選曲）
  *   assets/audio/kana/{romaji}.mp3  例如 a.mp3、shi.mp3、n.mp3
+ *
+ * 單字朗讀：與 JPAPP 相同，走 Google Cloud TTS proxy
+ *   https://jpapp-tts-proxy.yorkwahaha.workers.dev
  */
 window.JPMatchAudio = (() => {
   const BASE = "assets/audio";
+  const TTS_PROXY_URL = "https://jpapp-tts-proxy.yorkwahaha.workers.dev/tts";
+  const TTS_SESSION_URL = "https://jpapp-tts-proxy.yorkwahaha.workers.dev/session";
+  const DEFAULT_TTS_VOICE = "ja-JP-Neural2-B";
 
   const PATHS = {
     sfx: {
@@ -34,6 +40,11 @@ window.JPMatchAudio = (() => {
   let bgmEl = null;
   let bgmIndex = -1;
   let unlocked = false;
+
+  let sessionTokenData = null;
+  let readingSessionId = 0;
+  let readingAudio = null;
+  let readingObjectUrl = null;
 
   const settings = {
     voice: true,
@@ -81,18 +92,57 @@ window.JPMatchAudio = (() => {
     playSrc(src, settings.sfxVolume, sfxCache);
   }
 
+  function stopReading() {
+    readingSessionId += 1;
+    if (window.speechSynthesis) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {}
+    }
+    if (readingAudio) {
+      try {
+        readingAudio.pause();
+        readingAudio.onended = null;
+        readingAudio.onerror = null;
+      } catch (e) {}
+      readingAudio = null;
+    }
+    if (readingObjectUrl) {
+      try {
+        URL.revokeObjectURL(readingObjectUrl);
+      } catch (e) {}
+      readingObjectUrl = null;
+    }
+  }
+
   function playKana(romajiKey) {
     if (!settings.voice || !romajiKey) return;
+    stopReading();
     const key = String(romajiKey).toLowerCase();
     const src = PATHS.kanaDir + key + ".mp3";
     playSrc(src, settings.voiceVolume, kanaCache);
   }
 
-  function playReading(text) {
-    if (!settings.voice || !text) return;
+  async function getSessionToken() {
+    if (sessionTokenData && sessionTokenData.exp > Date.now() + 5000) {
+      return sessionTokenData.token;
+    }
+    try {
+      const res = await fetch(TTS_SESSION_URL);
+      if (!res.ok) return null;
+      const data = await res.json();
+      sessionTokenData = data;
+      return data.token;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function playWebSpeechFallback(text, sessionId) {
     if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance !== "function") {
       return;
     }
+    if (sessionId !== readingSessionId) return;
     try {
       window.speechSynthesis.cancel();
       const utter = new window.SpeechSynthesisUtterance(String(text));
@@ -101,6 +151,108 @@ window.JPMatchAudio = (() => {
       utter.volume = settings.voiceVolume;
       window.speechSynthesis.speak(utter);
     } catch (e) {}
+  }
+
+  async function speakCloudTts(text, sessionId) {
+    let res = null;
+    let retryCount = 0;
+    let success = false;
+
+    while (retryCount < 2 && !success) {
+      if (sessionId !== readingSessionId) return false;
+      const token = await getSessionToken();
+      if (!token) return false;
+      try {
+        res = await fetch(TTS_PROXY_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Session-Token": token,
+          },
+          body: JSON.stringify({
+            text: text,
+            voice: DEFAULT_TTS_VOICE,
+            rate: "1.0",
+            pitch: "default",
+          }),
+        });
+        if (res.status === 401) {
+          sessionTokenData = null;
+          retryCount += 1;
+          continue;
+        }
+        success = true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    if (!res || !res.ok) return false;
+    if (sessionId !== readingSessionId) return false;
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    if (sessionId !== readingSessionId) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch (e) {}
+      return false;
+    }
+
+    if (!readingAudio) readingAudio = new Audio();
+    const audio = readingAudio;
+    if (readingObjectUrl) {
+      try {
+        URL.revokeObjectURL(readingObjectUrl);
+      } catch (e) {}
+    }
+    readingObjectUrl = url;
+    audio.onended = function () {
+      if (readingObjectUrl === url) {
+        try {
+          URL.revokeObjectURL(url);
+        } catch (e) {}
+        readingObjectUrl = null;
+      }
+    };
+    audio.onerror = function () {
+      if (readingObjectUrl === url) {
+        try {
+          URL.revokeObjectURL(url);
+        } catch (e) {}
+        readingObjectUrl = null;
+      }
+    };
+    audio.src = url;
+    audio.volume = settings.voiceVolume;
+
+    try {
+      await audio.play();
+      return sessionId === readingSessionId;
+    } catch (e) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch (err) {}
+      if (readingObjectUrl === url) readingObjectUrl = null;
+      return false;
+    }
+  }
+
+  function playReading(text) {
+    if (!settings.voice || !text) return;
+    unlock();
+    stopReading();
+    const sessionId = readingSessionId;
+    const clean = String(text)
+      .replace(/<[^>]*>/g, "")
+      .trim();
+    if (!clean) return;
+
+    speakCloudTts(clean, sessionId).then(function (ok) {
+      if (ok) return;
+      if (sessionId !== readingSessionId) return;
+      playWebSpeechFallback(clean, sessionId);
+    });
   }
 
   function pickBgm() {
@@ -146,6 +298,7 @@ window.JPMatchAudio = (() => {
 
   function setVoice(on) {
     settings.voice = !!on;
+    if (!on) stopReading();
   }
 
   function setBgm(on) {
@@ -178,6 +331,7 @@ window.JPMatchAudio = (() => {
     playSfx: playSfx,
     playKana: playKana,
     playReading: playReading,
+    stopReading: stopReading,
     startBgm: startBgm,
     stopBgm: stopBgm,
     setVoice: setVoice,
