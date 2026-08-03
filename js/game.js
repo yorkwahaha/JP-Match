@@ -1,19 +1,37 @@
 (() => {
-  const { PAIR_MODES, GRID_PRESETS, buildDeck } = window.JPMatchData;
+  const {
+    PAIR_MODES,
+    GRID_PRESETS,
+    DEFAULT_GRID_ID,
+    ROWS,
+    DEFAULT_ROW_FROM,
+    DEFAULT_ROW_TO,
+    getKanaInRange,
+    normalizeRowRange,
+    buildDeck,
+  } = window.JPMatchData;
   const Sound = window.JPMatchAudio;
 
   const FLIP_MS = 280;
   const MISMATCH_HOLD_MS = 900;
   const MATCH_HOLD_MS = 420;
+  const PLAYER_NAMES = ["玩家 1", "玩家 2"];
+  const THEME_STORAGE_KEY = "jp-match-theme";
+  const THEMES = {
+    night: { id: "night", label: "夜紺", meta: "#142033" },
+    mist: { id: "mist", label: "水霧", meta: "#8fb4c8" },
+    yuzu: { id: "yuzu", label: "柚香", meta: "#cbb887" },
+  };
+  const DEFAULT_THEME = "night";
 
   const state = {
     screen: "setup",
     players: 2,
-    playerNames: ["玩家 1", "玩家 2"],
     pairMode: "romaji-hira",
-    gridId: "8x4",
-    cols: 8,
-    rows: 4,
+    gridId: DEFAULT_GRID_ID,
+    rowFrom: DEFAULT_ROW_FROM,
+    rowTo: DEFAULT_ROW_TO,
+    theme: DEFAULT_THEME,
     deck: [],
     flipped: [],
     matched: new Set(),
@@ -23,6 +41,8 @@
     moves: 0,
     startedAt: null,
     ended: false,
+    // 每次開局遞增；async 流程 await 回來須比對，避免舊局殘留的回呼污染新局
+    runId: 0,
   };
 
   const els = {
@@ -46,6 +66,10 @@
     optSfx: document.getElementById("opt-sfx"),
     optBgm: document.getElementById("opt-bgm"),
     optBgmVolume: document.getElementById("opt-bgm-volume"),
+    rowFrom: document.getElementById("row-from"),
+    rowTo: document.getElementById("row-to"),
+    rangeHint: document.getElementById("range-hint"),
+    btnStart: document.getElementById("btn-start"),
   };
 
   function qs(sel, root) {
@@ -57,12 +81,47 @@
   }
 
   function getGrid() {
-    return GRID_PRESETS.find((g) => g.id === state.gridId) || GRID_PRESETS[3];
+    return (
+      GRID_PRESETS.find((g) => g.id === state.gridId) ||
+      GRID_PRESETS.find((g) => g.id === DEFAULT_GRID_ID)
+    );
   }
 
   function pairCount() {
     const g = getGrid();
     return (g.cols * g.rows) / 2;
+  }
+
+  function loadSavedTheme() {
+    try {
+      const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
+      if (saved && THEMES[saved]) return saved;
+    } catch (err) {
+      /* ignore */
+    }
+    return DEFAULT_THEME;
+  }
+
+  function applyTheme(themeId, opts) {
+    const theme = THEMES[themeId] || THEMES[DEFAULT_THEME];
+    state.theme = theme.id;
+    document.documentElement.dataset.theme = theme.id;
+    const meta = document.getElementById("meta-theme-color");
+    if (meta) meta.setAttribute("content", theme.meta);
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme.id);
+    } catch (err) {
+      /* ignore */
+    }
+    if (!(opts && opts.silent)) {
+      syncThemeUI();
+    }
+  }
+
+  function syncThemeUI() {
+    qsa('[data-group="theme"] .opt, [data-group="theme-menu"] .opt').forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.value === state.theme);
+    });
   }
 
   function syncAudioSettings() {
@@ -77,6 +136,7 @@
     els.optSfx.checked = Sound.settings.sfx;
     els.optBgm.checked = Sound.settings.bgm;
     els.optBgmVolume.value = String(Math.round(Sound.settings.bgmVolume * 100));
+    syncThemeUI();
   }
 
   function openMenu() {
@@ -114,16 +174,52 @@
     qsa('[data-group="grid"] .opt').forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.value === state.gridId);
     });
+    if (els.rowFrom) els.rowFrom.value = state.rowFrom;
+    if (els.rowTo) els.rowTo.value = state.rowTo;
+    syncThemeUI();
+    syncRangeHint();
+  }
+
+  function poolSize() {
+    return getKanaInRange(state.rowFrom, state.rowTo).length;
+  }
+
+  function syncRangeHint() {
+    if (!els.rangeHint || !els.btnStart) return;
+    const size = poolSize();
+    const need = pairCount();
+    const ok = size >= need;
+    const range = normalizeRowRange(state.rowFrom, state.rowTo);
+    const fromLabel = ROWS[range.from].label;
+    const toLabel = ROWS[range.to].label;
+    const same = range.from === range.to;
+
+    let text =
+      (same ? fromLabel : fromLabel + "～" + toLabel) +
+      " · 題池 " +
+      size +
+      " 個假名";
+    if (!ok) {
+      text += " · 目前盤面需 " + need + " 組，請縮小盤面或擴大範圍";
+    }
+    els.rangeHint.textContent = text;
+    els.rangeHint.classList.toggle("is-warn", !ok);
+    els.btnStart.disabled = !ok;
   }
 
   function startGame() {
+    if (poolSize() < pairCount()) {
+      syncRangeHint();
+      return;
+    }
     syncAudioSettings();
     Sound.unlock();
     Sound.playSfx("start");
     const grid = getGrid();
-    state.cols = grid.cols;
-    state.rows = grid.rows;
-    state.deck = buildDeck(state.pairMode, pairCount());
+    state.deck = buildDeck(state.pairMode, pairCount(), {
+      fromRow: state.rowFrom,
+      toRow: state.rowTo,
+    });
     state.flipped = [];
     state.matched = new Set();
     state.scores = [0, 0];
@@ -132,10 +228,10 @@
     state.moves = 0;
     state.startedAt = Date.now();
     state.ended = false;
-    state.playerNames = ["玩家 1", "玩家 2"];
+    state.runId += 1;
 
-    els.board.style.setProperty("--cols", String(state.cols));
-    els.board.style.setProperty("--rows", String(state.rows));
+    els.board.style.setProperty("--cols", String(grid.cols));
+    els.board.style.setProperty("--rows", String(grid.rows));
     document.body.dataset.players = String(state.players);
     document.body.dataset.turn = "0";
 
@@ -144,6 +240,10 @@
     updateHud();
     showScreen("game");
     Sound.startBgm();
+  }
+
+  function faceDownLabel(index) {
+    return "卡牌 " + (index + 1) + "（未翻開）";
   }
 
   function renderBoard() {
@@ -156,13 +256,13 @@
       btn.className = "card";
       btn.dataset.index = String(index);
       btn.dataset.side = card.side;
-      btn.setAttribute("aria-label", "卡牌 " + (index + 1));
+      btn.setAttribute("aria-label", faceDownLabel(index));
       btn.innerHTML =
         '<span class="card-inner">' +
         '<span class="card-face card-back" aria-hidden="true">' +
         '<span class="card-back-pattern"></span>' +
         '<span class="card-corners" aria-hidden="true"></span>' +
-        '<span class="seal"><span class="seal-ring"></span><span class="seal-char">あ</span></span>' +
+        '<span class="seal"><span class="seal-ring"></span><span class="seal-char"></span></span>' +
         "</span>" +
         '<span class="card-face card-front" data-side="' +
         card.side +
@@ -205,14 +305,14 @@
 
     els.hudDual.hidden = false;
     els.hudSolo.hidden = true;
-    els.scoreP1.querySelector(".score-name").textContent = state.playerNames[0];
-    els.scoreP2.querySelector(".score-name").textContent = state.playerNames[1];
+    els.scoreP1.querySelector(".score-name").textContent = PLAYER_NAMES[0];
+    els.scoreP2.querySelector(".score-name").textContent = PLAYER_NAMES[1];
     els.scoreP1.querySelector(".score-num").textContent = String(state.scores[0]);
     els.scoreP2.querySelector(".score-num").textContent = String(state.scores[1]);
     els.scoreP1.classList.toggle("is-active", state.currentPlayer === 0);
     els.scoreP2.classList.toggle("is-active", state.currentPlayer === 1);
 
-    els.turnBanner.textContent = state.playerNames[state.currentPlayer] + " 的回合";
+    els.turnBanner.textContent = PLAYER_NAMES[state.currentPlayer] + " 的回合";
     els.turnBanner.classList.toggle("is-p2", state.currentPlayer === 1);
     document.body.dataset.turn = String(state.currentPlayer);
 
@@ -256,15 +356,21 @@
 
   function flipOpen(index) {
     const el = cardEl(index);
-    if (el) el.classList.add("is-flipped");
-    Sound.playSfx("flip");
     const card = state.deck[index];
+    if (el) {
+      el.classList.add("is-flipped");
+      el.setAttribute("aria-label", card.kindLabel + " " + card.text);
+    }
+    Sound.playSfx("flip");
     if (card) Sound.playKana(card.audioKey);
   }
 
   function flipClose(index) {
     const el = cardEl(index);
-    if (el) el.classList.remove("is-flipped");
+    if (el) {
+      el.classList.remove("is-flipped");
+      el.setAttribute("aria-label", faceDownLabel(index));
+    }
   }
 
   function wait(ms) {
@@ -272,7 +378,9 @@
   }
 
   async function handleMatch(a, b, pairKey) {
+    const run = state.runId;
     await wait(MATCH_HOLD_MS);
+    if (run !== state.runId) return;
     Sound.playSfx("match");
     state.matched.add(pairKey);
     const elA = cardEl(a);
@@ -291,11 +399,14 @@
   }
 
   async function handleMismatch(a, b) {
+    const run = state.runId;
     await wait(MISMATCH_HOLD_MS);
+    if (run !== state.runId) return;
     Sound.playSfx("mismatch");
     flipClose(a);
     flipClose(b);
     await wait(FLIP_MS);
+    if (run !== state.runId) return;
     state.flipped = [];
     state.lock = false;
     if (state.players === 2) {
@@ -325,8 +436,8 @@
 
     const s1 = state.scores[0];
     const s2 = state.scores[1];
-    const n1 = state.playerNames[0];
-    const n2 = state.playerNames[1];
+    const n1 = PLAYER_NAMES[0];
+    const n2 = PLAYER_NAMES[1];
     const scoreLine =
       n1 + " " + s1 + " ： " + s2 + " " + n2 + " · " + state.moves + " 次翻牌 · " + timeText;
 
@@ -348,10 +459,24 @@
         if (group === "players") state.players = Number(value);
         if (group === "mode") state.pairMode = value;
         if (group === "grid") state.gridId = value;
+        if (group === "theme" || group === "theme-menu") {
+          applyTheme(value);
+          Sound.playSfx("select");
+          return;
+        }
         Sound.playSfx("select");
         syncSetupUI();
       });
     });
+
+    function onRowChange() {
+      state.rowFrom = els.rowFrom.value;
+      state.rowTo = els.rowTo.value;
+      Sound.playSfx("select");
+      syncRangeHint();
+    }
+    els.rowFrom.addEventListener("change", onRowChange);
+    els.rowTo.addEventListener("change", onRowChange);
 
     [els.optVoice, els.optSfx, els.optBgm].forEach((input) => {
       input.addEventListener("change", () => {
@@ -361,7 +486,7 @@
     });
     els.optBgmVolume.addEventListener("input", syncAudioSettings);
 
-    qs("#btn-start").addEventListener("click", startGame);
+    els.btnStart.addEventListener("click", startGame);
     qs("#btn-restart").addEventListener("click", startGame);
     qs("#btn-to-setup").addEventListener("click", () => {
       Sound.playSfx("select");
@@ -394,6 +519,16 @@
     });
   }
 
+  function fillRowSelects() {
+    const options = ROWS.map((row) => {
+      return '<option value="' + row.id + '">' + row.label + "</option>";
+    }).join("");
+    els.rowFrom.innerHTML = options;
+    els.rowTo.innerHTML = options;
+    els.rowFrom.value = state.rowFrom;
+    els.rowTo.value = state.rowTo;
+  }
+
   function initModeOptions() {
     const host = qs('[data-group="mode"]');
     host.innerHTML = Object.keys(PAIR_MODES)
@@ -421,6 +556,8 @@
     }).join("");
   }
 
+  applyTheme(loadSavedTheme(), { silent: true });
+  fillRowSelects();
   initModeOptions();
   bindSetup();
   syncAudioSettings();

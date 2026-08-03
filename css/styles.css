@@ -17,6 +17,101 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
+
+  /* 主題殼層（夜紺為預設） */
+  --page-bg: #1a2f4a;
+  --page-fg: #edf2f7;
+  --ui-muted: rgba(237, 242, 247, 0.55);
+  --ui-muted-strong: rgba(237, 242, 247, 0.72);
+  --ui-faint: rgba(237, 242, 247, 0.45);
+  --ui-surface: rgba(16, 24, 32, 0.28);
+  --ui-surface-strong: rgba(16, 24, 32, 0.35);
+  --ui-border: rgba(237, 242, 247, 0.18);
+  --ui-border-soft: rgba(237, 242, 247, 0.12);
+  --ui-border-strong: rgba(237, 242, 247, 0.22);
+  --brand-mark: var(--sky);
+  --btn-primary-bg: linear-gradient(135deg, #e4572e 0%, #ff6a3d 100%);
+  --btn-primary-shadow: rgba(228, 87, 46, 0.28);
+  --opt-active-bg: var(--paper);
+  --opt-active-fg: var(--ink);
+  --setup-bg:
+    radial-gradient(ellipse 80% 50% at 10% 0%, rgba(126, 182, 217, 0.22), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 100% 100%, rgba(228, 87, 46, 0.18), transparent 50%),
+    linear-gradient(160deg, #142033 0%, #1a2f4a 45%, #0f1a28 100%);
+  --setup-stripe: rgba(255, 255, 255, 0.35);
+  --game-bg:
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(126, 182, 217, 0.16), transparent 55%),
+    linear-gradient(180deg, #142033 0%, #1a2f4a 100%);
+  --result-bg:
+    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(228, 87, 46, 0.2), transparent 60%),
+    linear-gradient(160deg, #142033, #1a2f4a);
+  --menu-overlay-bg: rgba(8, 14, 22, 0.62);
+  --menu-panel-bg: linear-gradient(180deg, rgba(36, 54, 78, 0.96), rgba(18, 30, 46, 0.98));
+  --menu-panel-border: rgba(237, 242, 247, 0.14);
+  --menu-row-bg: rgba(16, 24, 32, 0.35);
+  --p1: #7eb6d9;
+  --p2: #e4572e;
+  --edge-p1: rgba(126, 182, 217, 0.34);
+  --edge-p1-soft: rgba(126, 182, 217, 0.12);
+  --edge-p2: rgba(228, 87, 46, 0.34);
+  --edge-p2-soft: rgba(228, 87, 46, 0.12);
+  --turn-banner-bg: rgba(237, 242, 247, 0.12);
+  --turn-banner-p2-bg: rgba(228, 87, 46, 0.22);
+  --turn-banner-p2-fg: #ffd7c8;
+  --score-pill-bg: rgba(16, 24, 32, 0.35);
+  --score-pill-border: rgba(237, 242, 247, 0.12);
+  --score-active-border: rgba(126, 182, 217, 0.7);
+  --score-active-bg: rgba(126, 182, 217, 0.18);
+  --score-active-glow: rgba(126, 182, 217, 0.12);
+  --score-p2-active-border: rgba(228, 87, 46, 0.7);
+  --score-p2-active-bg: rgba(228, 87, 46, 0.18);
+  --score-p2-active-glow: rgba(228, 87, 46, 0.14);
+  --score-name: rgba(237, 242, 247, 0.7);
+  --arrow-p1: #9fd0ef;
+  --arrow-p2: #ffb090;
+  --mode-chip: rgba(237, 242, 247, 0.55);
+  --result-card-bg: rgba(16, 24, 32, 0.45);
+  --result-detail: rgba(237, 242, 247, 0.7);
+  --card-back-bg:
+    radial-gradient(circle at 30% 20%, rgba(126, 182, 217, 0.18), transparent 42%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.1), transparent 38%),
+    linear-gradient(160deg, #2a5078 0%, #1a2f4a 48%, #101c2c 100%);
+  --card-back-border: rgba(190, 220, 240, 0.22);
+  --card-pattern-border: rgba(126, 182, 217, 0.18);
+  --card-pattern-bg:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 10px,
+      rgba(126, 182, 217, 0.05) 10px 11px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0 10px,
+      rgba(126, 182, 217, 0.04) 10px 11px
+    );
+  --corner: rgba(126, 182, 217, 0.55);
+  --corner-ink: rgba(26, 47, 74, 0.35);
+  --seal-border: rgba(126, 182, 217, 0.6);
+  --seal-inset: rgba(16, 28, 44, 0.4);
+  --seal-ring-glow: rgba(126, 182, 217, 0.18);
+  --seal-glow: rgba(126, 182, 217, 0.12);
+  --seal-tick: rgba(126, 182, 217, 0.22);
+  --seal-char: rgba(210, 230, 245, 0.95);
+  --seal-glyph: "あ";
+  --card-front-bg: linear-gradient(180deg, #fbfcfe 0%, #e7eef6 100%);
+  --card-front-border: rgba(16, 24, 32, 0.1);
+  --card-front-glow-1: rgba(228, 87, 46, 0.08);
+  --card-front-glow-2: rgba(42, 80, 120, 0.08);
+  --card-frame-border: rgba(26, 47, 74, 0.14);
+  --card-text: #142033;
+  --kind-bg: rgba(16, 24, 32, 0.06);
+  --kind-fg: rgba(16, 24, 32, 0.5);
+  --match-front-bg: linear-gradient(180deg, #eefaf5 0%, #d5efe5 100%);
+  --theme-meta: #142033;
+  --select-chevron: rgba(237, 242, 247, 0.55);
+  --select-option-bg: #142033;
+  --select-option-fg: #edf2f7;
+  --range-hint-warn: var(--accent-soft);
 }
 
 *,
@@ -30,8 +125,8 @@ body {
   margin: 0;
   min-height: 100%;
   height: 100%;
-  background: var(--indigo);
-  color: var(--paper);
+  background: var(--page-bg);
+  color: var(--page-fg);
   font-family: var(--font-body);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
@@ -39,7 +134,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
   color: inherit;
 }
@@ -77,10 +173,7 @@ button {
   align-content: center;
   gap: 28px;
   overflow: auto;
-  background:
-    radial-gradient(ellipse 80% 50% at 10% 0%, rgba(126, 182, 217, 0.22), transparent 55%),
-    radial-gradient(ellipse 70% 45% at 100% 100%, rgba(228, 87, 46, 0.18), transparent 50%),
-    linear-gradient(160deg, #142033 0%, #1a2f4a 45%, #0f1a28 100%);
+  background: var(--setup-bg);
 }
 
 .setup-bg {
@@ -92,7 +185,7 @@ button {
     repeating-linear-gradient(
       -18deg,
       transparent 0 18px,
-      rgba(255, 255, 255, 0.35) 18px 19px
+      var(--setup-stripe) 18px 19px
     );
 }
 
@@ -107,7 +200,7 @@ button {
   letter-spacing: 0.35em;
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--sky);
+  color: var(--brand-mark);
 }
 
 .brand-title {
@@ -122,7 +215,7 @@ button {
 .brand-sub {
   margin: 12px auto 0;
   max-width: 22em;
-  color: rgba(237, 242, 247, 0.72);
+  color: var(--ui-muted-strong);
   font-size: 0.98rem;
   line-height: 1.55;
 }
@@ -144,7 +237,7 @@ button {
 .field-label {
   font-size: 0.78rem;
   letter-spacing: 0.14em;
-  color: rgba(237, 242, 247, 0.55);
+  color: var(--ui-muted);
   text-transform: uppercase;
 }
 
@@ -162,9 +255,9 @@ button {
   min-height: 44px;
   padding: 10px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(237, 242, 247, 0.18);
-  background: rgba(16, 24, 32, 0.28);
-  color: rgba(237, 242, 247, 0.85);
+  border: 1px solid var(--ui-border);
+  background: var(--ui-surface);
+  color: var(--page-fg);
   transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
 }
 
@@ -173,73 +266,92 @@ button {
 }
 
 .opt.is-active {
-  background: var(--paper);
-  color: var(--ink);
-  border-color: var(--paper);
+  background: var(--opt-active-bg);
+  color: var(--opt-active-fg);
+  border-color: var(--opt-active-bg);
   font-weight: 700;
 }
 
-.name-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.range-row {
+  display: flex;
+  align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
-.name-field {
+.range-select-wrap {
+  flex: 1 1 140px;
   display: grid;
   gap: 6px;
-  font-size: 0.8rem;
-  color: rgba(237, 242, 247, 0.6);
 }
 
-.name-field input {
-  min-height: 46px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(237, 242, 247, 0.18);
-  background: rgba(16, 24, 32, 0.35);
-  outline: none;
+.range-select-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--ui-faint);
 }
 
-.name-field input:focus {
-  border-color: var(--sky);
-}
-
-.toggle-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+.range-select {
+  width: 100%;
   min-height: 44px;
-  padding: 8px 14px;
+  padding: 10px 36px 10px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(237, 242, 247, 0.18);
-  background: rgba(16, 24, 32, 0.28);
-  font-size: 0.92rem;
-  color: rgba(237, 242, 247, 0.88);
-  cursor: pointer;
+  border: 1px solid var(--ui-border);
+  background:
+    linear-gradient(45deg, transparent 50%, var(--select-chevron) 50%)
+      calc(100% - 18px) calc(50% - 3px) / 6px 6px no-repeat,
+    linear-gradient(135deg, transparent 50%, var(--select-chevron) 50%)
+      calc(100% - 12px) calc(50% - 3px) / 6px 6px no-repeat,
+    var(--ui-surface);
+  color: var(--page-fg);
+  appearance: none;
+  -webkit-appearance: none;
 }
 
-.toggle input {
-  width: 1.05rem;
-  height: 1.05rem;
-  accent-color: var(--accent);
+.range-select:focus {
+  outline: 2px solid rgba(126, 182, 217, 0.55);
+  outline-offset: 2px;
+}
+
+.range-select option {
+  background: var(--select-option-bg);
+  color: var(--select-option-fg);
+}
+
+.range-sep {
+  flex: 0 0 auto;
+  margin-top: 18px;
+  color: var(--ui-faint);
+  font-size: 1.1rem;
+}
+
+.range-hint {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--ui-muted);
+}
+
+.range-hint.is-warn {
+  color: var(--range-hint-warn);
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: grayscale(0.25);
 }
 
 .btn-primary {
   min-height: 54px;
   margin-top: 6px;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--accent) 0%, #ff6a3d 100%);
+  background: var(--btn-primary-bg);
   color: #fff;
   font-weight: 700;
   letter-spacing: 0.12em;
-  box-shadow: 0 12px 28px rgba(228, 87, 46, 0.28);
+  box-shadow: 0 12px 28px var(--btn-primary-shadow);
   transition: transform 0.15s, filter 0.2s;
 }
 
@@ -251,8 +363,9 @@ button {
   min-height: 40px;
   padding: 8px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(237, 242, 247, 0.22);
-  color: rgba(237, 242, 247, 0.85);
+  border: 1px solid var(--ui-border-strong);
+  color: var(--page-fg);
+  background: var(--ui-surface);
   font-size: 0.9rem;
 }
 
@@ -268,23 +381,19 @@ button {
     calc(16px + var(--safe-right))
     calc(16px + var(--safe-bottom))
     calc(16px + var(--safe-left));
-  background: rgba(8, 14, 22, 0.62);
+  background: var(--menu-overlay-bg);
   backdrop-filter: blur(8px);
-}
-
-.menu-overlay[hidden] {
-  display: none !important;
 }
 
 .menu-panel {
   width: min(420px, 100%);
   padding: 22px 20px 18px;
   border-radius: 20px;
-  background:
-    linear-gradient(180deg, rgba(36, 54, 78, 0.96), rgba(18, 30, 46, 0.98));
-  border: 1px solid rgba(237, 242, 247, 0.14);
+  background: var(--menu-panel-bg);
+  border: 1px solid var(--menu-panel-border);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
   animation: rise-in 0.28s ease both;
+  color: var(--page-fg);
 }
 
 .menu-head {
@@ -315,10 +424,10 @@ button {
   min-height: 48px;
   padding: 10px 14px;
   border-radius: 12px;
-  background: rgba(16, 24, 32, 0.35);
-  border: 1px solid rgba(237, 242, 247, 0.1);
+  background: var(--menu-row-bg);
+  border: 1px solid var(--ui-border-soft);
   font-size: 0.98rem;
-  color: rgba(237, 242, 247, 0.9);
+  color: var(--page-fg);
   cursor: pointer;
 }
 
@@ -356,16 +465,14 @@ button {
   display: grid;
   grid-template-rows: auto auto 1fr;
   gap: 12px;
-  background:
-    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(126, 182, 217, 0.16), transparent 55%),
-    linear-gradient(180deg, #142033 0%, #1a2f4a 100%);
+  background: var(--game-bg);
   overflow: hidden;
 }
 
 /* 雙人回合：左右邊緣色帶 */
 .game::before,
 .game::after {
-  content: "";
+  content: ";
   position: absolute;
   top: 0;
   bottom: 0;
@@ -380,8 +487,8 @@ button {
   left: 0;
   background: linear-gradient(
     90deg,
-    rgba(126, 182, 217, 0.34) 0%,
-    rgba(126, 182, 217, 0.12) 45%,
+    var(--edge-p1) 0%,
+    var(--edge-p1-soft) 45%,
     transparent 100%
   );
 }
@@ -390,8 +497,8 @@ button {
   right: 0;
   background: linear-gradient(
     270deg,
-    rgba(228, 87, 46, 0.34) 0%,
-    rgba(228, 87, 46, 0.12) 45%,
+    var(--edge-p2) 0%,
+    var(--edge-p2-soft) 45%,
     transparent 100%
   );
 }
@@ -430,7 +537,7 @@ body.turn-switched[data-turn="1"] .game::after {
   justify-self: center;
   padding: 8px 16px;
   border-radius: 999px;
-  background: rgba(237, 242, 247, 0.12);
+  background: var(--turn-banner-bg);
   font-weight: 700;
   letter-spacing: 0.04em;
   transition: background 0.3s, color 0.3s, box-shadow 0.3s;
@@ -438,8 +545,8 @@ body.turn-switched[data-turn="1"] .game::after {
 }
 
 .turn-banner.is-p2 {
-  background: rgba(228, 87, 46, 0.22);
-  color: #ffd7c8;
+  background: var(--turn-banner-p2-bg);
+  color: var(--turn-banner-p2-fg);
 }
 
 body.turn-switched .turn-banner {
@@ -448,7 +555,7 @@ body.turn-switched .turn-banner {
 
 .mode-chip {
   font-size: 0.72rem;
-  color: rgba(237, 242, 247, 0.55);
+  color: var(--mode-chip);
   letter-spacing: 0.02em;
   text-align: right;
   max-width: 9em;
@@ -479,22 +586,22 @@ body.turn-switched .turn-banner {
   min-height: 48px;
   padding: 10px 14px;
   border-radius: 14px;
-  background: rgba(16, 24, 32, 0.35);
-  border: 1px solid rgba(237, 242, 247, 0.12);
+  background: var(--score-pill-bg);
+  border: 1px solid var(--score-pill-border);
   transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
 }
 
 .score-pill.is-active {
-  border-color: rgba(126, 182, 217, 0.7);
-  background: rgba(126, 182, 217, 0.18);
+  border-color: var(--score-active-border);
+  background: var(--score-active-bg);
   transform: translateY(-1px);
-  box-shadow: 0 0 0 1px rgba(126, 182, 217, 0.25), 0 8px 20px rgba(126, 182, 217, 0.12);
+  box-shadow: 0 0 0 1px var(--score-active-border), 0 8px 20px var(--score-active-glow);
 }
 
 #score-p2.score-pill.is-active {
-  border-color: rgba(228, 87, 46, 0.7);
-  background: rgba(228, 87, 46, 0.18);
-  box-shadow: 0 0 0 1px rgba(228, 87, 46, 0.28), 0 8px 20px rgba(228, 87, 46, 0.14);
+  border-color: var(--score-p2-active-border);
+  background: var(--score-p2-active-bg);
+  box-shadow: 0 0 0 1px var(--score-p2-active-border), 0 8px 20px var(--score-p2-active-glow);
 }
 
 .turn-arrow {
@@ -511,12 +618,12 @@ body.turn-switched .turn-banner {
 }
 
 .turn-arrow-left {
-  color: #9fd0ef;
+  color: var(--arrow-p1);
   margin-right: 2px;
 }
 
 .turn-arrow-right {
-  color: #ffb090;
+  color: var(--arrow-p2);
   margin-left: 2px;
 }
 
@@ -530,7 +637,7 @@ body.turn-switched .score-pill.is-active {
 
 .score-name {
   font-size: 0.88rem;
-  color: rgba(237, 242, 247, 0.7);
+  color: var(--score-name);
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -555,7 +662,7 @@ body.turn-switched .score-pill.is-active {
 .remaining-label {
   font-size: 0.68rem;
   letter-spacing: 0.12em;
-  color: rgba(237, 242, 247, 0.45);
+  color: var(--ui-faint);
 }
 
 .remaining-num {
@@ -632,11 +739,8 @@ body.turn-switched .score-pill.is-active {
   z-index: 1;
   -webkit-transform: rotateY(0deg) translateZ(1px);
   transform: rotateY(0deg) translateZ(1px);
-  background:
-    radial-gradient(circle at 30% 20%, rgba(126, 182, 217, 0.18), transparent 42%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.1), transparent 38%),
-    linear-gradient(160deg, #2a5078 0%, #1a2f4a 48%, #101c2c 100%);
-  border: 1px solid rgba(190, 220, 240, 0.22);
+  background: var(--card-back-bg);
+  border: 1px solid var(--card-back-border);
 }
 
 /* Safari 後備：翻開後強制隱藏背面，避免圖案透出 */
@@ -650,19 +754,9 @@ body.turn-switched .score-pill.is-active {
   position: absolute;
   inset: 10px;
   border-radius: 10px;
-  border: 1px solid rgba(126, 182, 217, 0.18);
+  border: 1px solid var(--card-pattern-border);
   overflow: hidden;
-  background:
-    repeating-linear-gradient(
-      45deg,
-      transparent 0 10px,
-      rgba(126, 182, 217, 0.05) 10px 11px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      transparent 0 10px,
-      rgba(126, 182, 217, 0.04) 10px 11px
-    );
+  background: var(--card-pattern-bg);
   pointer-events: none;
 }
 
@@ -680,11 +774,11 @@ body.turn-switched .score-pill.is-active {
 
 .card-corners::before,
 .card-corners::after {
-  content: "";
+  content: ";
   position: absolute;
   width: 14px;
   height: 14px;
-  border-color: rgba(126, 182, 217, 0.55);
+  border-color: var(--corner);
   border-style: solid;
 }
 
@@ -702,7 +796,7 @@ body.turn-switched .score-pill.is-active {
 
 .card-corners-ink::before,
 .card-corners-ink::after {
-  border-color: rgba(26, 47, 74, 0.35);
+  border-color: var(--corner-ink);
 }
 
 .seal {
@@ -718,28 +812,33 @@ body.turn-switched .score-pill.is-active {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 2px solid rgba(126, 182, 217, 0.6);
+  border: 2px solid var(--seal-border);
   box-shadow:
-    inset 0 0 0 7px rgba(16, 28, 44, 0.4),
-    0 0 0 1px rgba(126, 182, 217, 0.18),
-    0 0 24px rgba(126, 182, 217, 0.12);
+    inset 0 0 0 7px var(--seal-inset),
+    0 0 0 1px var(--seal-ring-glow),
+    0 0 24px var(--seal-glow);
   background:
     conic-gradient(
       from 20deg,
       transparent 0 12deg,
-      rgba(126, 182, 217, 0.22) 12deg 14deg,
+      var(--seal-tick) 12deg 14deg,
       transparent 14deg 42deg,
-      rgba(126, 182, 217, 0.22) 42deg 44deg,
+      var(--seal-tick) 42deg 44deg,
       transparent 44deg
     );
 }
 
 .seal-char {
   position: relative;
-  color: rgba(210, 230, 245, 0.95);
+  color: var(--seal-char);
   font-family: var(--font-display);
+  font-size: 0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.seal-char::before {
+  content: var(--seal-glyph);
   font-size: clamp(1.35rem, 3.6vw, 2.1rem);
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
 
 .card-front {
@@ -748,19 +847,19 @@ body.turn-switched .score-pill.is-active {
   -webkit-transform: rotateY(180deg) translateZ(1px);
   transform: rotateY(180deg) translateZ(1px);
   /* 用不透明底色，避免 Safari 透出背面 */
-  background: linear-gradient(180deg, #fbfcfe 0%, #e7eef6 100%);
+  background: var(--card-front-bg);
   color: var(--ink);
-  border: 1px solid rgba(16, 24, 32, 0.1);
+  border: 1px solid var(--card-front-border);
   padding: 6px;
 }
 
 .card-front::before {
-  content: "";
+  content: ";
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 80% 15%, rgba(228, 87, 46, 0.08), transparent 40%),
-    radial-gradient(circle at 15% 85%, rgba(42, 80, 120, 0.08), transparent 42%);
+    radial-gradient(circle at 80% 15%, var(--card-front-glow-1), transparent 40%),
+    radial-gradient(circle at 15% 85%, var(--card-front-glow-2), transparent 42%);
   pointer-events: none;
 }
 
@@ -768,7 +867,7 @@ body.turn-switched .score-pill.is-active {
   position: absolute;
   inset: 7px;
   border-radius: 9px;
-  border: 1.5px solid rgba(26, 47, 74, 0.14);
+  border: 1.5px solid var(--card-frame-border);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 40%);
   pointer-events: none;
@@ -799,10 +898,10 @@ body.turn-switched .score-pill.is-active {
   left: 12px;
   padding: 2px 7px;
   border-radius: 999px;
-  background: rgba(16, 24, 32, 0.06);
+  background: var(--kind-bg);
   font-size: clamp(0.5rem, 1.2cqmin, 0.72rem);
   letter-spacing: 0.04em;
-  color: rgba(16, 24, 32, 0.5);
+  color: var(--kind-fg);
 }
 
 .card-text {
@@ -814,7 +913,7 @@ body.turn-switched .score-pill.is-active {
   font-size: 42cqmin;
   line-height: 1;
   letter-spacing: 0.02em;
-  color: #142033;
+  color: var(--card-text);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
@@ -832,7 +931,7 @@ body.turn-switched .score-pill.is-active {
 }
 
 .card.is-matched .card-front {
-  background: linear-gradient(180deg, #eefaf5 0%, #d5efe5 100%);
+  background: var(--match-front-bg);
   box-shadow: 0 0 0 2px rgba(47, 158, 123, 0.4);
 }
 
@@ -840,9 +939,7 @@ body.turn-switched .score-pill.is-active {
 .result {
   display: grid;
   place-items: center;
-  background:
-    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(228, 87, 46, 0.2), transparent 60%),
-    linear-gradient(160deg, #142033, #1a2f4a);
+  background: var(--result-bg);
 }
 
 .result-card {
@@ -850,10 +947,11 @@ body.turn-switched .score-pill.is-active {
   padding: 36px 28px;
   text-align: center;
   border-radius: 24px;
-  background: rgba(16, 24, 32, 0.45);
-  border: 1px solid rgba(237, 242, 247, 0.12);
+  background: var(--result-card-bg);
+  border: 1px solid var(--ui-border-soft);
   backdrop-filter: blur(10px);
   animation: rise-in 0.55s ease both;
+  color: var(--page-fg);
 }
 
 .result-kicker {
@@ -871,7 +969,7 @@ body.turn-switched .score-pill.is-active {
 
 .result-detail {
   margin: 0 0 24px;
-  color: rgba(237, 242, 247, 0.7);
+  color: var(--result-detail);
   line-height: 1.6;
 }
 
@@ -1014,7 +1112,6 @@ body.turn-switched .score-pill.is-active {
   }
 }
 
-/* Phone portrait: fewer columns feel taller */
 @media (max-width: 700px) {
   .game-top {
     grid-template-columns: auto 1fr;
@@ -1023,9 +1120,13 @@ body.turn-switched .score-pill.is-active {
   .mode-chip {
     display: none;
   }
+}
 
-  .name-row {
-    grid-template-columns: 1fr;
+/* 手機直向：轉置盤面（10×5 → 5×10），避免欄數過多把卡片壓成細條 */
+@media (max-width: 700px) and (orientation: portrait) {
+  .board {
+    grid-template-columns: repeat(var(--rows), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--cols), minmax(0, 1fr));
   }
 }
 
@@ -1055,4 +1156,282 @@ body.turn-switched .score-pill.is-active {
     animation: none !important;
     transition-duration: 0.01ms !important;
   }
+
+  /* 回合箭頭平時靠動畫才會顯現，關掉動畫後需補回可見度 */
+  .score-pill.is-active .turn-arrow {
+    opacity: 1;
+  }
+
+  body[data-players="2"][data-turn="0"] .game::before,
+  body[data-players="2"][data-turn="1"] .game::after {
+    opacity: 1;
+  }
+}
+
+/* ========== THEME PICKER ========== */
+.theme-opt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.theme-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+.theme-swatch-night {
+  background: linear-gradient(135deg, #2a5078 0%, #e4572e 100%);
+}
+
+.theme-swatch-mist {
+  background: linear-gradient(135deg, #9ec4d8 0%, #7eb0c9 100%);
+}
+
+.theme-swatch-yuzu {
+  background: linear-gradient(135deg, #e8d9a8 0%, #d4b86a 100%);
+}
+
+.menu-theme {
+  display: grid;
+  gap: 8px;
+  padding: 10px 14px 12px;
+  border-radius: 12px;
+  background: var(--menu-row-bg);
+  border: 1px solid var(--ui-border-soft);
+}
+
+.menu-theme-label {
+  font-size: 0.98rem;
+  color: var(--page-fg);
+}
+
+.menu-theme .opt-row {
+  margin: 0;
+}
+
+.menu-theme .opt {
+  min-height: 40px;
+  font-size: 0.88rem;
+  padding: 8px 12px;
+}
+
+/* ========== THEME: mist（水霧藍） ========== */
+html[data-theme="mist"] {
+  --ink: #2a3f4f;
+  --ink-soft: #3d5566;
+  --paper: #f5f9fc;
+  --paper-deep: #d9e7f0;
+  --indigo: #8fb4c8;
+  --indigo-mid: #6f9bb3;
+  --sky: #5f8faa;
+  --accent: #c97b6e;
+  --accent-soft: #d99a8f;
+  --match: #4f9d86;
+  --shadow: rgba(60, 90, 110, 0.18);
+  --page-bg: #c5d9e6;
+  --page-fg: #2a3f4f;
+  --ui-muted: rgba(42, 63, 79, 0.55);
+  --ui-muted-strong: rgba(42, 63, 79, 0.72);
+  --ui-faint: rgba(42, 63, 79, 0.42);
+  --ui-surface: rgba(255, 255, 255, 0.42);
+  --ui-surface-strong: rgba(255, 255, 255, 0.55);
+  --ui-border: rgba(42, 63, 79, 0.14);
+  --ui-border-soft: rgba(42, 63, 79, 0.1);
+  --ui-border-strong: rgba(42, 63, 79, 0.18);
+  --brand-mark: #5f8faa;
+  --btn-primary-bg: linear-gradient(135deg, #6f9bb3 0%, #88b4c8 100%);
+  --btn-primary-shadow: rgba(95, 143, 170, 0.28);
+  --opt-active-bg: #2a3f4f;
+  --opt-active-fg: #f5f9fc;
+  --setup-bg:
+    radial-gradient(ellipse 80% 50% at 12% 0%, rgba(255, 255, 255, 0.55), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 100% 100%, rgba(201, 123, 110, 0.16), transparent 50%),
+    linear-gradient(160deg, #d5e6f0 0%, #b7cfe0 48%, #a8c4d6 100%);
+  --setup-stripe: rgba(42, 63, 79, 0.18);
+  --game-bg:
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(255, 255, 255, 0.45), transparent 55%),
+    linear-gradient(180deg, #d2e4ef 0%, #b9d2e2 100%);
+  --result-bg:
+    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(111, 155, 179, 0.28), transparent 60%),
+    linear-gradient(160deg, #d2e4ef, #b7cfe0);
+  --menu-overlay-bg: rgba(70, 100, 120, 0.35);
+  --menu-panel-bg: linear-gradient(180deg, rgba(245, 249, 252, 0.96), rgba(220, 234, 243, 0.98));
+  --menu-panel-border: rgba(42, 63, 79, 0.12);
+  --menu-row-bg: rgba(255, 255, 255, 0.55);
+  --p1: #5f8faa;
+  --p2: #c97b6e;
+  --edge-p1: rgba(95, 143, 170, 0.32);
+  --edge-p1-soft: rgba(95, 143, 170, 0.12);
+  --edge-p2: rgba(201, 123, 110, 0.3);
+  --edge-p2-soft: rgba(201, 123, 110, 0.1);
+  --turn-banner-bg: rgba(255, 255, 255, 0.55);
+  --turn-banner-p2-bg: rgba(201, 123, 110, 0.22);
+  --turn-banner-p2-fg: #6a3d35;
+  --score-pill-bg: rgba(255, 255, 255, 0.5);
+  --score-pill-border: rgba(42, 63, 79, 0.1);
+  --score-active-border: rgba(95, 143, 170, 0.7);
+  --score-active-bg: rgba(95, 143, 170, 0.16);
+  --score-active-glow: rgba(95, 143, 170, 0.12);
+  --score-p2-active-border: rgba(201, 123, 110, 0.7);
+  --score-p2-active-bg: rgba(201, 123, 110, 0.16);
+  --score-p2-active-glow: rgba(201, 123, 110, 0.12);
+  --score-name: rgba(42, 63, 79, 0.7);
+  --arrow-p1: #4d7f9a;
+  --arrow-p2: #b56a5e;
+  --mode-chip: rgba(42, 63, 79, 0.5);
+  --result-card-bg: rgba(255, 255, 255, 0.62);
+  --result-detail: rgba(42, 63, 79, 0.7);
+  --card-back-bg:
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.55), transparent 42%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.28), transparent 40%),
+    linear-gradient(160deg, #8fb8cc 0%, #6f9bb3 48%, #587f96 100%);
+  --card-back-border: rgba(255, 255, 255, 0.35);
+  --card-pattern-border: rgba(255, 255, 255, 0.28);
+  --card-pattern-bg:
+    radial-gradient(circle, rgba(255, 255, 255, 0.28) 1.1px, transparent 1.3px) 0 0 / 11px 11px,
+    radial-gradient(circle, rgba(255, 255, 255, 0.12) 1px, transparent 1.2px) 5px 5px / 11px 11px;
+  --corner: rgba(255, 255, 255, 0.65);
+  --corner-ink: rgba(42, 63, 79, 0.28);
+  --seal-border: rgba(255, 255, 255, 0.7);
+  --seal-inset: rgba(70, 110, 130, 0.28);
+  --seal-ring-glow: rgba(255, 255, 255, 0.25);
+  --seal-glow: rgba(255, 255, 255, 0.18);
+  --seal-tick: rgba(255, 255, 255, 0.35);
+  --seal-char: rgba(245, 250, 252, 0.96);
+  --seal-glyph: "み";
+  --card-front-bg: linear-gradient(180deg, #fcfeff 0%, #e4eef5 100%);
+  --card-front-border: rgba(42, 63, 79, 0.1);
+  --card-front-glow-1: rgba(201, 123, 110, 0.1);
+  --card-front-glow-2: rgba(95, 143, 170, 0.12);
+  --card-frame-border: rgba(42, 63, 79, 0.12);
+  --card-text: #243848;
+  --kind-bg: rgba(42, 63, 79, 0.06);
+  --kind-fg: rgba(42, 63, 79, 0.5);
+  --match-front-bg: linear-gradient(180deg, #eef8f4 0%, #d5ebe3 100%);
+  --theme-meta: #8fb4c8;
+  --select-chevron: rgba(42, 63, 79, 0.45);
+  --select-option-bg: #e8f1f6;
+  --select-option-fg: #2a3f4f;
+  --range-hint-warn: #b56a5e;
+}
+
+html[data-theme="mist"] .seal-ring {
+  border-radius: 46% 54% 52% 48% / 48% 46% 54% 52%;
+}
+
+/* ========== THEME: yuzu（柚香黃） ========== */
+html[data-theme="yuzu"] {
+  --ink: #4a3f2e;
+  --ink-soft: #5e5240;
+  --paper: #fbf7ec;
+  --paper-deep: #ebe2cb;
+  --indigo: #cbb887;
+  --indigo-mid: #b8a46f;
+  --sky: #9a8758;
+  --accent: #c8896a;
+  --accent-soft: #d9a58c;
+  --match: #6f9a78;
+  --shadow: rgba(90, 70, 40, 0.16);
+  --page-bg: #e8dcb8;
+  --page-fg: #4a3f2e;
+  --ui-muted: rgba(74, 63, 46, 0.55);
+  --ui-muted-strong: rgba(74, 63, 46, 0.72);
+  --ui-faint: rgba(74, 63, 46, 0.42);
+  --ui-surface: rgba(255, 251, 240, 0.48);
+  --ui-surface-strong: rgba(255, 251, 240, 0.62);
+  --ui-border: rgba(74, 63, 46, 0.14);
+  --ui-border-soft: rgba(74, 63, 46, 0.1);
+  --ui-border-strong: rgba(74, 63, 46, 0.18);
+  --brand-mark: #9a8758;
+  --btn-primary-bg: linear-gradient(135deg, #c8896a 0%, #d4a07f 100%);
+  --btn-primary-shadow: rgba(200, 137, 106, 0.28);
+  --opt-active-bg: #4a3f2e;
+  --opt-active-fg: #fbf7ec;
+  --setup-bg:
+    radial-gradient(ellipse 80% 50% at 10% 0%, rgba(255, 255, 255, 0.5), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 100% 100%, rgba(200, 137, 106, 0.18), transparent 50%),
+    linear-gradient(160deg, #f0e6c8 0%, #e2d3a8 48%, #d6c48f 100%);
+  --setup-stripe: rgba(74, 63, 46, 0.16);
+  --game-bg:
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(255, 255, 255, 0.42), transparent 55%),
+    linear-gradient(180deg, #eee2c2 0%, #e0d0a4 100%);
+  --result-bg:
+    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(200, 137, 106, 0.22), transparent 60%),
+    linear-gradient(160deg, #eee2c2, #dfcfa0);
+  --menu-overlay-bg: rgba(90, 75, 45, 0.32);
+  --menu-panel-bg: linear-gradient(180deg, rgba(251, 247, 236, 0.97), rgba(236, 226, 200, 0.98));
+  --menu-panel-border: rgba(74, 63, 46, 0.12);
+  --menu-row-bg: rgba(255, 251, 240, 0.6);
+  --p1: #9a8758;
+  --p2: #c8896a;
+  --edge-p1: rgba(154, 135, 88, 0.3);
+  --edge-p1-soft: rgba(154, 135, 88, 0.1);
+  --edge-p2: rgba(200, 137, 106, 0.3);
+  --edge-p2-soft: rgba(200, 137, 106, 0.1);
+  --turn-banner-bg: rgba(255, 251, 240, 0.6);
+  --turn-banner-p2-bg: rgba(200, 137, 106, 0.22);
+  --turn-banner-p2-fg: #6a4434;
+  --score-pill-bg: rgba(255, 251, 240, 0.55);
+  --score-pill-border: rgba(74, 63, 46, 0.1);
+  --score-active-border: rgba(154, 135, 88, 0.7);
+  --score-active-bg: rgba(154, 135, 88, 0.16);
+  --score-active-glow: rgba(154, 135, 88, 0.12);
+  --score-p2-active-border: rgba(200, 137, 106, 0.7);
+  --score-p2-active-bg: rgba(200, 137, 106, 0.16);
+  --score-p2-active-glow: rgba(200, 137, 106, 0.12);
+  --score-name: rgba(74, 63, 46, 0.7);
+  --arrow-p1: #7d6c42;
+  --arrow-p2: #b57255;
+  --mode-chip: rgba(74, 63, 46, 0.5);
+  --result-card-bg: rgba(255, 251, 240, 0.68);
+  --result-detail: rgba(74, 63, 46, 0.7);
+  --card-back-bg:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.45), transparent 42%),
+    linear-gradient(145deg, rgba(255, 248, 230, 0.35), transparent 40%),
+    linear-gradient(160deg, #d4bf7e 0%, #bda45f 48%, #a38b4a 100%);
+  --card-back-border: rgba(255, 248, 230, 0.4);
+  --card-pattern-border: rgba(255, 248, 230, 0.3);
+  --card-pattern-bg:
+    repeating-linear-gradient(
+      60deg,
+      transparent 0 9px,
+      rgba(255, 248, 230, 0.16) 9px 10px
+    ),
+    repeating-linear-gradient(
+      -60deg,
+      transparent 0 9px,
+      rgba(74, 63, 46, 0.05) 9px 10px
+    );
+  --corner: rgba(255, 248, 230, 0.7);
+  --corner-ink: rgba(74, 63, 46, 0.28);
+  --seal-border: rgba(255, 248, 230, 0.75);
+  --seal-inset: rgba(120, 95, 50, 0.22);
+  --seal-ring-glow: rgba(255, 248, 230, 0.28);
+  --seal-glow: rgba(255, 248, 230, 0.16);
+  --seal-tick: rgba(255, 248, 230, 0.38);
+  --seal-char: rgba(255, 250, 235, 0.96);
+  --seal-glyph: "ゆ";
+  --card-front-bg: linear-gradient(180deg, #fffdf7 0%, #f0e7d0 100%);
+  --card-front-border: rgba(74, 63, 46, 0.1);
+  --card-front-glow-1: rgba(200, 137, 106, 0.12);
+  --card-front-glow-2: rgba(154, 135, 88, 0.12);
+  --card-frame-border: rgba(74, 63, 46, 0.12);
+  --card-text: #3f3526;
+  --kind-bg: rgba(74, 63, 46, 0.06);
+  --kind-fg: rgba(74, 63, 46, 0.5);
+  --match-front-bg: linear-gradient(180deg, #eef6ef 0%, #d8eadb 100%);
+  --theme-meta: #cbb887;
+  --select-chevron: rgba(74, 63, 46, 0.45);
+  --select-option-bg: #f5edd8;
+  --select-option-fg: #4a3f2e;
+  --range-hint-warn: #b57255;
+}
+
+html[data-theme="yuzu"] .seal-ring {
+  border-radius: 18%;
 }

@@ -25,7 +25,6 @@ window.JPMatchAudio = (() => {
       BASE + "/bgm/area-1.mp3",
       BASE + "/bgm/area-2.mp3",
       BASE + "/bgm/area-3.mp3",
-      BASE + "/bgm/boss.mp3",
     ],
     kanaDir: BASE + "/kana/",
   };
@@ -159,7 +158,6 @@ window.JPMatchAudio = (() => {
   }
 
   return {
-    PATHS: PATHS,
     settings: settings,
     unlock: unlock,
     playSfx: playSfx,

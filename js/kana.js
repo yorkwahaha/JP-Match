@@ -60,8 +60,6 @@ window.JPMatchData = (() => {
     { key: "ze", romaji: "ze", hira: "ぜ", kata: "ゼ" },
     { key: "zo", romaji: "zo", hira: "ぞ", kata: "ゾ" },
     { key: "da", romaji: "da", hira: "だ", kata: "ダ" },
-    { key: "di", romaji: "ji", hira: "ぢ", kata: "ヂ" },
-    { key: "du", romaji: "zu", hira: "づ", kata: "ヅ" },
     { key: "de", romaji: "de", hira: "で", kata: "デ" },
     { key: "do", romaji: "do", hira: "ど", kata: "ド" },
     { key: "ba", romaji: "ba", hira: "ば", kata: "バ" },
@@ -106,6 +104,56 @@ window.JPMatchData = (() => {
     { id: "10x5", cols: 10, rows: 5, label: "10×5（25 組）" },
   ];
 
+  const DEFAULT_GRID_ID = "8x4";
+
+  /** 五十音「行」順序（含濁音／半濁音），用於出題範圍 */
+  const ROWS = [
+    { id: "a", label: "あ行", keys: ["a", "i", "u", "e", "o"] },
+    { id: "ka", label: "か行", keys: ["ka", "ki", "ku", "ke", "ko"] },
+    { id: "sa", label: "さ行", keys: ["sa", "shi", "su", "se", "so"] },
+    { id: "ta", label: "た行", keys: ["ta", "chi", "tsu", "te", "to"] },
+    { id: "na", label: "な行", keys: ["na", "ni", "nu", "ne", "no"] },
+    { id: "ha", label: "は行", keys: ["ha", "hi", "fu", "he", "ho"] },
+    { id: "ma", label: "ま行", keys: ["ma", "mi", "mu", "me", "mo"] },
+    { id: "ya", label: "や行", keys: ["ya", "yu", "yo"] },
+    { id: "ra", label: "ら行", keys: ["ra", "ri", "ru", "re", "ro"] },
+    { id: "wa", label: "わ行", keys: ["wa", "wo", "n"] },
+    { id: "ga", label: "が行", keys: ["ga", "gi", "gu", "ge", "go"] },
+    { id: "za", label: "ざ行", keys: ["za", "ji", "zu", "ze", "zo"] },
+    { id: "da", label: "だ行", keys: ["da", "de", "do"] },
+    { id: "ba", label: "ば行", keys: ["ba", "bi", "bu", "be", "bo"] },
+    { id: "pa", label: "ぱ行", keys: ["pa", "pi", "pu", "pe", "po"] },
+  ];
+
+  const DEFAULT_ROW_FROM = "a";
+  const DEFAULT_ROW_TO = "pa";
+
+  function rowIndex(rowId) {
+    return ROWS.findIndex((r) => r.id === rowId);
+  }
+
+  function normalizeRowRange(fromId, toId) {
+    let from = rowIndex(fromId);
+    let to = rowIndex(toId);
+    if (from < 0) from = 0;
+    if (to < 0) to = ROWS.length - 1;
+    if (from > to) {
+      const tmp = from;
+      from = to;
+      to = tmp;
+    }
+    return { from, to, fromId: ROWS[from].id, toId: ROWS[to].id };
+  }
+
+  function getKanaInRange(fromId, toId) {
+    const { from, to } = normalizeRowRange(fromId, toId);
+    const keys = new Set();
+    for (let i = from; i <= to; i += 1) {
+      ROWS[i].keys.forEach((k) => keys.add(k));
+    }
+    return KANA.filter((kana) => keys.has(kana.key));
+  }
+
   function shuffle(array) {
     const arr = array.slice();
     for (let i = arr.length - 1; i > 0; i -= 1) {
@@ -117,19 +165,25 @@ window.JPMatchData = (() => {
     return arr;
   }
 
-  function buildDeck(pairModeId, pairCount) {
+  function buildDeck(pairModeId, pairCount, options) {
     const mode = PAIR_MODES[pairModeId];
     if (!mode) throw new Error("未知配對模式：" + pairModeId);
 
-    const count = Math.min(Math.max(1, pairCount), KANA.length);
-    const selected = shuffle(KANA).slice(0, count);
+    const opts = options || {};
+    const pool = getKanaInRange(
+      opts.fromRow || DEFAULT_ROW_FROM,
+      opts.toRow || DEFAULT_ROW_TO
+    );
+    if (!pool.length) throw new Error("出題範圍沒有可用假名");
+
+    const count = Math.min(Math.max(1, pairCount), pool.length);
+    const selected = shuffle(pool).slice(0, count);
     const sideA = mode.sides[0];
     const sideB = mode.sides[1];
 
     const cards = [];
     selected.forEach((kana) => {
       cards.push({
-        id: kana.key + "-" + sideA,
         pairKey: kana.key,
         audioKey: kana.romaji,
         side: sideA,
@@ -137,7 +191,6 @@ window.JPMatchData = (() => {
         kindLabel: mode.sideLabels[sideA],
       });
       cards.push({
-        id: kana.key + "-" + sideB,
         pairKey: kana.key,
         audioKey: kana.romaji,
         side: sideB,
@@ -149,5 +202,15 @@ window.JPMatchData = (() => {
     return shuffle(cards);
   }
 
-  return { KANA, PAIR_MODES, GRID_PRESETS, shuffle, buildDeck };
+  return {
+    PAIR_MODES,
+    GRID_PRESETS,
+    DEFAULT_GRID_ID,
+    ROWS,
+    DEFAULT_ROW_FROM,
+    DEFAULT_ROW_TO,
+    getKanaInRange,
+    normalizeRowRange,
+    buildDeck,
+  };
 })();

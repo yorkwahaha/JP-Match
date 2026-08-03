@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" data-theme="night">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="theme-color" content="#142033" />
+    <meta name="theme-color" content="#142033" id="meta-theme-color" />
     <title>JP Match · 五十音配對</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -45,6 +45,40 @@
           <div class="field">
             <span class="field-label">盤面大小</span>
             <div class="opt-row opt-wrap" data-group="grid"></div>
+          </div>
+
+          <div class="field">
+            <span class="field-label">出題範圍</span>
+            <div class="range-row">
+              <label class="range-select-wrap">
+                <span class="range-select-label">從</span>
+                <select id="row-from" class="range-select" aria-label="起始行"></select>
+              </label>
+              <span class="range-sep" aria-hidden="true">～</span>
+              <label class="range-select-wrap">
+                <span class="range-select-label">到</span>
+                <select id="row-to" class="range-select" aria-label="結束行"></select>
+              </label>
+            </div>
+            <p id="range-hint" class="range-hint">題池 69 個假名</p>
+          </div>
+
+          <div class="field">
+            <span class="field-label">介面配色</span>
+            <div class="opt-row opt-wrap" data-group="theme">
+              <button type="button" class="opt theme-opt is-active" data-value="night">
+                <span class="theme-swatch theme-swatch-night" aria-hidden="true"></span>
+                夜紺
+              </button>
+              <button type="button" class="opt theme-opt" data-value="mist">
+                <span class="theme-swatch theme-swatch-mist" aria-hidden="true"></span>
+                水霧
+              </button>
+              <button type="button" class="opt theme-opt" data-value="yuzu">
+                <span class="theme-swatch theme-swatch-yuzu" aria-hidden="true"></span>
+                柚香
+              </button>
+            </div>
           </div>
 
           <button type="button" id="btn-start" class="btn-primary">開始遊戲</button>
@@ -87,7 +121,7 @@
           </div>
         </div>
 
-        <div id="board" class="board" role="grid" aria-label="配對卡牌盤面"></div>
+        <div id="board" class="board" role="group" aria-label="配對卡牌盤面"></div>
       </section>
 
       <!-- RESULT -->
@@ -117,6 +151,23 @@
           </header>
 
           <div class="menu-body">
+            <div class="menu-theme">
+              <span class="menu-theme-label">介面配色</span>
+              <div class="opt-row opt-wrap" data-group="theme-menu">
+                <button type="button" class="opt theme-opt is-active" data-value="night">
+                  <span class="theme-swatch theme-swatch-night" aria-hidden="true"></span>
+                  夜紺
+                </button>
+                <button type="button" class="opt theme-opt" data-value="mist">
+                  <span class="theme-swatch theme-swatch-mist" aria-hidden="true"></span>
+                  水霧
+                </button>
+                <button type="button" class="opt theme-opt" data-value="yuzu">
+                  <span class="theme-swatch theme-swatch-yuzu" aria-hidden="true"></span>
+                  柚香
+                </button>
+              </div>
+            </div>
             <label class="menu-row">
               <span>翻牌發音</span>
               <input id="opt-voice" type="checkbox" checked />
