@@ -891,6 +891,20 @@ body.turn-switched .score-pill.is-active {
     inset 0 0 0 3px rgba(47, 158, 123, 0.14);
 }
 
+.card-front[data-side="pic"] {
+  box-shadow:
+    0 10px 22px var(--shadow),
+    inset 0 0 0 3px rgba(126, 182, 217, 0.16);
+}
+
+.card-emoji {
+  position: relative;
+  z-index: 2;
+  font-size: 48cqmin;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+}
+
 .card-kind {
   position: absolute;
   z-index: 2;
@@ -923,6 +937,16 @@ body.turn-switched .score-pill.is-active {
   letter-spacing: 0.02em;
   text-transform: lowercase;
   font-size: 36cqmin;
+}
+
+.card-text.is-compact {
+  font-size: 30cqmin;
+  letter-spacing: -0.02em;
+}
+
+.card-front[data-side="romaji"] .card-text.is-compact {
+  font-size: 26cqmin;
+  letter-spacing: 0;
 }
 
 .card.is-matched {

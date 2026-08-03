@@ -25,7 +25,7 @@
         <header class="brand">
           <p class="brand-mark">JP MATCH</p>
           <h1 class="brand-title">五十音配對</h1>
-          <p class="brand-sub">掀開兩張，找到同一音的另一種寫法</p>
+          <p class="brand-sub">掀開兩張，找到同一組的另一面</p>
         </header>
 
         <div class="setup-panel">
@@ -34,6 +34,14 @@
             <div class="opt-row" data-group="players">
               <button type="button" class="opt" data-value="1">單人練習</button>
               <button type="button" class="opt is-active" data-value="2">雙人對戰</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="field-label">練習內容</span>
+            <div class="opt-row" data-group="kind">
+              <button type="button" class="opt is-active" data-value="kana">五十音</button>
+              <button type="button" class="opt" data-value="words">單字</button>
             </div>
           </div>
 
@@ -47,8 +55,13 @@
             <div class="opt-row opt-wrap" data-group="grid"></div>
           </div>
 
-          <div class="field">
+          <div class="field" id="field-kana-range">
             <span class="field-label">出題範圍</span>
+            <div class="opt-row opt-wrap" data-group="range-preset">
+              <button type="button" class="opt is-active" data-value="seion">清音</button>
+              <button type="button" class="opt" data-value="dakuon">＋濁音</button>
+              <button type="button" class="opt" data-value="youon">＋拗音</button>
+            </div>
             <div class="range-row">
               <label class="range-select-wrap">
                 <span class="range-select-label">從</span>
@@ -60,7 +73,13 @@
                 <select id="row-to" class="range-select" aria-label="結束行"></select>
               </label>
             </div>
-            <p id="range-hint" class="range-hint">題池 69 個假名</p>
+            <p id="range-hint" class="range-hint">あ行～わ行 · 題池 46 個假名</p>
+          </div>
+
+          <div class="field" id="field-word-category" hidden>
+            <span class="field-label">單字主題</span>
+            <div class="opt-row opt-wrap" data-group="word-category"></div>
+            <p id="word-hint" class="range-hint">題池 18 個單字</p>
           </div>
 
           <div class="field">
@@ -202,6 +221,7 @@
     </div>
 
     <script src="./js/kana.js"></script>
+    <script src="./js/words.js"></script>
     <script src="./js/audio.js"></script>
     <script src="./js/game.js"></script>
   </body>

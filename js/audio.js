@@ -88,6 +88,21 @@ window.JPMatchAudio = (() => {
     playSrc(src, settings.voiceVolume, kanaCache);
   }
 
+  function playReading(text) {
+    if (!settings.voice || !text) return;
+    if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance !== "function") {
+      return;
+    }
+    try {
+      window.speechSynthesis.cancel();
+      const utter = new window.SpeechSynthesisUtterance(String(text));
+      utter.lang = "ja-JP";
+      utter.rate = 0.92;
+      utter.volume = settings.voiceVolume;
+      window.speechSynthesis.speak(utter);
+    } catch (e) {}
+  }
+
   function pickBgm() {
     if (!PATHS.bgm.length) return null;
     let next = Math.floor(Math.random() * PATHS.bgm.length);
@@ -162,6 +177,7 @@ window.JPMatchAudio = (() => {
     unlock: unlock,
     playSfx: playSfx,
     playKana: playKana,
+    playReading: playReading,
     startBgm: startBgm,
     stopBgm: stopBgm,
     setVoice: setVoice,

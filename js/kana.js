@@ -1,5 +1,5 @@
 /**
- * 五十音資料（清音＋濁音＋半濁音）
+ * 五十音資料（清音＋濁音＋半濁音＋拗音）
  */
 window.JPMatchData = (() => {
   const KANA = [
@@ -72,6 +72,39 @@ window.JPMatchData = (() => {
     { key: "pu", romaji: "pu", hira: "ぷ", kata: "プ" },
     { key: "pe", romaji: "pe", hira: "ぺ", kata: "ペ" },
     { key: "po", romaji: "po", hira: "ぽ", kata: "ポ" },
+    { key: "kya", romaji: "kya", hira: "きゃ", kata: "キャ" },
+    { key: "kyu", romaji: "kyu", hira: "きゅ", kata: "キュ" },
+    { key: "kyo", romaji: "kyo", hira: "きょ", kata: "キョ" },
+    { key: "sha", romaji: "sha", hira: "しゃ", kata: "シャ" },
+    { key: "shu", romaji: "shu", hira: "しゅ", kata: "シュ" },
+    { key: "sho", romaji: "sho", hira: "しょ", kata: "ショ" },
+    { key: "cha", romaji: "cha", hira: "ちゃ", kata: "チャ" },
+    { key: "chu", romaji: "chu", hira: "ちゅ", kata: "チュ" },
+    { key: "cho", romaji: "cho", hira: "ちょ", kata: "チョ" },
+    { key: "nya", romaji: "nya", hira: "にゃ", kata: "ニャ" },
+    { key: "nyu", romaji: "nyu", hira: "にゅ", kata: "ニュ" },
+    { key: "nyo", romaji: "nyo", hira: "にょ", kata: "ニョ" },
+    { key: "hya", romaji: "hya", hira: "ひゃ", kata: "ヒャ" },
+    { key: "hyu", romaji: "hyu", hira: "ひゅ", kata: "ヒュ" },
+    { key: "hyo", romaji: "hyo", hira: "ひょ", kata: "ヒョ" },
+    { key: "mya", romaji: "mya", hira: "みゃ", kata: "ミャ" },
+    { key: "myu", romaji: "myu", hira: "みゅ", kata: "ミュ" },
+    { key: "myo", romaji: "myo", hira: "みょ", kata: "ミョ" },
+    { key: "rya", romaji: "rya", hira: "りゃ", kata: "リャ" },
+    { key: "ryu", romaji: "ryu", hira: "りゅ", kata: "リュ" },
+    { key: "ryo", romaji: "ryo", hira: "りょ", kata: "リョ" },
+    { key: "gya", romaji: "gya", hira: "ぎゃ", kata: "ギャ" },
+    { key: "gyu", romaji: "gyu", hira: "ぎゅ", kata: "ギュ" },
+    { key: "gyo", romaji: "gyo", hira: "ぎょ", kata: "ギョ" },
+    { key: "ja", romaji: "ja", hira: "じゃ", kata: "ジャ" },
+    { key: "ju", romaji: "ju", hira: "じゅ", kata: "ジュ" },
+    { key: "jo", romaji: "jo", hira: "じょ", kata: "ジョ" },
+    { key: "bya", romaji: "bya", hira: "びゃ", kata: "ビャ" },
+    { key: "byu", romaji: "byu", hira: "びゅ", kata: "ビュ" },
+    { key: "byo", romaji: "byo", hira: "びょ", kata: "ビョ" },
+    { key: "pya", romaji: "pya", hira: "ぴゃ", kata: "ピャ" },
+    { key: "pyu", romaji: "pyu", hira: "ぴゅ", kata: "ピュ" },
+    { key: "pyo", romaji: "pyo", hira: "ぴょ", kata: "ピョ" },
   ];
 
   const PAIR_MODES = {
@@ -106,7 +139,7 @@ window.JPMatchData = (() => {
 
   const DEFAULT_GRID_ID = "8x4";
 
-  /** 五十音「行」順序（含濁音／半濁音），用於出題範圍 */
+  /** 五十音「行」順序（清音→濁音／半濁音→拗音），用於出題範圍 */
   const ROWS = [
     { id: "a", label: "あ行", keys: ["a", "i", "u", "e", "o"] },
     { id: "ka", label: "か行", keys: ["ka", "ki", "ku", "ke", "ko"] },
@@ -123,10 +156,29 @@ window.JPMatchData = (() => {
     { id: "da", label: "だ行", keys: ["da", "de", "do"] },
     { id: "ba", label: "ば行", keys: ["ba", "bi", "bu", "be", "bo"] },
     { id: "pa", label: "ぱ行", keys: ["pa", "pi", "pu", "pe", "po"] },
+    { id: "kya", label: "きゃ行", keys: ["kya", "kyu", "kyo"] },
+    { id: "sha", label: "しゃ行", keys: ["sha", "shu", "sho"] },
+    { id: "cha", label: "ちゃ行", keys: ["cha", "chu", "cho"] },
+    { id: "nya", label: "にゃ行", keys: ["nya", "nyu", "nyo"] },
+    { id: "hya", label: "ひゃ行", keys: ["hya", "hyu", "hyo"] },
+    { id: "mya", label: "みゃ行", keys: ["mya", "myu", "myo"] },
+    { id: "rya", label: "りゃ行", keys: ["rya", "ryu", "ryo"] },
+    { id: "gya", label: "ぎゃ行", keys: ["gya", "gyu", "gyo"] },
+    { id: "ja", label: "じゃ行", keys: ["ja", "ju", "jo"] },
+    { id: "bya", label: "びゃ行", keys: ["bya", "byu", "byo"] },
+    { id: "pya", label: "ぴゃ行", keys: ["pya", "pyu", "pyo"] },
   ];
 
+  /** 預設只出清音（あ行～わ行） */
   const DEFAULT_ROW_FROM = "a";
-  const DEFAULT_ROW_TO = "pa";
+  const DEFAULT_ROW_TO = "wa";
+
+  const RANGE_PRESETS = {
+    seion: { id: "seion", label: "清音", from: "a", to: "wa" },
+    dakuon: { id: "dakuon", label: "＋濁音", from: "a", to: "pa" },
+    youon: { id: "youon", label: "＋拗音", from: "a", to: "pya" },
+  };
+  const DEFAULT_RANGE_PRESET = "seion";
 
   function rowIndex(rowId) {
     return ROWS.findIndex((r) => r.id === rowId);
@@ -209,6 +261,8 @@ window.JPMatchData = (() => {
     ROWS,
     DEFAULT_ROW_FROM,
     DEFAULT_ROW_TO,
+    RANGE_PRESETS,
+    DEFAULT_RANGE_PRESET,
     getKanaInRange,
     normalizeRowRange,
     buildDeck,

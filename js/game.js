@@ -1,15 +1,24 @@
 (() => {
   const {
-    PAIR_MODES,
+    PAIR_MODES: KANA_PAIR_MODES,
     GRID_PRESETS,
     DEFAULT_GRID_ID,
     ROWS,
     DEFAULT_ROW_FROM,
     DEFAULT_ROW_TO,
+    RANGE_PRESETS,
+    DEFAULT_RANGE_PRESET,
     getKanaInRange,
     normalizeRowRange,
-    buildDeck,
+    buildDeck: buildKanaDeck,
   } = window.JPMatchData;
+  const {
+    CATEGORIES: WORD_CATEGORIES,
+    DEFAULT_CATEGORY: DEFAULT_WORD_CATEGORY,
+    PAIR_MODES: WORD_PAIR_MODES,
+    getWordsInCategory,
+    buildDeck: buildWordDeck,
+  } = window.JPMatchWords;
   const Sound = window.JPMatchAudio;
 
   const FLIP_MS = 280;
@@ -23,14 +32,18 @@
     yuzu: { id: "yuzu", label: "柚香", meta: "#cbb887" },
   };
   const DEFAULT_THEME = "night";
+  const DEFAULT_KIND = "kana";
 
   const state = {
     screen: "setup",
     players: 2,
+    kind: DEFAULT_KIND,
     pairMode: "romaji-hira",
     gridId: DEFAULT_GRID_ID,
     rowFrom: DEFAULT_ROW_FROM,
     rowTo: DEFAULT_ROW_TO,
+    rangePreset: DEFAULT_RANGE_PRESET,
+    wordCategory: DEFAULT_WORD_CATEGORY,
     theme: DEFAULT_THEME,
     deck: [],
     flipped: [],
@@ -69,6 +82,9 @@
     rowFrom: document.getElementById("row-from"),
     rowTo: document.getElementById("row-to"),
     rangeHint: document.getElementById("range-hint"),
+    wordHint: document.getElementById("word-hint"),
+    fieldKanaRange: document.getElementById("field-kana-range"),
+    fieldWordCategory: document.getElementById("field-word-category"),
     btnStart: document.getElementById("btn-start"),
   };
 
@@ -78,6 +94,14 @@
 
   function qsa(sel, root) {
     return Array.prototype.slice.call((root || document).querySelectorAll(sel));
+  }
+
+  function currentModes() {
+    return state.kind === "words" ? WORD_PAIR_MODES : KANA_PAIR_MODES;
+  }
+
+  function currentMode() {
+    return currentModes()[state.pairMode];
   }
 
   function getGrid() {
@@ -90,6 +114,13 @@
   function pairCount() {
     const g = getGrid();
     return (g.cols * g.rows) / 2;
+  }
+
+  function poolSize() {
+    if (state.kind === "words") {
+      return getWordsInCategory(state.wordCategory).length;
+    }
+    return getKanaInRange(state.rowFrom, state.rowTo).length;
   }
 
   function loadSavedTheme() {
@@ -168,58 +199,89 @@
     qsa('[data-group="players"] .opt').forEach((btn) => {
       btn.classList.toggle("is-active", Number(btn.dataset.value) === state.players);
     });
+    qsa('[data-group="kind"] .opt').forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.value === state.kind);
+    });
     qsa('[data-group="mode"] .opt').forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.value === state.pairMode);
     });
     qsa('[data-group="grid"] .opt').forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.value === state.gridId);
     });
+    qsa('[data-group="word-category"] .opt').forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.value === state.wordCategory);
+    });
+    qsa('[data-group="range-preset"] .opt').forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.value === state.rangePreset);
+    });
     if (els.rowFrom) els.rowFrom.value = state.rowFrom;
     if (els.rowTo) els.rowTo.value = state.rowTo;
+
+    const isWords = state.kind === "words";
+    if (els.fieldKanaRange) els.fieldKanaRange.hidden = isWords;
+    if (els.fieldWordCategory) els.fieldWordCategory.hidden = !isWords;
+
     syncThemeUI();
-    syncRangeHint();
+    syncPoolHint();
   }
 
-  function poolSize() {
-    return getKanaInRange(state.rowFrom, state.rowTo).length;
-  }
-
-  function syncRangeHint() {
-    if (!els.rangeHint || !els.btnStart) return;
+  function syncPoolHint() {
     const size = poolSize();
     const need = pairCount();
     const ok = size >= need;
-    const range = normalizeRowRange(state.rowFrom, state.rowTo);
-    const fromLabel = ROWS[range.from].label;
-    const toLabel = ROWS[range.to].label;
-    const same = range.from === range.to;
+    const hintEl = state.kind === "words" ? els.wordHint : els.rangeHint;
+    if (!hintEl || !els.btnStart) return;
 
-    let text =
-      (same ? fromLabel : fromLabel + "～" + toLabel) +
-      " · 題池 " +
-      size +
-      " 個假名";
+    let text = "";
+    if (state.kind === "words") {
+      const cat =
+        WORD_CATEGORIES.find((c) => c.id === state.wordCategory) ||
+        WORD_CATEGORIES[0];
+      text = cat.label + " · 題池 " + size + " 個單字";
+    } else {
+      const range = normalizeRowRange(state.rowFrom, state.rowTo);
+      const fromLabel = ROWS[range.from].label;
+      const toLabel = ROWS[range.to].label;
+      const same = range.from === range.to;
+      text =
+        (same ? fromLabel : fromLabel + "～" + toLabel) +
+        " · 題池 " +
+        size +
+        " 個假名";
+    }
     if (!ok) {
       text += " · 目前盤面需 " + need + " 組，請縮小盤面或擴大範圍";
     }
-    els.rangeHint.textContent = text;
-    els.rangeHint.classList.toggle("is-warn", !ok);
+    hintEl.textContent = text;
+    hintEl.classList.toggle("is-warn", !ok);
+    if (els.rangeHint && hintEl !== els.rangeHint) {
+      els.rangeHint.classList.remove("is-warn");
+    }
+    if (els.wordHint && hintEl !== els.wordHint) {
+      els.wordHint.classList.remove("is-warn");
+    }
     els.btnStart.disabled = !ok;
   }
 
   function startGame() {
     if (poolSize() < pairCount()) {
-      syncRangeHint();
+      syncPoolHint();
       return;
     }
     syncAudioSettings();
     Sound.unlock();
     Sound.playSfx("start");
     const grid = getGrid();
-    state.deck = buildDeck(state.pairMode, pairCount(), {
-      fromRow: state.rowFrom,
-      toRow: state.rowTo,
-    });
+    if (state.kind === "words") {
+      state.deck = buildWordDeck(state.pairMode, pairCount(), {
+        category: state.wordCategory,
+      });
+    } else {
+      state.deck = buildKanaDeck(state.pairMode, pairCount(), {
+        fromRow: state.rowFrom,
+        toRow: state.rowTo,
+      });
+    }
     state.flipped = [];
     state.matched = new Set();
     state.scores = [0, 0];
@@ -235,7 +297,8 @@
     document.body.dataset.players = String(state.players);
     document.body.dataset.turn = "0";
 
-    els.modeChip.textContent = PAIR_MODES[state.pairMode].label;
+    const mode = currentMode();
+    els.modeChip.textContent = mode ? mode.label : "";
     renderBoard();
     updateHud();
     showScreen("game");
@@ -257,6 +320,16 @@
       btn.dataset.index = String(index);
       btn.dataset.side = card.side;
       btn.setAttribute("aria-label", faceDownLabel(index));
+
+      const isPic = card.display === "pic" || card.side === "pic";
+      const contentHtml = isPic
+        ? '<span class="card-emoji" aria-hidden="true">' + card.text + "</span>"
+        : '<span class="card-text' +
+          (card.text.length > 1 ? " is-compact" : "") +
+          '">' +
+          card.text +
+          "</span>";
+
       btn.innerHTML =
         '<span class="card-inner">' +
         '<span class="card-face card-back" aria-hidden="true">' +
@@ -272,9 +345,7 @@
         '<span class="card-kind">' +
         card.kindLabel +
         "</span>" +
-        '<span class="card-text">' +
-        card.text +
-        "</span>" +
+        contentHtml +
         "</span></span>";
       btn.addEventListener("click", () => onCardTap(index));
       frag.appendChild(btn);
@@ -359,10 +430,16 @@
     const card = state.deck[index];
     if (el) {
       el.classList.add("is-flipped");
-      el.setAttribute("aria-label", card.kindLabel + " " + card.text);
+      const spoken =
+        card.side === "pic" && card.label
+          ? card.kindLabel + " " + card.label
+          : card.kindLabel + " " + card.text;
+      el.setAttribute("aria-label", spoken);
     }
     Sound.playSfx("flip");
-    if (card) Sound.playKana(card.audioKey);
+    if (!card) return;
+    if (card.voiceText) Sound.playReading(card.voiceText);
+    else if (card.audioKey) Sound.playKana(card.audioKey);
   }
 
   function flipClose(index) {
@@ -451,29 +528,63 @@
     els.resultDetail.textContent = scoreLine;
   }
 
+  function applyRangePreset(presetId) {
+    const preset = RANGE_PRESETS[presetId];
+    if (!preset) return;
+    state.rangePreset = preset.id;
+    state.rowFrom = preset.from;
+    state.rowTo = preset.to;
+  }
+
+  function syncRangePresetFromRows() {
+    const match = Object.keys(RANGE_PRESETS).find((id) => {
+      const p = RANGE_PRESETS[id];
+      return p.from === state.rowFrom && p.to === state.rowTo;
+    });
+    state.rangePreset = match || "";
+  }
+
+  function setKind(kind) {
+    if (kind !== "kana" && kind !== "words") return;
+    if (state.kind === kind) return;
+    state.kind = kind;
+    const modes = currentModes();
+    const ids = Object.keys(modes);
+    state.pairMode = ids[0];
+    renderModeOptions();
+  }
+
   function bindSetup() {
-    qsa("[data-group] .opt").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const group = btn.parentElement.dataset.group;
-        const value = btn.dataset.value;
-        if (group === "players") state.players = Number(value);
-        if (group === "mode") state.pairMode = value;
-        if (group === "grid") state.gridId = value;
-        if (group === "theme" || group === "theme-menu") {
-          applyTheme(value);
-          Sound.playSfx("select");
-          return;
-        }
+    document.getElementById("app").addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-group] .opt");
+      if (!btn) return;
+      const groupEl = btn.parentElement;
+      if (!groupEl || !groupEl.dataset.group) return;
+      const group = groupEl.dataset.group;
+      const value = btn.dataset.value;
+
+      if (group === "theme" || group === "theme-menu") {
+        applyTheme(value);
         Sound.playSfx("select");
-        syncSetupUI();
-      });
+        return;
+      }
+      if (group === "players") state.players = Number(value);
+      if (group === "kind") setKind(value);
+      if (group === "mode") state.pairMode = value;
+      if (group === "grid") state.gridId = value;
+      if (group === "word-category") state.wordCategory = value;
+      if (group === "range-preset") applyRangePreset(value);
+      Sound.playSfx("select");
+      syncSetupUI();
     });
 
     function onRowChange() {
       state.rowFrom = els.rowFrom.value;
       state.rowTo = els.rowTo.value;
+      syncRangePresetFromRows();
       Sound.playSfx("select");
-      syncRangeHint();
+      syncPoolHint();
+      syncSetupUI();
     }
     els.rowFrom.addEventListener("change", onRowChange);
     els.rowTo.addEventListener("change", onRowChange);
@@ -529,11 +640,12 @@
     els.rowTo.value = state.rowTo;
   }
 
-  function initModeOptions() {
+  function renderModeOptions() {
     const host = qs('[data-group="mode"]');
-    host.innerHTML = Object.keys(PAIR_MODES)
+    const modes = currentModes();
+    host.innerHTML = Object.keys(modes)
       .map((id) => {
-        const m = PAIR_MODES[id];
+        const m = modes[id];
         return (
           '<button type="button" class="opt" data-value="' +
           m.id +
@@ -543,6 +655,25 @@
         );
       })
       .join("");
+  }
+
+  function fillWordCategories() {
+    const host = qs('[data-group="word-category"]');
+    if (!host) return;
+    host.innerHTML = WORD_CATEGORIES.map((cat) => {
+      return (
+        '<button type="button" class="opt" data-value="' +
+        cat.id +
+        '">' +
+        cat.label +
+        "</button>"
+      );
+    }).join("");
+  }
+
+  function initStaticOptions() {
+    renderModeOptions();
+    fillWordCategories();
 
     const gridHost = qs('[data-group="grid"]');
     gridHost.innerHTML = GRID_PRESETS.map((g) => {
@@ -558,7 +689,7 @@
 
   applyTheme(loadSavedTheme(), { silent: true });
   fillRowSelects();
-  initModeOptions();
+  initStaticOptions();
   bindSetup();
   syncAudioSettings();
   syncSetupUI();
