@@ -42,6 +42,7 @@ https://yorkwahaha.github.io/JP-Match/
 - 食物
 - 顏色
 - 日常
+- 電器傢俱
 - 月・曜・數（一到十、星期、月分）
 - 全部
 
