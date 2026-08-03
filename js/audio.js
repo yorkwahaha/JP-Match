@@ -50,9 +50,9 @@ window.JPMatchAudio = (() => {
     voice: true,
     bgm: true,
     sfx: true,
-    bgmVolume: 0.35,
+    bgmVolume: 0.18,
     sfxVolume: 0.55,
-    voiceVolume: 0.9,
+    voiceVolume: 1,
   };
 
   function unlock() {
@@ -321,7 +321,7 @@ window.JPMatchAudio = (() => {
 
   function setBgmVolume(value) {
     const v = Math.min(1, Math.max(0, Number(value)));
-    settings.bgmVolume = Number.isFinite(v) ? v : 0.35;
+    settings.bgmVolume = Number.isFinite(v) ? v : 0.18;
     if (bgmEl) bgmEl.volume = settings.bgmVolume;
   }
 

@@ -73,7 +73,12 @@
     hudSolo: document.getElementById("hud-solo"),
     modeChip: document.getElementById("mode-chip"),
     resultTitle: document.getElementById("result-title"),
-    resultDetail: document.getElementById("result-detail"),
+    resultScoreboard: document.getElementById("result-scoreboard"),
+    resultNameP1: document.getElementById("result-name-p1"),
+    resultNameP2: document.getElementById("result-name-p2"),
+    resultScoreP1: document.getElementById("result-score-p1"),
+    resultScoreP2: document.getElementById("result-score-p2"),
+    resultMeta: document.getElementById("result-meta"),
     menuOverlay: document.getElementById("menu-overlay"),
     optVoice: document.getElementById("opt-voice"),
     optSfx: document.getElementById("opt-sfx"),
@@ -85,6 +90,11 @@
     wordHint: document.getElementById("word-hint"),
     fieldKanaRange: document.getElementById("field-kana-range"),
     fieldWordCategory: document.getElementById("field-word-category"),
+    selMode: document.getElementById("sel-mode"),
+    selGrid: document.getElementById("sel-grid"),
+    selRangePreset: document.getElementById("sel-range-preset"),
+    selWordCategory: document.getElementById("sel-word-category"),
+    selTheme: document.getElementById("sel-theme"),
     btnStart: document.getElementById("btn-start"),
   };
 
@@ -150,9 +160,10 @@
   }
 
   function syncThemeUI() {
-    qsa('[data-group="theme"] .opt, [data-group="theme-menu"] .opt').forEach((btn) => {
+    qsa('[data-group="theme-menu"] .opt').forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.value === state.theme);
     });
+    if (els.selTheme) els.selTheme.value = state.theme;
   }
 
   function syncAudioSettings() {
@@ -203,18 +214,10 @@
     qsa('[data-group="kind"] .opt').forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.value === state.kind);
     });
-    qsa('[data-group="mode"] .opt').forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.value === state.pairMode);
-    });
-    qsa('[data-group="grid"] .opt').forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.value === state.gridId);
-    });
-    qsa('[data-group="word-category"] .opt').forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.value === state.wordCategory);
-    });
-    qsa('[data-group="range-preset"] .opt').forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.value === state.rangePreset);
-    });
+    if (els.selMode) els.selMode.value = state.pairMode;
+    if (els.selGrid) els.selGrid.value = state.gridId;
+    if (els.selWordCategory) els.selWordCategory.value = state.wordCategory;
+    if (els.selRangePreset) els.selRangePreset.value = state.rangePreset || "";
     if (els.rowFrom) els.rowFrom.value = state.rowFrom;
     if (els.rowTo) els.rowTo.value = state.rowTo;
 
@@ -326,11 +329,19 @@
       const isSymbol = card.display === "symbol";
       let contentHtml;
       if (isSymbol) {
+        const compact = card.text.length > 2 ? " is-compact" : "";
+        const stacked = card.picSub ? " is-stacked" : "";
         contentHtml =
           '<span class="card-symbol' +
-          (card.text.length > 2 ? " is-compact" : "") +
+          compact +
+          stacked +
           '">' +
+          '<span class="card-symbol-main">' +
           card.text +
+          "</span>" +
+          (card.picSub
+            ? '<span class="card-symbol-sub">' + card.picSub + "</span>"
+            : "") +
           "</span>";
       } else if (isPic) {
         contentHtml =
@@ -515,13 +526,15 @@
     const mins = Math.floor(elapsed / 60);
     const secs = elapsed % 60;
     const timeText = mins > 0 ? mins + " 分 " + secs + " 秒" : secs + " 秒";
+    const metaText = state.moves + " 次翻牌 · " + timeText;
 
     showScreen("result");
 
     if (state.players === 1) {
       els.resultTitle.textContent = "全部配對完成！";
-      els.resultDetail.textContent =
-        "共 " + state.moves + " 次翻牌 · 用時 " + timeText + " · 配對 " + state.scores[0] + " 組";
+      if (els.resultScoreboard) els.resultScoreboard.hidden = true;
+      els.resultMeta.textContent =
+        "配對 " + state.scores[0] + " 組 · " + metaText;
       return;
     }
 
@@ -529,8 +542,6 @@
     const s2 = state.scores[1];
     const n1 = PLAYER_NAMES[0];
     const n2 = PLAYER_NAMES[1];
-    const scoreLine =
-      n1 + " " + s1 + " ： " + s2 + " " + n2 + " · " + state.moves + " 次翻牌 · " + timeText;
 
     if (s1 === s2) {
       els.resultTitle.textContent = "平手！";
@@ -539,7 +550,17 @@
     } else {
       els.resultTitle.textContent = n2 + " 獲勝";
     }
-    els.resultDetail.textContent = scoreLine;
+
+    if (els.resultScoreboard) {
+      els.resultScoreboard.hidden = false;
+      els.resultNameP1.textContent = n1;
+      els.resultNameP2.textContent = n2;
+      els.resultScoreP1.textContent = String(s1);
+      els.resultScoreP2.textContent = String(s2);
+      els.resultScoreP1.classList.toggle("is-winner", s1 > s2);
+      els.resultScoreP2.classList.toggle("is-winner", s2 > s1);
+    }
+    els.resultMeta.textContent = metaText;
   }
 
   function applyRangePreset(presetId) {
@@ -577,19 +598,54 @@
       const group = groupEl.dataset.group;
       const value = btn.dataset.value;
 
-      if (group === "theme" || group === "theme-menu") {
+      if (group === "theme-menu") {
         applyTheme(value);
         Sound.playSfx("select");
         return;
       }
       if (group === "players") state.players = Number(value);
       if (group === "kind") setKind(value);
-      if (group === "mode") state.pairMode = value;
-      if (group === "grid") state.gridId = value;
-      if (group === "word-category") state.wordCategory = value;
-      if (group === "range-preset") applyRangePreset(value);
       Sound.playSfx("select");
       syncSetupUI();
+    });
+
+    function onSelectChange(handler) {
+      return () => {
+        handler();
+        Sound.playSfx("select");
+        syncSetupUI();
+      };
+    }
+
+    els.selMode.addEventListener(
+      "change",
+      onSelectChange(() => {
+        state.pairMode = els.selMode.value;
+      })
+    );
+    els.selGrid.addEventListener(
+      "change",
+      onSelectChange(() => {
+        state.gridId = els.selGrid.value;
+      })
+    );
+    els.selWordCategory.addEventListener(
+      "change",
+      onSelectChange(() => {
+        state.wordCategory = els.selWordCategory.value;
+      })
+    );
+    els.selRangePreset.addEventListener(
+      "change",
+      onSelectChange(() => {
+        const value = els.selRangePreset.value;
+        if (value) applyRangePreset(value);
+        else state.rangePreset = "";
+      })
+    );
+    els.selTheme.addEventListener("change", () => {
+      applyTheme(els.selTheme.value);
+      Sound.playSfx("select");
     });
 
     function onRowChange() {
@@ -597,7 +653,6 @@
       state.rowTo = els.rowTo.value;
       syncRangePresetFromRows();
       Sound.playSfx("select");
-      syncPoolHint();
       syncSetupUI();
     }
     els.rowFrom.addEventListener("change", onRowChange);
@@ -655,55 +710,50 @@
   }
 
   function renderModeOptions() {
-    const host = qs('[data-group="mode"]');
     const modes = currentModes();
-    host.innerHTML = Object.keys(modes)
+    els.selMode.innerHTML = Object.keys(modes)
       .map((id) => {
         const m = modes[id];
-        return (
-          '<button type="button" class="opt" data-value="' +
-          m.id +
-          '">' +
-          m.label +
-          "</button>"
-        );
+        return '<option value="' + m.id + '">' + m.label + "</option>";
       })
       .join("");
+    els.selMode.value = state.pairMode;
   }
 
-  function fillWordCategories() {
-    const host = qs('[data-group="word-category"]');
-    if (!host) return;
-    host.innerHTML = WORD_CATEGORIES.map((cat) => {
-      return (
-        '<button type="button" class="opt" data-value="' +
-        cat.id +
-        '">' +
-        cat.label +
-        "</button>"
-      );
-    }).join("");
-  }
-
-  function initStaticOptions() {
+  function fillSetupSelects() {
     renderModeOptions();
-    fillWordCategories();
 
-    const gridHost = qs('[data-group="grid"]');
-    gridHost.innerHTML = GRID_PRESETS.map((g) => {
-      return (
-        '<button type="button" class="opt" data-value="' +
-        g.id +
-        '">' +
-        g.label +
-        "</button>"
-      );
+    els.selGrid.innerHTML = GRID_PRESETS.map((g) => {
+      return '<option value="' + g.id + '">' + g.label + "</option>";
     }).join("");
+    els.selGrid.value = state.gridId;
+
+    els.selWordCategory.innerHTML = WORD_CATEGORIES.map((cat) => {
+      return '<option value="' + cat.id + '">' + cat.label + "</option>";
+    }).join("");
+    els.selWordCategory.value = state.wordCategory;
+
+    els.selRangePreset.innerHTML =
+      Object.keys(RANGE_PRESETS)
+        .map((id) => {
+          const p = RANGE_PRESETS[id];
+          return '<option value="' + p.id + '">' + p.label + "</option>";
+        })
+        .join("") + '<option value="">自訂</option>';
+    els.selRangePreset.value = state.rangePreset || "";
+
+    els.selTheme.innerHTML = Object.keys(THEMES)
+      .map((id) => {
+        const t = THEMES[id];
+        return '<option value="' + t.id + '">' + t.label + "</option>";
+      })
+      .join("");
+    els.selTheme.value = state.theme;
   }
 
   applyTheme(loadSavedTheme(), { silent: true });
   fillRowSelects();
-  initStaticOptions();
+  fillSetupSelects();
   bindSetup();
   syncAudioSettings();
   syncSetupUI();

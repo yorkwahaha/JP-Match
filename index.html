@@ -25,7 +25,6 @@
         <header class="brand">
           <p class="brand-mark">JP MATCH</p>
           <h1 class="brand-title">五十音配對</h1>
-          <p class="brand-sub">掀開兩張，找到同一組的另一面</p>
         </header>
 
         <div class="setup-panel">
@@ -46,22 +45,18 @@
           </div>
 
           <div class="field">
-            <span class="field-label">配對模式</span>
-            <div class="opt-row opt-wrap" data-group="mode"></div>
+            <label class="field-label" for="sel-mode">配對模式</label>
+            <select id="sel-mode" class="setup-select" aria-label="配對模式"></select>
           </div>
 
           <div class="field">
-            <span class="field-label">盤面大小</span>
-            <div class="opt-row opt-wrap" data-group="grid"></div>
+            <label class="field-label" for="sel-grid">盤面大小</label>
+            <select id="sel-grid" class="setup-select" aria-label="盤面大小"></select>
           </div>
 
           <div class="field" id="field-kana-range">
-            <span class="field-label">出題範圍</span>
-            <div class="opt-row opt-wrap" data-group="range-preset">
-              <button type="button" class="opt is-active" data-value="seion">清音</button>
-              <button type="button" class="opt" data-value="dakuon">＋濁音</button>
-              <button type="button" class="opt" data-value="youon">＋拗音</button>
-            </div>
+            <label class="field-label" for="sel-range-preset">出題範圍</label>
+            <select id="sel-range-preset" class="setup-select" aria-label="出題範圍快捷"></select>
             <div class="range-row">
               <label class="range-select-wrap">
                 <span class="range-select-label">從</span>
@@ -77,27 +72,14 @@
           </div>
 
           <div class="field" id="field-word-category" hidden>
-            <span class="field-label">單字主題</span>
-            <div class="opt-row opt-wrap" data-group="word-category"></div>
+            <label class="field-label" for="sel-word-category">單字主題</label>
+            <select id="sel-word-category" class="setup-select" aria-label="單字主題"></select>
             <p id="word-hint" class="range-hint">題池 18 個單字</p>
           </div>
 
           <div class="field">
-            <span class="field-label">介面配色</span>
-            <div class="opt-row opt-wrap" data-group="theme">
-              <button type="button" class="opt theme-opt is-active" data-value="night">
-                <span class="theme-swatch theme-swatch-night" aria-hidden="true"></span>
-                夜紺
-              </button>
-              <button type="button" class="opt theme-opt" data-value="mist">
-                <span class="theme-swatch theme-swatch-mist" aria-hidden="true"></span>
-                水霧
-              </button>
-              <button type="button" class="opt theme-opt" data-value="yuzu">
-                <span class="theme-swatch theme-swatch-yuzu" aria-hidden="true"></span>
-                柚香
-              </button>
-            </div>
+            <label class="field-label" for="sel-theme">介面配色</label>
+            <select id="sel-theme" class="setup-select" aria-label="介面配色"></select>
           </div>
 
           <button type="button" id="btn-start" class="btn-primary">開始遊戲</button>
@@ -148,7 +130,21 @@
         <div class="result-card">
           <p class="result-kicker">GAME OVER</p>
           <h2 id="result-title" class="result-title">獲勝</h2>
-          <p id="result-detail" class="result-detail"></p>
+
+          <div id="result-scoreboard" class="result-scoreboard" hidden>
+            <div class="result-score-side is-p1">
+              <span id="result-name-p1" class="result-score-name">玩家 1</span>
+              <span id="result-score-p1" class="result-score-num">0</span>
+            </div>
+            <span class="result-score-sep" aria-hidden="true">:</span>
+            <div class="result-score-side is-p2">
+              <span id="result-name-p2" class="result-score-name">玩家 2</span>
+              <span id="result-score-p2" class="result-score-num">0</span>
+            </div>
+          </div>
+
+          <p id="result-meta" class="result-meta"></p>
+
           <div class="result-actions">
             <button type="button" id="btn-restart" class="btn-primary">再玩一局</button>
             <button type="button" id="btn-to-setup" class="btn-ghost">回到首頁</button>
@@ -206,7 +202,7 @@
                 type="range"
                 min="0"
                 max="100"
-                value="35"
+                value="18"
                 step="1"
               />
             </label>

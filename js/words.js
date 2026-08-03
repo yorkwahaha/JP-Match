@@ -49,6 +49,10 @@ window.JPMatchWords = (() => {
     { key: "kuro", hira: "くろ", romaji: "kuro", pic: "⚫", label: "黑色", category: "colors" },
     { key: "murasaki", hira: "むらさき", romaji: "murasaki", pic: "🟣", label: "紫色", category: "colors" },
     { key: "orenji", hira: "オレンジ", romaji: "orenji", pic: "🟠", label: "橘色", category: "colors" },
+    { key: "pinku", hira: "ピンク", romaji: "pinku", pic: "🩷", label: "粉紅色", category: "colors" },
+    { key: "haiiro", hira: "はいいろ", romaji: "haiiro", pic: "🩶", label: "灰色", category: "colors" },
+    { key: "kiniro", hira: "きんいろ", romaji: "kiniro", pic: "🥇", label: "金色", category: "colors" },
+    { key: "giniro", hira: "ぎんいろ", romaji: "giniro", pic: "🥈", label: "銀色", category: "colors" },
 
     // 日常／自然
     { key: "taiyou", hira: "たいよう", romaji: "taiyou", pic: "☀️", label: "太陽", category: "daily" },
@@ -78,13 +82,13 @@ window.JPMatchWords = (() => {
     { key: "kyuu", hira: "きゅう", romaji: "kyuu", pic: "9", label: "九", category: "calendar", picKind: "symbol" },
     { key: "juu", hira: "じゅう", romaji: "juu", pic: "10", label: "十", category: "calendar", picKind: "symbol" },
 
-    { key: "getsuyoubi", hira: "げつようび", romaji: "getsuyoubi", pic: "月", label: "星期一", category: "calendar", picKind: "symbol" },
-    { key: "kayoubi", hira: "かようび", romaji: "kayoubi", pic: "火", label: "星期二", category: "calendar", picKind: "symbol" },
-    { key: "suiyoubi", hira: "すいようび", romaji: "suiyoubi", pic: "水", label: "星期三", category: "calendar", picKind: "symbol" },
-    { key: "mokuyoubi", hira: "もくようび", romaji: "mokuyoubi", pic: "木", label: "星期四", category: "calendar", picKind: "symbol" },
-    { key: "kinyoubi", hira: "きんようび", romaji: "kinyoubi", pic: "金", label: "星期五", category: "calendar", picKind: "symbol" },
-    { key: "doyoubi", hira: "どようび", romaji: "doyoubi", pic: "土", label: "星期六", category: "calendar", picKind: "symbol" },
-    { key: "nichiyoubi", hira: "にちようび", romaji: "nichiyoubi", pic: "日", label: "星期日", category: "calendar", picKind: "symbol" },
+    { key: "getsuyoubi", hira: "げつようび", romaji: "getsuyoubi", pic: "月曜日", picSub: "（星期一）", label: "星期一", category: "calendar", picKind: "symbol" },
+    { key: "kayoubi", hira: "かようび", romaji: "kayoubi", pic: "火曜日", picSub: "（星期二）", label: "星期二", category: "calendar", picKind: "symbol" },
+    { key: "suiyoubi", hira: "すいようび", romaji: "suiyoubi", pic: "水曜日", picSub: "（星期三）", label: "星期三", category: "calendar", picKind: "symbol" },
+    { key: "mokuyoubi", hira: "もくようび", romaji: "mokuyoubi", pic: "木曜日", picSub: "（星期四）", label: "星期四", category: "calendar", picKind: "symbol" },
+    { key: "kinyoubi", hira: "きんようび", romaji: "kinyoubi", pic: "金曜日", picSub: "（星期五）", label: "星期五", category: "calendar", picKind: "symbol" },
+    { key: "doyoubi", hira: "どようび", romaji: "doyoubi", pic: "土曜日", picSub: "（星期六）", label: "星期六", category: "calendar", picKind: "symbol" },
+    { key: "nichiyoubi", hira: "にちようび", romaji: "nichiyoubi", pic: "日曜日", picSub: "（星期日）", label: "星期日", category: "calendar", picKind: "symbol" },
 
     { key: "ichigatsu", hira: "いちがつ", romaji: "ichigatsu", pic: "1月", label: "一月", category: "calendar", picKind: "symbol" },
     { key: "nigatsu", hira: "にがつ", romaji: "nigatsu", pic: "2月", label: "二月", category: "calendar", picKind: "symbol" },
@@ -166,6 +170,7 @@ window.JPMatchWords = (() => {
         display: sideA === "pic" ? picDisplay : "text",
         voiceText: word.hira,
         label: word.label,
+        picSub: sideA === "pic" ? word.picSub || "" : "",
       });
       cards.push({
         pairKey: word.key,
@@ -175,6 +180,7 @@ window.JPMatchWords = (() => {
         display: sideB === "pic" ? picDisplay : "text",
         voiceText: word.hira,
         label: word.label,
+        picSub: sideB === "pic" ? word.picSub || "" : "",
       });
     });
 
