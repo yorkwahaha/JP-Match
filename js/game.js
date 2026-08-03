@@ -325,7 +325,8 @@
       btn.dataset.side = card.side;
       btn.setAttribute("aria-label", faceDownLabel(index));
 
-      const isPic = card.display === "pic" || card.side === "pic";
+      const isImg = card.display === "img";
+      const isPic = card.display === "pic" || (card.side === "pic" && !isImg);
       const isSymbol = card.display === "symbol";
       let contentHtml;
       if (isSymbol) {
@@ -343,6 +344,11 @@
             ? '<span class="card-symbol-sub">' + card.picSub + "</span>"
             : "") +
           "</span>";
+      } else if (isImg) {
+        contentHtml =
+          '<img class="card-img" src="' +
+          card.text +
+          '" alt="" draggable="false" />';
       } else if (isPic) {
         contentHtml =
           '<span class="card-emoji" aria-hidden="true">' + card.text + "</span>";

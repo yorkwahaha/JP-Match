@@ -925,6 +925,16 @@ body.turn-switched .score-pill.is-active {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
 }
 
+.card-img {
+  position: relative;
+  z-index: 2;
+  width: 58cqmin;
+  height: 58cqmin;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
 .card-symbol {
   position: relative;
   z-index: 2;

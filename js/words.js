@@ -116,34 +116,34 @@ window.JPMatchWords = (() => {
     { key: "michi", hira: "みち", romaji: "michi", pic: "🛣️", label: "路", category: "daily" },
     { key: "hashi", hira: "はし", romaji: "hashi", pic: "🌉", label: "橋", category: "daily" },
 
-    // 電器・傢俱
-    { key: "terebi", hira: "テレビ", romaji: "terebi", pic: "📺", label: "電視", category: "home" },
-    { key: "beddo", hira: "ベッド", romaji: "beddo", pic: "🛏️", label: "床", category: "home" },
-    { key: "tsukue", hira: "つくえ", romaji: "tsukue", pic: "🪑", label: "桌子", category: "home" },
-    { key: "isu", hira: "いす", romaji: "isu", pic: "💺", label: "椅子", category: "home" },
-    { key: "tana", hira: "たな", romaji: "tana", pic: "🗄️", label: "架子", category: "home" },
-    { key: "tansu", hira: "たんす", romaji: "tansu", pic: "🗄️", label: "衣櫃", category: "home" },
-    { key: "reizouko", hira: "れいぞうこ", romaji: "reizouko", pic: "🧊", label: "冰箱", category: "home" },
-    { key: "sentakuki", hira: "せんたくき", romaji: "sentakuki", pic: "🧺", label: "洗衣機", category: "home" },
-    { key: "soujiki", hira: "そうじき", romaji: "soujiki", pic: "🧹", label: "吸塵器", category: "home" },
-    { key: "eakon", hira: "エアコン", romaji: "eakon", pic: "❄️", label: "冷氣", category: "home" },
-    { key: "denki", hira: "でんき", romaji: "denki", pic: "💡", label: "電燈", category: "home" },
-    { key: "denwa", hira: "でんわ", romaji: "denwa", pic: "☎️", label: "電話", category: "home" },
-    { key: "keitai", hira: "けいたい", romaji: "keitai", pic: "📱", label: "手機", category: "home" },
-    { key: "pasokon", hira: "パソコン", romaji: "pasokon", pic: "💻", label: "電腦", category: "home" },
-    { key: "kamera", hira: "カメラ", romaji: "kamera", pic: "📷", label: "相機", category: "home" },
-    { key: "rajio", hira: "ラジオ", romaji: "rajio", pic: "📻", label: "收音機", category: "home" },
-    { key: "senpuuki", hira: "せんぷうき", romaji: "senpuuki", pic: "🪭", label: "電風扇", category: "home" },
-    { key: "kagami", hira: "かがみ", romaji: "kagami", pic: "🪞", label: "鏡子", category: "home" },
-    { key: "mado", hira: "まど", romaji: "mado", pic: "🪟", label: "窗戶", category: "home" },
-    { key: "doa", hira: "ドア", romaji: "doa", pic: "🚪", label: "門", category: "home" },
-    { key: "futon", hira: "ふとん", romaji: "futon", pic: "🛏️", label: "被褥", category: "home" },
-    { key: "makura", hira: "まくら", romaji: "makura", pic: "🛌", label: "枕頭", category: "home" },
-    { key: "ofuro", hira: "おふろ", romaji: "ofuro", pic: "🛁", label: "浴缸", category: "home" },
-    { key: "toire", hira: "トイレ", romaji: "toire", pic: "🚽", label: "廁所", category: "home" },
-    { key: "nagashidai", hira: "ながしだい", romaji: "nagashidai", pic: "🚰", label: "水槽", category: "home" },
-    { key: "suihanki", hira: "すいはんき", romaji: "suihanki", pic: "🍚", label: "電鍋", category: "home" },
-    { key: "renji", hira: "レンジ", romaji: "renji", pic: "🍳", label: "微波爐", category: "home" },
+    // 電器・傢俱（自製 SVG，避免 emoji 圖文不符）
+    { key: "terebi", hira: "テレビ", romaji: "terebi", pic: "assets/icons/home/terebi.svg", label: "電視", category: "home", picKind: "img" },
+    { key: "beddo", hira: "ベッド", romaji: "beddo", pic: "assets/icons/home/beddo.svg", label: "床", category: "home", picKind: "img" },
+    { key: "tsukue", hira: "つくえ", romaji: "tsukue", pic: "assets/icons/home/tsukue.svg", label: "桌子", category: "home", picKind: "img" },
+    { key: "isu", hira: "いす", romaji: "isu", pic: "assets/icons/home/isu.svg", label: "椅子", category: "home", picKind: "img" },
+    { key: "tana", hira: "たな", romaji: "tana", pic: "assets/icons/home/tana.svg", label: "架子", category: "home", picKind: "img" },
+    { key: "tansu", hira: "たんす", romaji: "tansu", pic: "assets/icons/home/tansu.svg", label: "衣櫃", category: "home", picKind: "img" },
+    { key: "reizouko", hira: "れいぞうこ", romaji: "reizouko", pic: "assets/icons/home/reizouko.svg", label: "冰箱", category: "home", picKind: "img" },
+    { key: "sentakuki", hira: "せんたくき", romaji: "sentakuki", pic: "assets/icons/home/sentakuki.svg", label: "洗衣機", category: "home", picKind: "img" },
+    { key: "soujiki", hira: "そうじき", romaji: "soujiki", pic: "assets/icons/home/soujiki.svg", label: "吸塵器", category: "home", picKind: "img" },
+    { key: "eakon", hira: "エアコン", romaji: "eakon", pic: "assets/icons/home/eakon.svg", label: "冷氣", category: "home", picKind: "img" },
+    { key: "denki", hira: "でんき", romaji: "denki", pic: "assets/icons/home/denki.svg", label: "電燈", category: "home", picKind: "img" },
+    { key: "denwa", hira: "でんわ", romaji: "denwa", pic: "assets/icons/home/denwa.svg", label: "電話", category: "home", picKind: "img" },
+    { key: "keitai", hira: "けいたい", romaji: "keitai", pic: "assets/icons/home/keitai.svg", label: "手機", category: "home", picKind: "img" },
+    { key: "pasokon", hira: "パソコン", romaji: "pasokon", pic: "assets/icons/home/pasokon.svg", label: "電腦", category: "home", picKind: "img" },
+    { key: "kamera", hira: "カメラ", romaji: "kamera", pic: "assets/icons/home/kamera.svg", label: "相機", category: "home", picKind: "img" },
+    { key: "rajio", hira: "ラジオ", romaji: "rajio", pic: "assets/icons/home/rajio.svg", label: "收音機", category: "home", picKind: "img" },
+    { key: "senpuuki", hira: "せんぷうき", romaji: "senpuuki", pic: "assets/icons/home/senpuuki.svg", label: "電風扇", category: "home", picKind: "img" },
+    { key: "kagami", hira: "かがみ", romaji: "kagami", pic: "assets/icons/home/kagami.svg", label: "鏡子", category: "home", picKind: "img" },
+    { key: "mado", hira: "まど", romaji: "mado", pic: "assets/icons/home/mado.svg", label: "窗戶", category: "home", picKind: "img" },
+    { key: "doa", hira: "ドア", romaji: "doa", pic: "assets/icons/home/doa.svg", label: "門", category: "home", picKind: "img" },
+    { key: "futon", hira: "ふとん", romaji: "futon", pic: "assets/icons/home/futon.svg", label: "被褥", category: "home", picKind: "img" },
+    { key: "makura", hira: "まくら", romaji: "makura", pic: "assets/icons/home/makura.svg", label: "枕頭", category: "home", picKind: "img" },
+    { key: "ofuro", hira: "おふろ", romaji: "ofuro", pic: "assets/icons/home/ofuro.svg", label: "浴缸", category: "home", picKind: "img" },
+    { key: "toire", hira: "トイレ", romaji: "toire", pic: "assets/icons/home/toire.svg", label: "廁所", category: "home", picKind: "img" },
+    { key: "nagashidai", hira: "ながしだい", romaji: "nagashidai", pic: "assets/icons/home/nagashidai.svg", label: "水槽", category: "home", picKind: "img" },
+    { key: "suihanki", hira: "すいはんき", romaji: "suihanki", pic: "assets/icons/home/suihanki.svg", label: "電鍋", category: "home", picKind: "img" },
+    { key: "renji", hira: "レンジ", romaji: "renji", pic: "assets/icons/home/renji.svg", label: "微波爐", category: "home", picKind: "img" },
 
     // 月分・星期・一到十（圖案側用數字／曜日記號）
     { key: "ichi", hira: "いち", romaji: "ichi", pic: "1", label: "一", category: "calendar", picKind: "symbol" },
@@ -237,7 +237,12 @@ window.JPMatchWords = (() => {
 
     const cards = [];
     selected.forEach((word) => {
-      const picDisplay = word.picKind === "symbol" ? "symbol" : "pic";
+      const picDisplay =
+        word.picKind === "symbol"
+          ? "symbol"
+          : word.picKind === "img"
+            ? "img"
+            : "pic";
       cards.push({
         pairKey: word.key,
         side: sideA,
