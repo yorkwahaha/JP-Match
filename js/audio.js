@@ -33,10 +33,12 @@ window.JPMatchAudio = (() => {
       BASE + "/bgm/area-3.mp3",
     ],
     kanaDir: BASE + "/kana/",
+    wordsDir: BASE + "/words/",
   };
 
   const sfxCache = {};
   const kanaCache = {};
+  const wordCache = {};
   let bgmEl = null;
   let bgmIndex = -1;
   let unlocked = false;
@@ -121,6 +123,41 @@ window.JPMatchAudio = (() => {
     const key = String(romajiKey).toLowerCase();
     const src = PATHS.kanaDir + key + ".mp3";
     playSrc(src, settings.voiceVolume, kanaCache);
+  }
+
+  function playWord(wordKey, fallbackText) {
+    if (!settings.voice || !wordKey) {
+      if (fallbackText) playReading(fallbackText);
+      return;
+    }
+    unlock();
+    stopReading();
+    const key = String(wordKey).toLowerCase();
+    const src = PATHS.wordsDir + key + ".mp3";
+    let el = wordCache[src];
+    if (!el) {
+      el = new Audio(src);
+      el.preload = "auto";
+      wordCache[src] = el;
+    }
+    el.pause();
+    try {
+      el.currentTime = 0;
+    } catch (e) {}
+    el.volume = settings.voiceVolume;
+    const sessionId = readingSessionId;
+    const onError = function () {
+      el.onerror = null;
+      if (sessionId !== readingSessionId) return;
+      if (fallbackText) playReading(fallbackText);
+    };
+    el.onerror = onError;
+    const p = el.play();
+    if (p && p.catch) {
+      p.catch(function () {
+        onError();
+      });
+    }
   }
 
   async function getSessionToken() {
@@ -330,6 +367,7 @@ window.JPMatchAudio = (() => {
     unlock: unlock,
     playSfx: playSfx,
     playKana: playKana,
+    playWord: playWord,
     playReading: playReading,
     stopReading: stopReading,
     startBgm: startBgm,

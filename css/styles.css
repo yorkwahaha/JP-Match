@@ -874,7 +874,7 @@ body.turn-switched .score-pill.is-active {
 }
 
 .card-front::before {
-  content: ";
+  content: "";
   position: absolute;
   inset: 0;
   background:
@@ -935,38 +935,23 @@ body.turn-switched .score-pill.is-active {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.card-pic-stack {
-  position: relative;
-  z-index: 2;
+.card-watermark {
+  position: absolute;
+  inset: 18% 8% 14%;
+  z-index: 1;
   display: grid;
-  justify-items: center;
-  align-content: center;
-  gap: 0.12em;
-  max-width: 92%;
-}
-
-.card-pic-stack .card-emoji {
-  font-size: 40cqmin;
-}
-
-.card-pic-stack .card-img {
-  width: 48cqmin;
-  height: 48cqmin;
-}
-
-.card-pic-sub {
-  display: block;
-  font-family: var(--font-body);
-  font-size: 14cqmin;
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: 0.02em;
-  color: var(--kind-fg);
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 34cqmin;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
   text-align: center;
-  max-width: 100%;
+  color: var(--card-text);
+  opacity: 0.18;
+  pointer-events: none;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  user-select: none;
 }
 
 .card-symbol {
@@ -1016,16 +1001,24 @@ body.turn-switched .score-pill.is-active {
 
 /* 卡面太矮時隱藏中文小字，避免擠壓 */
 @container (max-height: 88px) {
-  .card-symbol-sub,
-  .card-pic-sub {
+  .card-symbol-sub {
     display: none;
+  }
+
+  .card-watermark {
+    font-size: 28cqmin;
+    opacity: 0.14;
   }
 }
 
 @container (max-width: 72px) {
-  .card-symbol-sub,
-  .card-pic-sub {
+  .card-symbol-sub {
     display: none;
+  }
+
+  .card-watermark {
+    font-size: 26cqmin;
+    opacity: 0.14;
   }
 }
 

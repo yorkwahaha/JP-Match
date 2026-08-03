@@ -250,8 +250,9 @@ window.JPMatchWords = (() => {
         kindLabel: mode.sideLabels[sideA],
         display: sideA === "pic" ? picDisplay : "text",
         voiceText: word.hira,
+        voiceKey: word.key,
         label: word.label,
-        picSub: sideA === "pic" ? word.picSub || word.label || "" : "",
+        picSub: sideA === "pic" ? word.picSub || "" : "",
       });
       cards.push({
         pairKey: word.key,
@@ -260,8 +261,9 @@ window.JPMatchWords = (() => {
         kindLabel: mode.sideLabels[sideB],
         display: sideB === "pic" ? picDisplay : "text",
         voiceText: word.hira,
+        voiceKey: word.key,
         label: word.label,
-        picSub: sideB === "pic" ? word.picSub || word.label || "" : "",
+        picSub: sideB === "pic" ? word.picSub || "" : "",
       });
     });
 

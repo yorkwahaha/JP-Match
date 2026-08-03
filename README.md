@@ -46,7 +46,7 @@ https://yorkwahaha.github.io/JP-Match/
 - 月・曜・數（一到十、星期、月分）
 - 全部
 
-翻牌時單字會以 **Google Cloud TTS**（與 JPAPP 相同 proxy、日文 Neural2 聲線）朗讀；若無法連線則退回瀏覽器語音。
+翻牌時單字優先播放本地音檔（`assets/audio/words/`，Google Neural2 預先產生）；缺檔才走 Cloud TTS，再不行才退回瀏覽器語音。假名仍用 `assets/audio/kana/`。
 
 題池數量須 ≥ 盤面組數，否則會提示並無法開始。
 

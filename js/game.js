@@ -345,20 +345,13 @@
             : "") +
           "</span>";
       } else if (isImg || isPic) {
-        const visual = isImg
+        contentHtml = isImg
           ? '<img class="card-img" src="' +
             card.text +
             '" alt="" draggable="false" />'
           : '<span class="card-emoji" aria-hidden="true">' +
             card.text +
             "</span>";
-        contentHtml = card.picSub
-          ? '<span class="card-pic-stack">' +
-            visual +
-            '<span class="card-pic-sub">' +
-            card.picSub +
-            "</span></span>"
-          : visual;
       } else {
         contentHtml =
           '<span class="card-text' +
@@ -367,6 +360,13 @@
           card.text +
           "</span>";
       }
+
+      const watermarkHtml =
+        card.label && !isSymbol
+          ? '<span class="card-watermark" aria-hidden="true">' +
+            card.label +
+            "</span>"
+          : "";
 
       btn.innerHTML =
         '<span class="card-inner">' +
@@ -380,6 +380,7 @@
         '">' +
         '<span class="card-front-frame"></span>' +
         '<span class="card-corners card-corners-ink" aria-hidden="true"></span>' +
+        watermarkHtml +
         '<span class="card-kind">' +
         card.kindLabel +
         "</span>" +
@@ -476,7 +477,8 @@
     }
     Sound.playSfx("flip");
     if (!card) return;
-    if (card.voiceText) Sound.playReading(card.voiceText);
+    if (card.voiceKey) Sound.playWord(card.voiceKey, card.voiceText);
+    else if (card.voiceText) Sound.playReading(card.voiceText);
     else if (card.audioKey) Sound.playKana(card.audioKey);
   }
 
