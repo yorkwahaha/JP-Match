@@ -344,14 +344,21 @@
             ? '<span class="card-symbol-sub">' + card.picSub + "</span>"
             : "") +
           "</span>";
-      } else if (isImg) {
-        contentHtml =
-          '<img class="card-img" src="' +
-          card.text +
-          '" alt="" draggable="false" />';
-      } else if (isPic) {
-        contentHtml =
-          '<span class="card-emoji" aria-hidden="true">' + card.text + "</span>";
+      } else if (isImg || isPic) {
+        const visual = isImg
+          ? '<img class="card-img" src="' +
+            card.text +
+            '" alt="" draggable="false" />'
+          : '<span class="card-emoji" aria-hidden="true">' +
+            card.text +
+            "</span>";
+        contentHtml = card.picSub
+          ? '<span class="card-pic-stack">' +
+            visual +
+            '<span class="card-pic-sub">' +
+            card.picSub +
+            "</span></span>"
+          : visual;
       } else {
         contentHtml =
           '<span class="card-text' +

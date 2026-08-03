@@ -251,7 +251,7 @@ window.JPMatchWords = (() => {
         display: sideA === "pic" ? picDisplay : "text",
         voiceText: word.hira,
         label: word.label,
-        picSub: sideA === "pic" ? word.picSub || "" : "",
+        picSub: sideA === "pic" ? word.picSub || word.label || "" : "",
       });
       cards.push({
         pairKey: word.key,
@@ -261,7 +261,7 @@ window.JPMatchWords = (() => {
         display: sideB === "pic" ? picDisplay : "text",
         voiceText: word.hira,
         label: word.label,
-        picSub: sideB === "pic" ? word.picSub || "" : "",
+        picSub: sideB === "pic" ? word.picSub || word.label || "" : "",
       });
     });
 
