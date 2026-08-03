@@ -212,14 +212,6 @@ button {
   line-height: 1.15;
 }
 
-.brand-sub {
-  margin: 12px auto 0;
-  max-width: 22em;
-  color: var(--ui-muted-strong);
-  font-size: 0.98rem;
-  line-height: 1.55;
-}
-
 .setup-panel {
   position: relative;
   width: min(560px, 100%);
@@ -492,7 +484,7 @@ button {
 /* 雙人回合：左右邊緣色帶 */
 .game::before,
 .game::after {
-  content: ";
+  content: "";
   position: absolute;
   top: 0;
   bottom: 0;
@@ -1291,10 +1283,6 @@ body.turn-switched .score-pill.is-active {
 
   .brand-title {
     font-size: 1.8rem;
-  }
-
-  .brand-sub {
-    display: none;
   }
 
   .game {

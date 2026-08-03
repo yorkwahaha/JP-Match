@@ -94,8 +94,21 @@ window.JPMatchAudio = (() => {
     playSrc(src, settings.sfxVolume, sfxCache);
   }
 
+  function stopCachedAudio(cache) {
+    Object.keys(cache).forEach(function (src) {
+      const el = cache[src];
+      if (!el) return;
+      try {
+        el.pause();
+        el.currentTime = 0;
+      } catch (e) {}
+    });
+  }
+
   function stopReading() {
     readingSessionId += 1;
+    stopCachedAudio(kanaCache);
+    stopCachedAudio(wordCache);
     if (window.speechSynthesis) {
       try {
         window.speechSynthesis.cancel();

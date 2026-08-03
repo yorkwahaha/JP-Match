@@ -34,6 +34,23 @@
   const DEFAULT_THEME = "night";
   const DEFAULT_KIND = "kana";
 
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function safeAssetSrc(src) {
+    const value = String(src || "");
+    if (/^assets\/[a-z0-9_./-]+$/i.test(value) && value.indexOf("..") === -1) {
+      return value;
+    }
+    return "";
+  }
+
   const state = {
     screen: "setup",
     players: 2,
@@ -185,12 +202,10 @@
     if (state.screen !== "game" || state.ended) return;
     syncMenuUI();
     els.menuOverlay.hidden = false;
-    document.body.classList.add("menu-open");
   }
 
   function closeMenu() {
     els.menuOverlay.hidden = true;
-    document.body.classList.remove("menu-open");
   }
 
   function showScreen(name) {
@@ -338,26 +353,34 @@
           stacked +
           '">' +
           '<span class="card-symbol-main">' +
-          card.text +
+          escapeHtml(card.text) +
           "</span>" +
           (card.picSub
-            ? '<span class="card-symbol-sub">' + card.picSub + "</span>"
+            ? '<span class="card-symbol-sub">' +
+              escapeHtml(card.picSub) +
+              "</span>"
             : "") +
           "</span>";
       } else if (isImg || isPic) {
-        contentHtml = isImg
-          ? '<img class="card-img" src="' +
-            card.text +
-            '" alt="" draggable="false" />'
-          : '<span class="card-emoji" aria-hidden="true">' +
-            card.text +
+        if (isImg) {
+          const src = safeAssetSrc(card.text);
+          contentHtml = src
+            ? '<img class="card-img" src="' +
+              escapeHtml(src) +
+              '" alt="" draggable="false" />'
+            : '<span class="card-text">?</span>';
+        } else {
+          contentHtml =
+            '<span class="card-emoji" aria-hidden="true">' +
+            escapeHtml(card.text) +
             "</span>";
+        }
       } else {
         contentHtml =
           '<span class="card-text' +
           (card.text.length > 1 ? " is-compact" : "") +
           '">' +
-          card.text +
+          escapeHtml(card.text) +
           "</span>";
       }
 
@@ -369,7 +392,7 @@
         '<span class="seal"><span class="seal-ring"></span><span class="seal-char"></span></span>' +
         "</span>" +
         '<span class="card-face card-front" data-side="' +
-        card.side +
+        escapeHtml(card.side) +
         '">' +
         '<span class="card-front-frame"></span>' +
         '<span class="card-corners card-corners-ink" aria-hidden="true"></span>' +
@@ -526,6 +549,7 @@
   function endGame() {
     state.ended = true;
     Sound.stopBgm();
+    if (Sound.stopReading) Sound.stopReading();
     const elapsed = Math.round((Date.now() - state.startedAt) / 1000);
     const mins = Math.floor(elapsed / 60);
     const secs = elapsed % 60;
@@ -705,7 +729,13 @@
 
   function fillRowSelects() {
     const options = ROWS.map((row) => {
-      return '<option value="' + row.id + '">' + row.label + "</option>";
+      return (
+        '<option value="' +
+        escapeHtml(row.id) +
+        '">' +
+        escapeHtml(row.label) +
+        "</option>"
+      );
     }).join("");
     els.rowFrom.innerHTML = options;
     els.rowTo.innerHTML = options;
@@ -718,7 +748,13 @@
     els.selMode.innerHTML = Object.keys(modes)
       .map((id) => {
         const m = modes[id];
-        return '<option value="' + m.id + '">' + m.label + "</option>";
+        return (
+          '<option value="' +
+          escapeHtml(m.id) +
+          '">' +
+          escapeHtml(m.label) +
+          "</option>"
+        );
       })
       .join("");
     els.selMode.value = state.pairMode;
@@ -728,12 +764,24 @@
     renderModeOptions();
 
     els.selGrid.innerHTML = GRID_PRESETS.map((g) => {
-      return '<option value="' + g.id + '">' + g.label + "</option>";
+      return (
+        '<option value="' +
+        escapeHtml(g.id) +
+        '">' +
+        escapeHtml(g.label) +
+        "</option>"
+      );
     }).join("");
     els.selGrid.value = state.gridId;
 
     els.selWordCategory.innerHTML = WORD_CATEGORIES.map((cat) => {
-      return '<option value="' + cat.id + '">' + cat.label + "</option>";
+      return (
+        '<option value="' +
+        escapeHtml(cat.id) +
+        '">' +
+        escapeHtml(cat.label) +
+        "</option>"
+      );
     }).join("");
     els.selWordCategory.value = state.wordCategory;
 
@@ -741,7 +789,13 @@
       Object.keys(RANGE_PRESETS)
         .map((id) => {
           const p = RANGE_PRESETS[id];
-          return '<option value="' + p.id + '">' + p.label + "</option>";
+          return (
+            '<option value="' +
+            escapeHtml(p.id) +
+            '">' +
+            escapeHtml(p.label) +
+            "</option>"
+          );
         })
         .join("") + '<option value="">自訂</option>';
     els.selRangePreset.value = state.rangePreset || "";
@@ -749,7 +803,13 @@
     els.selTheme.innerHTML = Object.keys(THEMES)
       .map((id) => {
         const t = THEMES[id];
-        return '<option value="' + t.id + '">' + t.label + "</option>";
+        return (
+          '<option value="' +
+          escapeHtml(t.id) +
+          '">' +
+          escapeHtml(t.label) +
+          "</option>"
+        );
       })
       .join("");
     els.selTheme.value = state.theme;
