@@ -361,13 +361,6 @@
           "</span>";
       }
 
-      const watermarkHtml =
-        card.label && !isSymbol
-          ? '<span class="card-watermark" aria-hidden="true">' +
-            card.label +
-            "</span>"
-          : "";
-
       btn.innerHTML =
         '<span class="card-inner">' +
         '<span class="card-face card-back" aria-hidden="true">' +
@@ -380,10 +373,6 @@
         '">' +
         '<span class="card-front-frame"></span>' +
         '<span class="card-corners card-corners-ink" aria-hidden="true"></span>' +
-        watermarkHtml +
-        '<span class="card-kind">' +
-        card.kindLabel +
-        "</span>" +
         contentHtml +
         "</span></span>";
       btn.addEventListener("click", () => onCardTap(index));

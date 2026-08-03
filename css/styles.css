@@ -794,7 +794,7 @@ body.turn-switched .score-pill.is-active {
 
 .card-corners::before,
 .card-corners::after {
-  content: ";
+  content: "";
   position: absolute;
   width: 14px;
   height: 14px;
@@ -935,25 +935,6 @@ body.turn-switched .score-pill.is-active {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.card-watermark {
-  position: absolute;
-  inset: 18% 8% 14%;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 34cqmin;
-  line-height: 1.05;
-  letter-spacing: 0.04em;
-  text-align: center;
-  color: var(--card-text);
-  opacity: 0.18;
-  pointer-events: none;
-  overflow: hidden;
-  user-select: none;
-}
-
 .card-symbol {
   position: relative;
   z-index: 2;
@@ -999,15 +980,10 @@ body.turn-switched .score-pill.is-active {
   text-shadow: none;
 }
 
-/* 卡面太矮時隱藏中文小字，避免擠壓 */
+/* 卡面太矮時隱藏曜日中文小字 */
 @container (max-height: 88px) {
   .card-symbol-sub {
     display: none;
-  }
-
-  .card-watermark {
-    font-size: 28cqmin;
-    opacity: 0.14;
   }
 }
 
@@ -1015,24 +991,6 @@ body.turn-switched .score-pill.is-active {
   .card-symbol-sub {
     display: none;
   }
-
-  .card-watermark {
-    font-size: 26cqmin;
-    opacity: 0.14;
-  }
-}
-
-.card-kind {
-  position: absolute;
-  z-index: 2;
-  top: 10px;
-  left: 12px;
-  padding: 2px 7px;
-  border-radius: 999px;
-  background: var(--kind-bg);
-  font-size: clamp(0.5rem, 1.2cqmin, 0.72rem);
-  letter-spacing: 0.04em;
-  color: var(--kind-fg);
 }
 
 .card-text {
