@@ -21,9 +21,8 @@
   } = window.JPMatchWords;
   const Sound = window.JPMatchAudio;
 
-  const FLIP_MS = 280;
-  const MISMATCH_HOLD_MS = 900;
-  const MATCH_HOLD_MS = 420;
+  const MISMATCH_HOLD_MS = 420;
+  const MATCH_HOLD_MS = 280;
   const PLAYER_NAMES = ["玩家 1", "玩家 2"];
   const THEME_STORAGE_KEY = "jp-match-theme";
   const THEMES = {
@@ -534,8 +533,8 @@
     Sound.playSfx("mismatch");
     flipClose(a);
     flipClose(b);
-    await wait(FLIP_MS);
-    if (run !== state.runId) return;
+    // Unlock as soon as cards start closing so the next flip isn't blocked
+    // by the full close animation (~280ms).
     state.flipped = [];
     state.lock = false;
     if (state.players === 2) {
