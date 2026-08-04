@@ -21,7 +21,7 @@
   } = window.JPMatchWords;
   const Sound = window.JPMatchAudio;
 
-  const MISMATCH_HOLD_MS = 420;
+  const MISMATCH_HOLD_MS = 900;
   const MATCH_HOLD_MS = 280;
   const PLAYER_NAMES = ["玩家 1", "玩家 2"];
   const THEME_STORAGE_KEY = "jp-match-theme";
@@ -63,6 +63,8 @@
     theme: DEFAULT_THEME,
     deck: [],
     flipped: [],
+    pendingClose: [],
+    mismatchTimer: null,
     matched: new Set(),
     scores: [0, 0],
     currentPlayer: 0,
@@ -300,7 +302,9 @@
         toRow: state.rowTo,
       });
     }
+    clearMismatchTimer();
     state.flipped = [];
+    state.pendingClose = [];
     state.matched = new Set();
     state.scores = [0, 0];
     state.currentPlayer = 0;
@@ -449,12 +453,41 @@
     }
   }
 
+  function clearMismatchTimer() {
+    if (state.mismatchTimer == null) return;
+    clearTimeout(state.mismatchTimer);
+    state.mismatchTimer = null;
+  }
+
+  function closePendingCards() {
+    clearMismatchTimer();
+    state.pendingClose.forEach(flipClose);
+    state.pendingClose = [];
+  }
+
+  function schedulePendingClose(a, b, run) {
+    clearMismatchTimer();
+    state.pendingClose = [a, b];
+    state.mismatchTimer = setTimeout(function () {
+      state.mismatchTimer = null;
+      if (run !== state.runId) return;
+      if (state.pendingClose[0] !== a || state.pendingClose[1] !== b) return;
+      flipClose(a);
+      flipClose(b);
+      state.pendingClose = [];
+    }, MISMATCH_HOLD_MS);
+  }
+
   function onCardTap(index) {
     if (!els.menuOverlay.hidden) return;
     if (state.lock || state.ended) return;
     if (state.matched.has(state.deck[index].pairKey)) return;
     if (state.flipped.indexOf(index) !== -1) return;
+    if (state.pendingClose.indexOf(index) !== -1) return;
     if (state.flipped.length >= 2) return;
+
+    // 翻下一張時先蓋回上一組失敗牌，不必等滿 hold
+    if (state.pendingClose.length) closePendingCards();
 
     flipOpen(index);
     state.flipped.push(index);
@@ -526,17 +559,12 @@
     // 答對可連續翻牌，不換手
   }
 
-  async function handleMismatch(a, b) {
-    const run = state.runId;
-    await wait(MISMATCH_HOLD_MS);
-    if (run !== state.runId) return;
+  function handleMismatch(a, b) {
     Sound.playSfx("mismatch");
-    flipClose(a);
-    flipClose(b);
-    // Unlock as soon as cards start closing so the next flip isn't blocked
-    // by the full close animation (~280ms).
     state.flipped = [];
     state.lock = false;
+    // 失敗牌先保持翻開；滿 900ms 或下一張被翻開時才蓋回
+    schedulePendingClose(a, b, state.runId);
     if (state.players === 2) {
       state.currentPlayer = 1 - state.currentPlayer;
       updateHud({ turnSwitched: true });

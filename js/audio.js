@@ -41,6 +41,7 @@ window.JPMatchAudio = (() => {
   const wordCache = {};
   let bgmEl = null;
   let bgmIndex = -1;
+  let bgmPausedByHide = false;
   let unlocked = false;
 
   let sessionTokenData = null;
@@ -333,18 +334,51 @@ window.JPMatchAudio = (() => {
       bgmEl.src = src;
       bgmEl.dataset.src = src;
     }
+    bgmPausedByHide = false;
     bgmEl.volume = settings.bgmVolume;
     const p = bgmEl.play();
     if (p && p.catch) p.catch(function () {});
   }
 
   function stopBgm() {
+    bgmPausedByHide = false;
     if (!bgmEl) return;
     bgmEl.pause();
     try {
       bgmEl.currentTime = 0;
     } catch (e) {}
   }
+
+  function pauseForBackground() {
+    stopReading();
+    if (!bgmEl || bgmEl.paused) return;
+    bgmEl.pause();
+    bgmPausedByHide = true;
+  }
+
+  function resumeFromBackground() {
+    if (!bgmPausedByHide) return;
+    bgmPausedByHide = false;
+    if (!settings.bgm || !bgmEl || !bgmEl.dataset.src) return;
+    if (document.hidden) return;
+    bgmEl.volume = settings.bgmVolume;
+    const p = bgmEl.play();
+    if (p && p.catch) p.catch(function () {});
+  }
+
+  function onPageHide() {
+    pauseForBackground();
+  }
+
+  function onVisibilityChange() {
+    if (document.hidden) pauseForBackground();
+    else resumeFromBackground();
+  }
+
+  document.addEventListener("visibilitychange", onVisibilityChange);
+  window.addEventListener("pagehide", onPageHide);
+  window.addEventListener("freeze", onPageHide);
+  window.addEventListener("pageshow", resumeFromBackground);
 
   function setVoice(on) {
     settings.voice = !!on;
@@ -358,7 +392,8 @@ window.JPMatchAudio = (() => {
       return;
     }
     // 僅在已有曲目時恢復播放；首次開播由 startBgm() 負責
-    if (bgmEl && bgmEl.dataset.src) {
+    if (bgmEl && bgmEl.dataset.src && !document.hidden) {
+      bgmPausedByHide = false;
       bgmEl.volume = settings.bgmVolume;
       const p = bgmEl.play();
       if (p && p.catch) p.catch(function () {});
