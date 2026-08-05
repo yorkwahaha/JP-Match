@@ -19,7 +19,7 @@ const MAP = {
   denwa: "fluent-emoji:telephone",
   keitai: "fluent-emoji:mobile-phone",
   pasokon: "fluent-emoji:laptop",
-  kiiwaado: "fluent-emoji:keyboard",
+  kiiboodo: "fluent-emoji:keyboard",
   kamera: "fluent-emoji:camera",
   rajio: "fluent-emoji:radio",
   kagami: "fluent-emoji:mirror",

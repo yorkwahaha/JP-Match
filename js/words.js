@@ -125,7 +125,7 @@ window.JPMatchWords = (() => {
     { key: "denwa", hira: "でんわ", romaji: "denwa", pic: "assets/icons/home/denwa.png", label: "電話", category: "home", picKind: "img" },
     { key: "keitai", hira: "けいたい", romaji: "keitai", pic: "assets/icons/home/keitai.png", label: "手機", category: "home", picKind: "img" },
     { key: "pasokon", hira: "パソコン", romaji: "pasokon", pic: "assets/icons/home/pasokon.png", label: "電腦", category: "home", picKind: "img" },
-    { key: "kiiwaado", hira: "キーボード", romaji: "kiiwaado", pic: "assets/icons/home/kiiwaado.png", label: "鍵盤", category: "home", picKind: "img" },
+    { key: "kiiboodo", hira: "キーボード", romaji: "kiiboodo", pic: "assets/icons/home/kiiboodo.png", label: "鍵盤", category: "home", picKind: "img" },
     { key: "kamera", hira: "カメラ", romaji: "kamera", pic: "assets/icons/home/kamera.png", label: "相機", category: "home", picKind: "img" },
     { key: "rajio", hira: "ラジオ", romaji: "rajio", pic: "assets/icons/home/rajio.png", label: "收音機", category: "home", picKind: "img" },
     { key: "kagami", hira: "かがみ", romaji: "kagami", pic: "assets/icons/home/kagami.png", label: "鏡子", category: "home", picKind: "img" },

@@ -1,9 +1,1579 @@
 {
-  "id": "fish-962b6d73",
-  "provider": "Fish Audio",
   "model": "s2.1-pro-free",
   "referenceId": "962b6d7385574187bbf4b73bb1ec49f6",
-  "generatedAt": "2026-08-05T11:11:43.836Z",
-  "expectedWords": 159,
-  "generatedFiles": 159
+  "promptStrategy": "approved samples plus explicit Japanese reading tags; six approved rerecords applied 2026-08-06",
+  "words": [
+    {
+      "key": "neko",
+      "reading": "ねこ",
+      "written": "猫",
+      "prompt": "[日本語で「ねこ」と読んで] 猫。",
+      "filename": "neko.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "inu",
+      "reading": "いぬ",
+      "written": "犬",
+      "prompt": "[日本語で「いぬ」と読んで] 犬。",
+      "filename": "inu.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "usagi",
+      "reading": "うさぎ",
+      "written": "兎",
+      "prompt": "[日本語で「うさぎ」と読んで] 兎。",
+      "filename": "usagi.mp3",
+      "source": "approved-rerecord-20260806",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "kuma",
+      "reading": "くま",
+      "written": "熊",
+      "prompt": "[日本語で「くま」と読んで] 熊。",
+      "filename": "kuma.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "tori",
+      "reading": "とり",
+      "written": "鳥",
+      "prompt": "[日本語で「とり」と読んで] 鳥。",
+      "filename": "tori.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "sakana",
+      "reading": "さかな",
+      "written": "魚",
+      "prompt": "[日本語で「さかな」と読んで] 魚。",
+      "filename": "sakana.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "uma",
+      "reading": "うま",
+      "written": "馬",
+      "prompt": "[日本語で「うま」と読んで] 馬。",
+      "filename": "uma.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "buta",
+      "reading": "ぶた",
+      "written": "豚",
+      "prompt": "[日本語で「ぶた」と読んで] 豚。",
+      "filename": "buta.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "ushi",
+      "reading": "うし",
+      "written": "牛",
+      "prompt": "[日本語で「うし」と読んで] 牛。",
+      "filename": "ushi.mp3",
+      "source": "approved-rerecord-20260806",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "kaeru",
+      "reading": "かえる",
+      "written": "蛙",
+      "prompt": "[日本語で「かえる」と読んで] 蛙。",
+      "filename": "kaeru.mp3",
+      "source": "generated",
+      "bytes": 13791,
+      "status": "ok"
+    },
+    {
+      "key": "hebi",
+      "reading": "へび",
+      "written": "蛇",
+      "prompt": "[日本語で「へび」と読んで] 蛇。",
+      "filename": "hebi.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "pengin",
+      "reading": "ペンギン",
+      "written": "ペンギン",
+      "prompt": "[日本語で「ペンギン」と読んで] ペンギン。",
+      "filename": "pengin.mp3",
+      "source": "generated",
+      "bytes": 12955,
+      "status": "ok"
+    },
+    {
+      "key": "zou",
+      "reading": "ぞう",
+      "written": "象",
+      "prompt": "[日本語で「ぞう」と読んで] 象。",
+      "filename": "zou.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "kirin",
+      "reading": "きりん",
+      "written": "キリン",
+      "prompt": "[日本語で「きりん」と読んで] キリン。",
+      "filename": "kirin.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "raion",
+      "reading": "ライオン",
+      "written": "ライオン",
+      "prompt": "[日本語で「ライオン」と読んで] ライオン。",
+      "filename": "raion.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "nezumi",
+      "reading": "ねずみ",
+      "written": "鼠",
+      "prompt": "[日本語で「ねずみ」と読んで] 鼠。",
+      "filename": "nezumi.mp3",
+      "source": "generated",
+      "bytes": 13791,
+      "status": "ok"
+    },
+    {
+      "key": "hitsuji",
+      "reading": "ひつじ",
+      "written": "羊",
+      "prompt": "[日本語で「ひつじ」と読んで] 羊。",
+      "filename": "hitsuji.mp3",
+      "source": "generated",
+      "bytes": 17553,
+      "status": "ok"
+    },
+    {
+      "key": "saru",
+      "reading": "さる",
+      "written": "猿",
+      "prompt": "[日本語で「さる」と読んで] 猿。",
+      "filename": "saru.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "niwatori",
+      "reading": "にわとり",
+      "written": "鶏",
+      "prompt": "[日本語で「にわとり」と読んで] 鶏。",
+      "filename": "niwatori.mp3",
+      "source": "generated",
+      "bytes": 15045,
+      "status": "ok"
+    },
+    {
+      "key": "ahiru",
+      "reading": "あひる",
+      "written": "アヒル",
+      "prompt": "[日本語で「あひる」と読んで] アヒル。",
+      "filename": "ahiru.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "kame",
+      "reading": "かめ",
+      "written": "亀",
+      "prompt": "[日本語で「かめ」と読んで] 亀。",
+      "filename": "kame.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "kani",
+      "reading": "かに",
+      "written": "蟹",
+      "prompt": "[日本語で「かに」と読んで] 蟹。",
+      "filename": "kani.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "ebi",
+      "reading": "えび",
+      "written": "エビ",
+      "prompt": "[日本語で「えび」と読んで] エビ。",
+      "filename": "ebi.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "ari",
+      "reading": "あり",
+      "written": "蟻",
+      "prompt": "[日本語で「あり」と読んで] 蟻。",
+      "filename": "ari.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "chou",
+      "reading": "ちょう",
+      "written": "蝶",
+      "prompt": "[日本語で「ちょう」と読んで] 蝶。",
+      "filename": "chou.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "semi",
+      "reading": "せみ",
+      "written": "蝉",
+      "prompt": "[日本語で「せみ」と読んで] 蝉。",
+      "filename": "semi.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "iruka",
+      "reading": "いるか",
+      "written": "イルカ",
+      "prompt": "[日本語で「いるか」と読んで] イルカ。",
+      "filename": "iruka.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "kujira",
+      "reading": "くじら",
+      "written": "鯨",
+      "prompt": "[日本語で「くじら」と読んで] 鯨。",
+      "filename": "kujira.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "tora",
+      "reading": "とら",
+      "written": "虎",
+      "prompt": "[日本語で「とら」と読んで] 虎。",
+      "filename": "tora.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "ringo",
+      "reading": "りんご",
+      "written": "林檎",
+      "prompt": "[日本語で「りんご」と読んで] 林檎。",
+      "filename": "ringo.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "banana",
+      "reading": "バナナ",
+      "written": "バナナ",
+      "prompt": "[日本語で「バナナ」と読んで] バナナ。",
+      "filename": "banana.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "gohan",
+      "reading": "ごはん",
+      "written": "ご飯",
+      "prompt": "[日本語で「ごはん」と読んで] ご飯。",
+      "filename": "gohan.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "mizu",
+      "reading": "みず",
+      "written": "水",
+      "prompt": "[日本語で「みず」と読んで] 水。",
+      "filename": "mizu.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "pan",
+      "reading": "パン",
+      "written": "パン",
+      "prompt": "[日本語で「パン」と読んで] パン。",
+      "filename": "pan.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "tamago",
+      "reading": "たまご",
+      "written": "卵",
+      "prompt": "[日本語で「たまご」と読んで] 卵。",
+      "filename": "tamago.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "ichigo",
+      "reading": "いちご",
+      "written": "苺",
+      "prompt": "[日本語で「いちご」と読んで] 苺。",
+      "filename": "ichigo.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "suika",
+      "reading": "すいか",
+      "written": "西瓜",
+      "prompt": "[日本語で「すいか」と読んで] 西瓜。",
+      "filename": "suika.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "mikan",
+      "reading": "みかん",
+      "written": "蜜柑",
+      "prompt": "[日本語で「みかん」と読んで] 蜜柑。",
+      "filename": "mikan.mp3",
+      "source": "approved-rerecord-20260806",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "niku",
+      "reading": "にく",
+      "written": "肉",
+      "prompt": "[日本語で「にく」と読んで] 肉。",
+      "filename": "niku.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "yasai",
+      "reading": "やさい",
+      "written": "野菜",
+      "prompt": "[日本語で「やさい」と読んで] 野菜。",
+      "filename": "yasai.mp3",
+      "source": "generated",
+      "bytes": 16717,
+      "status": "ok"
+    },
+    {
+      "key": "ramen",
+      "reading": "ラーメン",
+      "written": "ラーメン",
+      "prompt": "[日本語で「ラーメン」と読んで] ラーメン。",
+      "filename": "ramen.mp3",
+      "source": "generated",
+      "bytes": 12955,
+      "status": "ok"
+    },
+    {
+      "key": "sushi",
+      "reading": "すし",
+      "written": "寿司",
+      "prompt": "[日本語で「すし」と読んで] 寿司。",
+      "filename": "sushi.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "ocha",
+      "reading": "おちゃ",
+      "written": "お茶",
+      "prompt": "[日本語で「おちゃ」と読んで] お茶。",
+      "filename": "ocha.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "gyuunyuu",
+      "reading": "ぎゅうにゅう",
+      "written": "牛乳",
+      "prompt": "[日本語で「ぎゅうにゅう」と読んで] 牛乳。",
+      "filename": "gyuunyuu.mp3",
+      "source": "generated",
+      "bytes": 15045,
+      "status": "ok"
+    },
+    {
+      "key": "koucha",
+      "reading": "こうちゃ",
+      "written": "紅茶",
+      "prompt": "[日本語で「こうちゃ」と読んで] 紅茶。",
+      "filename": "koucha.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "koohii",
+      "reading": "コーヒー",
+      "written": "コーヒー",
+      "prompt": "[日本語で「コーヒー」と読んで] コーヒー。",
+      "filename": "koohii.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "juusu",
+      "reading": "ジュース",
+      "written": "ジュース",
+      "prompt": "[日本語で「ジュース」と読んで] ジュース。",
+      "filename": "juusu.mp3",
+      "source": "generated",
+      "bytes": 15881,
+      "status": "ok"
+    },
+    {
+      "key": "udon",
+      "reading": "うどん",
+      "written": "うどん",
+      "prompt": "[日本語で「うどん」と読んで] うどん。",
+      "filename": "udon.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "soba",
+      "reading": "そば",
+      "written": "蕎麦",
+      "prompt": "[日本語で「そば」と読んで] 蕎麦。",
+      "filename": "soba.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "misoshiru",
+      "reading": "みそしる",
+      "written": "味噌汁",
+      "prompt": "[日本語で「みそしる」と読んで] 味噌汁。",
+      "filename": "misoshiru.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "kudamono",
+      "reading": "くだもの",
+      "written": "果物",
+      "prompt": "[日本語で「くだもの」と読んで] 果物。",
+      "filename": "kudamono.mp3",
+      "source": "generated",
+      "bytes": 13791,
+      "status": "ok"
+    },
+    {
+      "key": "budou",
+      "reading": "ぶどう",
+      "written": "葡萄",
+      "prompt": "[日本語で「ぶどう」と読んで] 葡萄。",
+      "filename": "budou.mp3",
+      "source": "generated",
+      "bytes": 12955,
+      "status": "ok"
+    },
+    {
+      "key": "nashi",
+      "reading": "なし",
+      "written": "梨",
+      "prompt": "[日本語で「なし」と読んで] 梨。",
+      "filename": "nashi.mp3",
+      "source": "generated",
+      "bytes": 13791,
+      "status": "ok"
+    },
+    {
+      "key": "momo",
+      "reading": "もも",
+      "written": "桃",
+      "prompt": "[日本語で「もも」と読んで] 桃。",
+      "filename": "momo.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "keeki",
+      "reading": "ケーキ",
+      "written": "ケーキ",
+      "prompt": "[日本語で「ケーキ」と読んで] ケーキ。",
+      "filename": "keeki.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "aisu",
+      "reading": "アイス",
+      "written": "アイス",
+      "prompt": "[日本語で「アイス」と読んで] アイス。",
+      "filename": "aisu.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "okashi",
+      "reading": "おかし",
+      "written": "お菓子",
+      "prompt": "[日本語で「おかし」と読んで] お菓子。",
+      "filename": "okashi.mp3",
+      "source": "generated",
+      "bytes": 15881,
+      "status": "ok"
+    },
+    {
+      "key": "osake",
+      "reading": "おさけ",
+      "written": "お酒",
+      "prompt": "[日本語で「おさけ」と読んで] お酒。",
+      "filename": "osake.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "biiru",
+      "reading": "ビール",
+      "written": "ビール",
+      "prompt": "[日本語で「ビール」と読んで] ビール。",
+      "filename": "biiru.mp3",
+      "source": "generated",
+      "bytes": 13791,
+      "status": "ok"
+    },
+    {
+      "key": "kome",
+      "reading": "こめ",
+      "written": "米",
+      "prompt": "[日本語で「こめ」と読んで] 米。",
+      "filename": "kome.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "onigiri",
+      "reading": "おにぎり",
+      "written": "おにぎり",
+      "prompt": "[日本語で「おにぎり」と読んで] おにぎり。",
+      "filename": "onigiri.mp3",
+      "source": "generated",
+      "bytes": 17553,
+      "status": "ok"
+    },
+    {
+      "key": "aka",
+      "reading": "あか",
+      "written": "赤",
+      "prompt": "[日本語で「あか」と読んで] 赤。",
+      "filename": "aka.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "ao",
+      "reading": "あお",
+      "written": "青",
+      "prompt": "[日本語で「あお」と読んで] 青。",
+      "filename": "ao.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "kiiro",
+      "reading": "きいろ",
+      "written": "黄色",
+      "prompt": "[日本語で「きいろ」と読んで] 黄色。",
+      "filename": "kiiro.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "midori",
+      "reading": "みどり",
+      "written": "緑",
+      "prompt": "[日本語で「みどり」と読んで] 緑。",
+      "filename": "midori.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "shiro",
+      "reading": "しろ",
+      "written": "白",
+      "prompt": "[日本語で「しろ」と読んで] 白。",
+      "filename": "shiro.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "kuro",
+      "reading": "くろ",
+      "written": "黒",
+      "prompt": "[日本語で「くろ」と読んで] 黒。",
+      "filename": "kuro.mp3",
+      "source": "generated",
+      "bytes": 8358,
+      "status": "ok"
+    },
+    {
+      "key": "murasaki",
+      "reading": "むらさき",
+      "written": "紫",
+      "prompt": "[日本語で「むらさき」と読んで] 紫。",
+      "filename": "murasaki.mp3",
+      "source": "generated",
+      "bytes": 17553,
+      "status": "ok"
+    },
+    {
+      "key": "orenji",
+      "reading": "オレンジ",
+      "written": "オレンジ",
+      "prompt": "[日本語で「オレンジ」と読んで] オレンジ。",
+      "filename": "orenji.mp3",
+      "source": "generated",
+      "bytes": 15045,
+      "status": "ok"
+    },
+    {
+      "key": "pinku",
+      "reading": "ピンク",
+      "written": "ピンク",
+      "prompt": "[日本語で「ピンク」と読んで] ピンク。",
+      "filename": "pinku.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "haiiro",
+      "reading": "はいいろ",
+      "written": "灰色",
+      "prompt": "[日本語で「はいいろ」と読んで] 灰色。",
+      "filename": "haiiro.mp3",
+      "source": "generated",
+      "bytes": 16717,
+      "status": "ok"
+    },
+    {
+      "key": "kiniro",
+      "reading": "きんいろ",
+      "written": "金色",
+      "prompt": "[日本語で「きんいろ」と読んで] 金色。",
+      "filename": "kiniro.mp3",
+      "source": "generated",
+      "bytes": 12955,
+      "status": "ok"
+    },
+    {
+      "key": "giniro",
+      "reading": "ぎんいろ",
+      "written": "銀色",
+      "prompt": "[日本語で「ぎんいろ」と読んで] 銀色。",
+      "filename": "giniro.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "taiyou",
+      "reading": "たいよう",
+      "written": "太陽",
+      "prompt": "[日本語で「たいよう」と読んで] 太陽。",
+      "filename": "taiyou.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "tsuki",
+      "reading": "つき",
+      "written": "月",
+      "prompt": "[日本語で「つき」と読んで] 月。",
+      "filename": "tsuki.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "hana",
+      "reading": "はな",
+      "written": "花",
+      "prompt": "[日本語で「はな」と読んで] 花。",
+      "filename": "hana.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "ki",
+      "reading": "き",
+      "written": "木",
+      "prompt": "[日本語で「き」と読んで] 木。",
+      "filename": "ki.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "yama",
+      "reading": "やま",
+      "written": "山",
+      "prompt": "[日本語で「やま」と読んで] 山。",
+      "filename": "yama.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "umi",
+      "reading": "うみ",
+      "written": "海",
+      "prompt": "[日本語で「うみ」と読んで] 海。",
+      "filename": "umi.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "ame",
+      "reading": "あめ",
+      "written": "雨",
+      "prompt": "[日本語で「あめ」と読んで] 雨。",
+      "filename": "ame.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "yuki",
+      "reading": "ゆき",
+      "written": "雪",
+      "prompt": "[日本語で「ゆき」と読んで] 雪。",
+      "filename": "yuki.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "ie",
+      "reading": "いえ",
+      "written": "家",
+      "prompt": "[日本語で「いえ」と読んで] 家。",
+      "filename": "ie.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "kuruma",
+      "reading": "くるま",
+      "written": "車",
+      "prompt": "[日本語で「くるま」と読んで] 車。",
+      "filename": "kuruma.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "densha",
+      "reading": "でんしゃ",
+      "written": "電車",
+      "prompt": "[日本語で「でんしゃ」と読んで] 電車。",
+      "filename": "densha.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "hon",
+      "reading": "ほん",
+      "written": "本",
+      "prompt": "[日本語で「ほん」と読んで] 本。",
+      "filename": "hon.mp3",
+      "source": "approved-rerecord-20260806",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "kasa",
+      "reading": "かさ",
+      "written": "傘",
+      "prompt": "[日本語で「かさ」と読んで] 傘。",
+      "filename": "kasa.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "tokei",
+      "reading": "とけい",
+      "written": "時計",
+      "prompt": "[日本語で「とけい」と読んで] 時計。",
+      "filename": "tokei.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "gakkou",
+      "reading": "がっこう",
+      "written": "学校",
+      "prompt": "[日本語で「がっこう」と読んで] 学校。",
+      "filename": "gakkou.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "eki",
+      "reading": "えき",
+      "written": "駅",
+      "prompt": "[日本語で「えき」と読んで] 駅。",
+      "filename": "eki.mp3",
+      "source": "approved-rerecord-20260806",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "byouin",
+      "reading": "びょういん",
+      "written": "病院",
+      "prompt": "[日本語で「びょういん」と読んで] 病院。",
+      "filename": "byouin.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "kouen",
+      "reading": "こうえん",
+      "written": "公園",
+      "prompt": "[日本語で「こうえん」と読んで] 公園。",
+      "filename": "kouen.mp3",
+      "source": "generated",
+      "bytes": 12955,
+      "status": "ok"
+    },
+    {
+      "key": "mise",
+      "reading": "みせ",
+      "written": "店",
+      "prompt": "[日本語で「みせ」と読んで] 店。",
+      "filename": "mise.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "tegami",
+      "reading": "てがみ",
+      "written": "手紙",
+      "prompt": "[日本語で「てがみ」と読んで] 手紙。",
+      "filename": "tegami.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "kutsu",
+      "reading": "くつ",
+      "written": "靴",
+      "prompt": "[日本語で「くつ」と読んで] 靴。",
+      "filename": "kutsu.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "fuku",
+      "reading": "ふく",
+      "written": "服",
+      "prompt": "[日本語で「ふく」と読んで] 服。",
+      "filename": "fuku.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "kagi",
+      "reading": "かぎ",
+      "written": "鍵",
+      "prompt": "[日本語で「かぎ」と読んで] 鍵。",
+      "filename": "kagi.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "okane",
+      "reading": "おかね",
+      "written": "お金",
+      "prompt": "[日本語で「おかね」と読んで] お金。",
+      "filename": "okane.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "pasupooto",
+      "reading": "パスポート",
+      "written": "パスポート",
+      "prompt": "[日本語で「パスポート」と読んで] パスポート。",
+      "filename": "pasupooto.mp3",
+      "source": "generated",
+      "bytes": 19643,
+      "status": "ok"
+    },
+    {
+      "key": "basu",
+      "reading": "バス",
+      "written": "バス",
+      "prompt": "[日本語で「バス」と読んで] バス。",
+      "filename": "basu.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "takushii",
+      "reading": "タクシー",
+      "written": "タクシー",
+      "prompt": "[日本語で「タクシー」と読んで] タクシー。",
+      "filename": "takushii.mp3",
+      "source": "generated",
+      "bytes": 13791,
+      "status": "ok"
+    },
+    {
+      "key": "hikouki",
+      "reading": "ひこうき",
+      "written": "飛行機",
+      "prompt": "[日本語で「ひこうき」と読んで] 飛行機。",
+      "filename": "hikouki.mp3",
+      "source": "generated",
+      "bytes": 15045,
+      "status": "ok"
+    },
+    {
+      "key": "fune",
+      "reading": "ふね",
+      "written": "船",
+      "prompt": "[日本語で「ふね」と読んで] 船。",
+      "filename": "fune.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "michi",
+      "reading": "みち",
+      "written": "道",
+      "prompt": "[日本語で「みち」と読んで] 道。",
+      "filename": "michi.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "hashi",
+      "reading": "はし",
+      "written": "橋",
+      "prompt": "[日本語で「はし」と読んで] 橋。",
+      "filename": "hashi.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "terebi",
+      "reading": "テレビ",
+      "written": "テレビ",
+      "prompt": "[日本語で「テレビ」と読んで] テレビ。",
+      "filename": "terebi.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "beddo",
+      "reading": "ベッド",
+      "written": "ベッド",
+      "prompt": "[日本語で「ベッド」と読んで] ベッド。",
+      "filename": "beddo.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "isu",
+      "reading": "いす",
+      "written": "椅子",
+      "prompt": "[日本語で「いす」と読んで] 椅子。",
+      "filename": "isu.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "sofaa",
+      "reading": "ソファー",
+      "written": "ソファー",
+      "prompt": "[日本語で「ソファー」と読んで] ソファー。",
+      "filename": "sofaa.mp3",
+      "source": "generated",
+      "bytes": 13791,
+      "status": "ok"
+    },
+    {
+      "key": "denki",
+      "reading": "でんき",
+      "written": "電気",
+      "prompt": "[日本語で「でんき」と読んで] 電気。",
+      "filename": "denki.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "denwa",
+      "reading": "でんわ",
+      "written": "電話",
+      "prompt": "[日本語で「でんわ」と読んで] 電話。",
+      "filename": "denwa.mp3",
+      "source": "generated",
+      "bytes": 16717,
+      "status": "ok"
+    },
+    {
+      "key": "keitai",
+      "reading": "けいたい",
+      "written": "携帯",
+      "prompt": "[日本語で「けいたい」と読んで] 携帯。",
+      "filename": "keitai.mp3",
+      "source": "generated",
+      "bytes": 13791,
+      "status": "ok"
+    },
+    {
+      "key": "pasokon",
+      "reading": "パソコン",
+      "written": "パソコン",
+      "prompt": "[日本語で「パソコン」と読んで] パソコン。",
+      "filename": "pasokon.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "kiiboodo",
+      "reading": "キーボード",
+      "written": "キーボード",
+      "prompt": "[日本語で「キーボード」と読んで] キーボード。",
+      "filename": "kiiboodo.mp3",
+      "source": "generated",
+      "bytes": 13791,
+      "status": "ok"
+    },
+    {
+      "key": "kamera",
+      "reading": "カメラ",
+      "written": "カメラ",
+      "prompt": "[日本語で「カメラ」と読んで] カメラ。",
+      "filename": "kamera.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "rajio",
+      "reading": "ラジオ",
+      "written": "ラジオ",
+      "prompt": "[日本語で「ラジオ」と読んで] ラジオ。",
+      "filename": "rajio.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "kagami",
+      "reading": "かがみ",
+      "written": "鏡",
+      "prompt": "[日本語で「かがみ」と読んで] 鏡。",
+      "filename": "kagami.mp3",
+      "source": "approved-rerecord-20260806",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "mado",
+      "reading": "まど",
+      "written": "窓",
+      "prompt": "[日本語で「まど」と読んで] 窓。",
+      "filename": "mado.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "doa",
+      "reading": "ドア",
+      "written": "ドア",
+      "prompt": "[日本語で「ドア」と読んで] ドア。",
+      "filename": "doa.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "ofuro",
+      "reading": "おふろ",
+      "written": "お風呂",
+      "prompt": "[日本語で「おふろ」と読んで] お風呂。",
+      "filename": "ofuro.mp3",
+      "source": "generated",
+      "bytes": 13791,
+      "status": "ok"
+    },
+    {
+      "key": "shawaa",
+      "reading": "シャワー",
+      "written": "シャワー",
+      "prompt": "[日本語で「シャワー」と読んで] シャワー。",
+      "filename": "shawaa.mp3",
+      "source": "generated",
+      "bytes": 17553,
+      "status": "ok"
+    },
+    {
+      "key": "toire",
+      "reading": "トイレ",
+      "written": "トイレ",
+      "prompt": "[日本語で「トイレ」と読んで] トイレ。",
+      "filename": "toire.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "houki",
+      "reading": "ほうき",
+      "written": "箒",
+      "prompt": "[日本語で「ほうき」と読んで] 箒。",
+      "filename": "houki.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "sekken",
+      "reading": "せっけん",
+      "written": "石鹸",
+      "prompt": "[日本語で「せっけん」と読んで] 石鹸。",
+      "filename": "sekken.mp3",
+      "source": "generated",
+      "bytes": 16717,
+      "status": "ok"
+    },
+    {
+      "key": "meggane",
+      "reading": "めがね",
+      "written": "眼鏡",
+      "prompt": "[日本語で「めがね」と読んで] 眼鏡。",
+      "filename": "meggane.mp3",
+      "source": "generated",
+      "bytes": 15881,
+      "status": "ok"
+    },
+    {
+      "key": "gomibako",
+      "reading": "ごみばこ",
+      "written": "ごみ箱",
+      "prompt": "[日本語で「ごみばこ」と読んで] ごみ箱。",
+      "filename": "gomibako.mp3",
+      "source": "generated",
+      "bytes": 15045,
+      "status": "ok"
+    },
+    {
+      "key": "hasami",
+      "reading": "はさみ",
+      "written": "鋏",
+      "prompt": "[日本語で「はさみ」と読んで] 鋏。",
+      "filename": "hasami.mp3",
+      "source": "generated",
+      "bytes": 11283,
+      "status": "ok"
+    },
+    {
+      "key": "denchi",
+      "reading": "でんち",
+      "written": "電池",
+      "prompt": "[日本語で「でんち」と読んで] 電池。",
+      "filename": "denchi.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "konsento",
+      "reading": "コンセント",
+      "written": "コンセント",
+      "prompt": "[日本語で「コンセント」と読んで] コンセント。",
+      "filename": "konsento.mp3",
+      "source": "generated",
+      "bytes": 15045,
+      "status": "ok"
+    },
+    {
+      "key": "e",
+      "reading": "え",
+      "written": "絵",
+      "prompt": "[日本語で「え」と読んで] 絵。",
+      "filename": "e.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "raito",
+      "reading": "ライト",
+      "written": "ライト",
+      "prompt": "[日本語で「ライト」と読んで] ライト。",
+      "filename": "raito.mp3",
+      "source": "generated",
+      "bytes": 16717,
+      "status": "ok"
+    },
+    {
+      "key": "ichi",
+      "reading": "いち",
+      "written": "一",
+      "prompt": "[日本語で「いち」と読んで] 一。",
+      "filename": "ichi.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "ni",
+      "reading": "に",
+      "written": "二",
+      "prompt": "[日本語で「に」と読んで] 二。",
+      "filename": "ni.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "san",
+      "reading": "さん",
+      "written": "三",
+      "prompt": "[日本語で「さん」と読んで] 三。",
+      "filename": "san.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "yon",
+      "reading": "よん",
+      "written": "四",
+      "prompt": "[日本語で「よん」と読んで] 四。",
+      "filename": "yon.mp3",
+      "source": "generated",
+      "bytes": 8358,
+      "status": "ok"
+    },
+    {
+      "key": "go",
+      "reading": "ご",
+      "written": "五",
+      "prompt": "[日本語で「ご」と読んで] 五。",
+      "filename": "go.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "roku",
+      "reading": "ろく",
+      "written": "六",
+      "prompt": "[日本語で「ろく」と読んで] 六。",
+      "filename": "roku.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "nana",
+      "reading": "なな",
+      "written": "七",
+      "prompt": "[日本語で「なな」と読んで] 七。",
+      "filename": "nana.mp3",
+      "source": "generated",
+      "bytes": 10030,
+      "status": "ok"
+    },
+    {
+      "key": "hachi",
+      "reading": "はち",
+      "written": "八",
+      "prompt": "[日本語で「はち」と読んで] 八。",
+      "filename": "hachi.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "kyuu",
+      "reading": "きゅう",
+      "written": "九",
+      "prompt": "[日本語で「きゅう」と読んで] 九。",
+      "filename": "kyuu.mp3",
+      "source": "generated",
+      "bytes": 9194,
+      "status": "ok"
+    },
+    {
+      "key": "juu",
+      "reading": "じゅう",
+      "written": "十",
+      "prompt": "[日本語で「じゅう」と読んで] 十。",
+      "filename": "juu.mp3",
+      "source": "generated",
+      "bytes": 10866,
+      "status": "ok"
+    },
+    {
+      "key": "getsuyoubi",
+      "reading": "げつようび",
+      "written": "月曜日",
+      "prompt": "[日本語で「げつようび」と読んで] 月曜日。",
+      "filename": "getsuyoubi.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "kayoubi",
+      "reading": "かようび",
+      "written": "火曜日",
+      "prompt": "[日本語で「かようび」と読んで] 火曜日。",
+      "filename": "kayoubi.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "suiyoubi",
+      "reading": "すいようび",
+      "written": "水曜日",
+      "prompt": "[日本語で「すいようび」と読んで] 水曜日。",
+      "filename": "suiyoubi.mp3",
+      "source": "generated",
+      "bytes": 15045,
+      "status": "ok"
+    },
+    {
+      "key": "mokuyoubi",
+      "reading": "もくようび",
+      "written": "木曜日",
+      "prompt": "[日本語で「もくようび」と読んで] 木曜日。",
+      "filename": "mokuyoubi.mp3",
+      "source": "generated",
+      "bytes": 19643,
+      "status": "ok"
+    },
+    {
+      "key": "kinyoubi",
+      "reading": "きんようび",
+      "written": "金曜日",
+      "prompt": "[日本語で「きんようび」と読んで] 金曜日。",
+      "filename": "kinyoubi.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "doyoubi",
+      "reading": "どようび",
+      "written": "土曜日",
+      "prompt": "[日本語で「どようび」と読んで] 土曜日。",
+      "filename": "doyoubi.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "nichiyoubi",
+      "reading": "にちようび",
+      "written": "日曜日",
+      "prompt": "[日本語で「にちようび」と読んで] 日曜日。",
+      "filename": "nichiyoubi.mp3",
+      "source": "generated",
+      "bytes": 18807,
+      "status": "ok"
+    },
+    {
+      "key": "ichigatsu",
+      "reading": "いちがつ",
+      "written": "一月",
+      "prompt": "[日本語で「いちがつ」と読んで] 一月。",
+      "filename": "ichigatsu.mp3",
+      "source": "generated",
+      "bytes": 15045,
+      "status": "ok"
+    },
+    {
+      "key": "nigatsu",
+      "reading": "にがつ",
+      "written": "二月",
+      "prompt": "[日本語で「にがつ」と読んで] 二月。",
+      "filename": "nigatsu.mp3",
+      "source": "generated",
+      "bytes": 15045,
+      "status": "ok"
+    },
+    {
+      "key": "sangatsu",
+      "reading": "さんがつ",
+      "written": "三月",
+      "prompt": "[日本語で「さんがつ」と読んで] 三月。",
+      "filename": "sangatsu.mp3",
+      "source": "generated",
+      "bytes": 15881,
+      "status": "ok"
+    },
+    {
+      "key": "shigatsu",
+      "reading": "しがつ",
+      "written": "四月",
+      "prompt": "[日本語で「しがつ」と読んで] 四月。",
+      "filename": "shigatsu.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "gogatsu",
+      "reading": "ごがつ",
+      "written": "五月",
+      "prompt": "[日本語で「ごがつ」と読んで] 五月。",
+      "filename": "gogatsu.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "rokugatsu",
+      "reading": "ろくがつ",
+      "written": "六月",
+      "prompt": "[日本語で「ろくがつ」と読んで] 六月。",
+      "filename": "rokugatsu.mp3",
+      "source": "generated",
+      "bytes": 14209,
+      "status": "ok"
+    },
+    {
+      "key": "shichigatsu",
+      "reading": "しちがつ",
+      "written": "七月",
+      "prompt": "[日本語で「しちがつ」と読んで] 七月。",
+      "filename": "shichigatsu.mp3",
+      "source": "approved-sample",
+      "status": "ok"
+    },
+    {
+      "key": "hachigatsu",
+      "reading": "はちがつ",
+      "written": "八月",
+      "prompt": "[日本語で「はちがつ」と読んで] 八月。",
+      "filename": "hachigatsu.mp3",
+      "source": "generated",
+      "bytes": 15045,
+      "status": "ok"
+    },
+    {
+      "key": "kugatsu",
+      "reading": "くがつ",
+      "written": "九月",
+      "prompt": "[日本語で「くがつ」と読んで] 九月。",
+      "filename": "kugatsu.mp3",
+      "source": "generated",
+      "bytes": 12119,
+      "status": "ok"
+    },
+    {
+      "key": "juugatsu",
+      "reading": "じゅうがつ",
+      "written": "十月",
+      "prompt": "[日本語で「じゅうがつ」と読んで] 十月。",
+      "filename": "juugatsu.mp3",
+      "source": "generated",
+      "bytes": 17553,
+      "status": "ok"
+    },
+    {
+      "key": "juuichigatsu",
+      "reading": "じゅういちがつ",
+      "written": "十一月",
+      "prompt": "[日本語で「じゅういちがつ」と読んで] 十一月。",
+      "filename": "juuichigatsu.mp3",
+      "source": "generated",
+      "bytes": 21732,
+      "status": "ok"
+    },
+    {
+      "key": "juunigatsu",
+      "reading": "じゅうにがつ",
+      "written": "十二月",
+      "prompt": "[日本語で「じゅうにがつ」と読んで] 十二月。",
+      "filename": "juunigatsu.mp3",
+      "source": "generated",
+      "bytes": 15881,
+      "status": "ok"
+    }
+  ]
 }

@@ -30,7 +30,7 @@ window.JPMatchAudio = (() => {
       id: "lively",
       label: "活力聲線",
       dir: BASE + "/word-voices/fish-962b6d73/",
-      revision: "s2-1",
+      revision: "s2-1-kanji-r2",
     },
   };
 
