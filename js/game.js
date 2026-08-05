@@ -25,6 +25,7 @@
   const MATCH_HOLD_MS = 280;
   const PLAYER_NAMES = ["玩家 1", "玩家 2"];
   const THEME_STORAGE_KEY = "jp-match-theme";
+  const WORD_VOICE_STORAGE_KEY = "jp-match-word-voice";
   const THEMES = {
     night: { id: "night", label: "夜紺", meta: "#142033" },
     mist: { id: "mist", label: "水霧", meta: "#8fb4c8" },
@@ -100,6 +101,7 @@
     resultMeta: document.getElementById("result-meta"),
     menuOverlay: document.getElementById("menu-overlay"),
     optVoice: document.getElementById("opt-voice"),
+    optWordVoice: document.getElementById("opt-word-voice"),
     optSfx: document.getElementById("opt-sfx"),
     optBgm: document.getElementById("opt-bgm"),
     optBgmVolume: document.getElementById("opt-bgm-volume"),
@@ -114,6 +116,7 @@
     selRangePreset: document.getElementById("sel-range-preset"),
     selWordCategory: document.getElementById("sel-word-category"),
     selTheme: document.getElementById("sel-theme"),
+    selWordVoice: document.getElementById("sel-word-voice"),
     btnStart: document.getElementById("btn-start"),
   };
 
@@ -185,6 +188,32 @@
     if (els.selTheme) els.selTheme.value = state.theme;
   }
 
+  function loadSavedWordVoice() {
+    try {
+      const saved = window.localStorage.getItem(WORD_VOICE_STORAGE_KEY);
+      if (saved && Sound.wordVoices[saved]) return saved;
+    } catch (err) {
+      /* ignore */
+    }
+    return "classic";
+  }
+
+  function applyWordVoice(voiceId) {
+    const id = Sound.wordVoices[voiceId] ? voiceId : "classic";
+    Sound.setWordVoice(id);
+    try {
+      window.localStorage.setItem(WORD_VOICE_STORAGE_KEY, id);
+    } catch (err) {
+      /* ignore */
+    }
+    syncWordVoiceUI();
+  }
+
+  function syncWordVoiceUI() {
+    if (els.selWordVoice) els.selWordVoice.value = Sound.settings.wordVoice;
+    if (els.optWordVoice) els.optWordVoice.value = Sound.settings.wordVoice;
+  }
+
   function syncAudioSettings() {
     Sound.setVoice(els.optVoice.checked);
     Sound.setSfx(els.optSfx.checked);
@@ -197,6 +226,7 @@
     els.optSfx.checked = Sound.settings.sfx;
     els.optBgm.checked = Sound.settings.bgm;
     els.optBgmVolume.value = String(Math.round(Sound.settings.bgmVolume * 100));
+    syncWordVoiceUI();
     syncThemeUI();
   }
 
@@ -260,6 +290,7 @@
     if (els.fieldWordCategory) els.fieldWordCategory.hidden = !isWords;
 
     syncThemeUI();
+    syncWordVoiceUI();
     syncPoolHint();
   }
 
@@ -848,6 +879,14 @@
       applyTheme(els.selTheme.value);
       Sound.playSfx("select");
     });
+    els.selWordVoice.addEventListener("change", () => {
+      applyWordVoice(els.selWordVoice.value);
+      Sound.playSfx("select");
+    });
+    els.optWordVoice.addEventListener("change", () => {
+      applyWordVoice(els.optWordVoice.value);
+      Sound.playSfx("select");
+    });
 
     function onRowChange() {
       state.rowFrom = els.rowFrom.value;
@@ -1010,9 +1049,26 @@
       })
       .join("");
     els.selTheme.value = state.theme;
+
+    const voiceOptions = Object.keys(Sound.wordVoices)
+      .map((id) => {
+        const voice = Sound.wordVoices[id];
+        return (
+          '<option value="' +
+          escapeHtml(voice.id) +
+          '">' +
+          escapeHtml(voice.label) +
+          "</option>"
+        );
+      })
+      .join("");
+    els.selWordVoice.innerHTML = voiceOptions;
+    els.optWordVoice.innerHTML = voiceOptions;
+    syncWordVoiceUI();
   }
 
   applyTheme(loadSavedTheme(), { silent: true });
+  applyWordVoice(loadSavedWordVoice());
   fillRowSelects();
   fillSetupSelects();
   bindSetup();

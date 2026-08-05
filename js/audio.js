@@ -10,7 +10,7 @@
  *   assets/audio/bgm/*.mp3          背景音樂（會隨機選曲）
  *   assets/audio/kana/{romaji}.mp3  例如 a.mp3、shi.mp3、n.mp3
  *
- * 單字朗讀：與 JPAPP 相同，走 Google Cloud TTS proxy
+ * 單字朗讀：優先使用設定的本地聲線包；檔案缺漏時走 Google Cloud TTS proxy
  *   https://jpapp-tts-proxy.yorkwahaha.workers.dev
  */
 window.JPMatchAudio = (() => {
@@ -18,6 +18,20 @@ window.JPMatchAudio = (() => {
   const TTS_PROXY_URL = "https://jpapp-tts-proxy.yorkwahaha.workers.dev/tts";
   const TTS_SESSION_URL = "https://jpapp-tts-proxy.yorkwahaha.workers.dev/session";
   const DEFAULT_TTS_VOICE = "ja-JP-Neural2-B";
+  const DEFAULT_WORD_VOICE = "classic";
+
+  const WORD_VOICES = {
+    classic: {
+      id: "classic",
+      label: "經典聲線",
+      dir: BASE + "/words/",
+    },
+    lively: {
+      id: "lively",
+      label: "活力聲線",
+      dir: BASE + "/word-voices/fish-962b6d73/",
+    },
+  };
 
   const PATHS = {
     sfx: {
@@ -33,7 +47,6 @@ window.JPMatchAudio = (() => {
       BASE + "/bgm/area-3.mp3",
     ],
     kanaDir: BASE + "/kana/",
-    wordsDir: BASE + "/words/",
   };
 
   const sfxCache = {};
@@ -56,6 +69,7 @@ window.JPMatchAudio = (() => {
     bgmVolume: 0.18,
     sfxVolume: 0.55,
     voiceVolume: 1,
+    wordVoice: DEFAULT_WORD_VOICE,
   };
 
   function unlock() {
@@ -147,7 +161,8 @@ window.JPMatchAudio = (() => {
     unlock();
     stopReading();
     const key = String(wordKey).toLowerCase();
-    const src = PATHS.wordsDir + key + ".mp3";
+    const voice = WORD_VOICES[settings.wordVoice] || WORD_VOICES[DEFAULT_WORD_VOICE];
+    const src = voice.dir + key + ".mp3";
     let el = wordCache[src];
     if (!el) {
       el = new Audio(src);
@@ -385,6 +400,13 @@ window.JPMatchAudio = (() => {
     if (!on) stopReading();
   }
 
+  function setWordVoice(voiceId) {
+    const next = WORD_VOICES[voiceId] || WORD_VOICES[DEFAULT_WORD_VOICE];
+    if (settings.wordVoice === next.id) return;
+    stopReading();
+    settings.wordVoice = next.id;
+  }
+
   function setBgm(on) {
     settings.bgm = !!on;
     if (!on) {
@@ -412,6 +434,7 @@ window.JPMatchAudio = (() => {
 
   return {
     settings: settings,
+    wordVoices: WORD_VOICES,
     unlock: unlock,
     playSfx: playSfx,
     playKana: playKana,
@@ -421,6 +444,7 @@ window.JPMatchAudio = (() => {
     startBgm: startBgm,
     stopBgm: stopBgm,
     setVoice: setVoice,
+    setWordVoice: setWordVoice,
     setBgm: setBgm,
     setSfx: setSfx,
     setBgmVolume: setBgmVolume,
