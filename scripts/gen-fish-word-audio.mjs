@@ -6,7 +6,22 @@ const API_URL = "https://api.fish.audio/v1/tts";
 const API_KEY = process.env.FISH_AUDIO_API_KEY;
 const REFERENCE_ID = "962b6d7385574187bbf4b73bb1ec49f6";
 const PACK_ID = "fish-962b6d73";
-const OUT_DIR = path.join("assets", "audio", "word-voices", PACK_ID);
+const modelArg = process.argv.find((arg) => arg.startsWith("--model="));
+const MODEL = modelArg ? modelArg.slice("--model=".length) : "s2.1-pro-free";
+const outDirArg = process.argv.find((arg) => arg.startsWith("--out-dir="));
+const OUT_DIR = outDirArg
+  ? path.resolve(outDirArg.slice("--out-dir=".length))
+  : path.join("assets", "audio", "word-voices", PACK_ID);
+const keysArg = process.argv.find((arg) => arg.startsWith("--keys="));
+const REQUESTED_KEYS = new Set(
+  keysArg
+    ? keysArg
+        .slice("--keys=".length)
+        .split(",")
+        .map((key) => key.trim())
+        .filter(Boolean)
+    : [],
+);
 const FORCE = process.argv.includes("--force");
 const limitArg = process.argv.find((arg) => arg.startsWith("--limit="));
 const LIMIT = limitArg ? Math.max(1, Number(limitArg.split("=")[1]) || 1) : Infinity;
@@ -61,7 +76,7 @@ async function synthesize(text) {
         headers: {
           Authorization: `Bearer ${API_KEY}`,
           "Content-Type": "application/json",
-          model: "s2-pro",
+          model: MODEL,
         },
         body: JSON.stringify({
           text,
@@ -71,6 +86,13 @@ async function synthesize(text) {
           mp3_bitrate: 128,
           latency: "normal",
           normalize: true,
+          temperature: 0.2,
+          top_p: 0.5,
+          max_new_tokens: 128,
+          repetition_penalty: 1.4,
+          min_chunk_length: 0,
+          condition_on_previous_chunks: false,
+          early_stop_threshold: 0.8,
           prosody: {
             speed: 1,
             volume: 0,
@@ -118,8 +140,15 @@ for (const word of words) {
 }
 
 const pending = uniqueWords
+  .filter((word) => !REQUESTED_KEYS.size || REQUESTED_KEYS.has(word.key))
   .filter((word) => FORCE || !hasValidExistingFile(path.join(OUT_DIR, `${word.key}.mp3`)))
   .slice(0, LIMIT);
+
+if (REQUESTED_KEYS.size) {
+  const knownKeys = new Set(uniqueWords.map((word) => word.key));
+  const unknownKeys = [...REQUESTED_KEYS].filter((key) => !knownKeys.has(key));
+  if (unknownKeys.length) throw new Error(`Unknown word keys: ${unknownKeys.join(", ")}`);
+}
 
 process.stdout.write(
   `pack=${PACK_ID} words=${uniqueWords.length} pending=${pending.length}${FORCE ? " force" : ""}\n`,
@@ -133,12 +162,13 @@ for (let index = 0; index < pending.length; index += 1) {
   const word = pending[index];
   const destination = path.join(OUT_DIR, `${word.key}.mp3`);
   try {
-    const audio = await synthesize(word.hira);
+    const spokenText = `${word.tts || word.hira}。`;
+    const audio = await synthesize(spokenText);
     fs.writeFileSync(destination, audio);
     completed += 1;
     consecutiveFailures = 0;
     process.stdout.write(
-      `[${index + 1}/${pending.length}] ${word.key} ${word.hira} ${audio.length} bytes\n`,
+      `[${index + 1}/${pending.length}] ${word.key} ${spokenText} ${audio.length} bytes\n`,
     );
   } catch (error) {
     failed += 1;
@@ -163,7 +193,7 @@ fs.writeFileSync(
   `${JSON.stringify({
     id: PACK_ID,
     provider: "Fish Audio",
-    model: "s2-pro",
+    model: MODEL,
     referenceId: REFERENCE_ID,
     generatedAt: new Date().toISOString(),
     expectedWords: uniqueWords.length,

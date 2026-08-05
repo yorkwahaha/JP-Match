@@ -30,6 +30,7 @@ window.JPMatchAudio = (() => {
       id: "lively",
       label: "活力聲線",
       dir: BASE + "/word-voices/fish-962b6d73/",
+      revision: "s2-1",
     },
   };
 
@@ -162,7 +163,7 @@ window.JPMatchAudio = (() => {
     stopReading();
     const key = String(wordKey).toLowerCase();
     const voice = WORD_VOICES[settings.wordVoice] || WORD_VOICES[DEFAULT_WORD_VOICE];
-    const src = voice.dir + key + ".mp3";
+    const src = voice.dir + key + ".mp3" + (voice.revision ? `?v=${voice.revision}` : "");
     let el = wordCache[src];
     if (!el) {
       el = new Audio(src);

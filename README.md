@@ -104,7 +104,7 @@ js/words.js     單字題庫與牌組產生
 js/audio.js     音訊路徑與播放
 js/game.js      遊戲流程與計分
 assets/audio/
-assets/audio/word-voices/fish-962b6d73/   Fish Audio 活力聲線（159 個單字）
+assets/audio/word-voices/fish-962b6d73/   Fish Audio S2.1 Pro 活力聲線（159 個單字）
 scripts/gen-fish-word-audio.mjs           Fish Audio 聲線包產生工具
 .github/workflows/pages.yml   推上 main 自動部署 GitHub Pages
 ```
