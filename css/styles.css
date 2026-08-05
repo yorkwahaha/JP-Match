@@ -2218,18 +2218,6 @@ body.turn-switched .score-pill.is-active {
   border-top: 5px solid var(--thread-success);
 }
 
-.result-scoreboard::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 56%;
-  height: 2px;
-  background: var(--thread-success);
-  transform: translate(-50%, -50%) rotate(-8deg);
-  z-index: -1;
-}
-
 .result-scoreboard {
   position: relative;
 }
