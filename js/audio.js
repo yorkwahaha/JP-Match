@@ -51,8 +51,6 @@ window.JPMatchAudio = (() => {
   };
 
   const sfxCache = {};
-  const kanaCache = {};
-  const wordCache = {};
   let bgmEl = null;
   let bgmIndex = -1;
   let bgmPausedByHide = false;
@@ -60,6 +58,7 @@ window.JPMatchAudio = (() => {
 
   let sessionTokenData = null;
   let readingSessionId = 0;
+  let localReadingAudio = null;
   let readingAudio = null;
   let readingObjectUrl = null;
 
@@ -103,6 +102,30 @@ window.JPMatchAudio = (() => {
     } catch (e) {}
   }
 
+  function playLocalReading(src, volume, onError) {
+    if (!src) return;
+    unlock();
+    try {
+      if (!localReadingAudio) {
+        localReadingAudio = new Audio();
+        localReadingAudio.preload = "auto";
+      }
+      const el = localReadingAudio;
+      el.onerror = typeof onError === "function" ? onError : null;
+      el.src = src;
+      el.volume = volume;
+      try {
+        el.currentTime = 0;
+      } catch (e) {}
+      const p = el.play();
+      if (p && p.catch && typeof onError === "function") {
+        p.catch(onError);
+      }
+    } catch (e) {
+      if (typeof onError === "function") onError();
+    }
+  }
+
   function playSfx(name) {
     if (!settings.sfx) return;
     const src = PATHS.sfx[name];
@@ -110,21 +133,16 @@ window.JPMatchAudio = (() => {
     playSrc(src, settings.sfxVolume, sfxCache);
   }
 
-  function stopCachedAudio(cache) {
-    Object.keys(cache).forEach(function (src) {
-      const el = cache[src];
-      if (!el) return;
-      try {
-        el.pause();
-        el.currentTime = 0;
-      } catch (e) {}
-    });
-  }
-
   function stopReading() {
     readingSessionId += 1;
-    stopCachedAudio(kanaCache);
-    stopCachedAudio(wordCache);
+    if (localReadingAudio) {
+      try {
+        localReadingAudio.pause();
+        localReadingAudio.onerror = null;
+        localReadingAudio.removeAttribute("src");
+        localReadingAudio.load();
+      } catch (e) {}
+    }
     if (window.speechSynthesis) {
       try {
         window.speechSynthesis.cancel();
@@ -151,7 +169,7 @@ window.JPMatchAudio = (() => {
     stopReading();
     const key = String(romajiKey).toLowerCase();
     const src = PATHS.kanaDir + key + ".mp3";
-    playSrc(src, settings.voiceVolume, kanaCache);
+    playLocalReading(src, settings.voiceVolume);
   }
 
   function playWord(wordKey, fallbackText) {
@@ -164,30 +182,13 @@ window.JPMatchAudio = (() => {
     const key = String(wordKey).toLowerCase();
     const voice = WORD_VOICES[settings.wordVoice] || WORD_VOICES[DEFAULT_WORD_VOICE];
     const src = voice.dir + key + ".mp3" + (voice.revision ? `?v=${voice.revision}` : "");
-    let el = wordCache[src];
-    if (!el) {
-      el = new Audio(src);
-      el.preload = "auto";
-      wordCache[src] = el;
-    }
-    el.pause();
-    try {
-      el.currentTime = 0;
-    } catch (e) {}
-    el.volume = settings.voiceVolume;
     const sessionId = readingSessionId;
     const onError = function () {
-      el.onerror = null;
+      if (localReadingAudio) localReadingAudio.onerror = null;
       if (sessionId !== readingSessionId) return;
       if (fallbackText) playReading(fallbackText);
     };
-    el.onerror = onError;
-    const p = el.play();
-    if (p && p.catch) {
-      p.catch(function () {
-        onError();
-      });
-    }
+    playLocalReading(src, settings.voiceVolume, onError);
   }
 
   async function getSessionToken() {
