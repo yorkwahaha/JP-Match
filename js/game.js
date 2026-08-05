@@ -66,6 +66,7 @@
     pendingClose: [],
     mismatchTimer: null,
     matched: new Set(),
+    matchTraces: [],
     scores: [0, 0],
     currentPlayer: 0,
     lock: false,
@@ -199,14 +200,31 @@
     syncThemeUI();
   }
 
+  let menuReturnFocus = null;
+
   function openMenu() {
     if (state.screen !== "game" || state.ended) return;
     syncMenuUI();
+    menuReturnFocus = document.activeElement;
     els.menuOverlay.hidden = false;
+    requestAnimationFrame(() => {
+      const closeButton = qs("#btn-menu-close");
+      if (closeButton) closeButton.focus();
+    });
   }
 
   function closeMenu() {
+    const wasOpen = !els.menuOverlay.hidden;
     els.menuOverlay.hidden = true;
+    if (
+      wasOpen &&
+      state.screen === "game" &&
+      menuReturnFocus &&
+      menuReturnFocus.isConnected
+    ) {
+      menuReturnFocus.focus();
+    }
+    menuReturnFocus = null;
   }
 
   function showScreen(name) {
@@ -306,6 +324,7 @@
     state.flipped = [];
     state.pendingClose = [];
     state.matched = new Set();
+    state.matchTraces = [];
     state.scores = [0, 0];
     state.currentPlayer = 0;
     state.lock = false;
@@ -324,6 +343,7 @@
     renderBoard();
     updateHud();
     showScreen("game");
+    scheduleCordRender();
     Sound.startBgm();
   }
 
@@ -333,6 +353,11 @@
 
   function renderBoard() {
     els.board.innerHTML = "";
+    const cordLayer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    cordLayer.classList.add("pair-cords");
+    cordLayer.setAttribute("aria-hidden", "true");
+    cordLayer.setAttribute("preserveAspectRatio", "none");
+    els.board.appendChild(cordLayer);
     const frag = document.createDocumentFragment();
 
     state.deck.forEach((card, index) => {
@@ -406,6 +431,104 @@
     });
 
     els.board.appendChild(frag);
+  }
+
+  function createSvgElement(name, attrs) {
+    const element = document.createElementNS("http://www.w3.org/2000/svg", name);
+    Object.keys(attrs || {}).forEach((key) => {
+      element.setAttribute(key, String(attrs[key]));
+    });
+    return element;
+  }
+
+  function renderMatchCords() {
+    const layer = qs(".pair-cords", els.board);
+    if (!layer || !state.matchTraces.length || state.screen !== "game") {
+      if (layer) layer.innerHTML = "";
+      return;
+    }
+
+    const boardRect = els.board.getBoundingClientRect();
+    if (!boardRect.width || !boardRect.height) return;
+    layer.setAttribute("viewBox", "0 0 " + boardRect.width + " " + boardRect.height);
+    layer.innerHTML = "";
+
+    state.matchTraces.forEach((trace, traceIndex) => {
+      const cardA = cardEl(trace.a);
+      const cardB = cardEl(trace.b);
+      if (!cardA || !cardB) return;
+      const rectA = cardA.getBoundingClientRect();
+      const rectB = cardB.getBoundingClientRect();
+      const ax = rectA.left - boardRect.left + rectA.width / 2;
+      const ay = rectA.top - boardRect.top + rectA.height / 2;
+      const bx = rectB.left - boardRect.left + rectB.width / 2;
+      const by = rectB.top - boardRect.top + rectB.height / 2;
+      const mx = (ax + bx) / 2;
+      const my = (ay + by) / 2;
+      const distance = Math.hypot(bx - ax, by - ay);
+      const bend = Math.min(88, Math.max(20, distance * 0.18));
+      const controlY = my + (trace.player === 0 ? -bend : bend);
+      const edgeX = trace.player === 0 ? 2 : boardRect.width - 2;
+      const edgeY = 2;
+      const pairPath =
+        "M " + ax + " " + ay +
+        " Q " + mx + " " + controlY + " " + bx + " " + by +
+        " M " + mx + " " + my +
+        " Q " + ((mx + edgeX) / 2) + " " + Math.max(8, my * 0.22) + " " + edgeX + " " + edgeY;
+      const ownerClass = trace.player === 0 ? "is-p1" : "is-p2";
+      const ageClass = traceIndex === state.matchTraces.length - 1 ? " is-latest" : "";
+      const path = createSvgElement("path", {
+        d: pairPath,
+        class: "pair-cord " + ownerClass + ageClass,
+        "vector-effect": "non-scaling-stroke",
+      });
+      layer.appendChild(path);
+
+      if (Date.now() - trace.createdAt < 900) {
+        layer.appendChild(
+          createSvgElement("path", {
+            d: pairPath,
+            class: "pair-cord-draw " + ownerClass,
+            pathLength: "100",
+            "vector-effect": "non-scaling-stroke",
+          })
+        );
+      }
+
+      [
+        [ax, ay],
+        [bx, by],
+      ].forEach(([x, y]) => {
+        if (trace.player === 0) {
+          const size = 7;
+          layer.appendChild(
+            createSvgElement("polygon", {
+              points: [x + "," + (y - size), (x + size) + "," + y, x + "," + (y + size), (x - size) + "," + y].join(" "),
+              class: "pair-anchor " + ownerClass,
+            })
+          );
+        } else {
+          layer.appendChild(
+            createSvgElement("rect", {
+              x: x - 6,
+              y: y - 6,
+              width: 12,
+              height: 12,
+              class: "pair-anchor " + ownerClass,
+            })
+          );
+        }
+      });
+    });
+  }
+
+  let cordRenderFrame = null;
+  function scheduleCordRender() {
+    if (cordRenderFrame != null) cancelAnimationFrame(cordRenderFrame);
+    cordRenderFrame = requestAnimationFrame(() => {
+      cordRenderFrame = null;
+      renderMatchCords();
+    });
   }
 
   function cardEl(index) {
@@ -530,8 +653,15 @@
     const el = cardEl(index);
     if (el) {
       el.classList.remove("is-flipped");
+      el.classList.remove("is-mismatch");
       el.setAttribute("aria-label", faceDownLabel(index));
     }
+  }
+
+  function matchAnchorLabel(card) {
+    const raw = card.side === "pic" ? card.label || "圖" : card.text;
+    const chars = Array.from(String(raw || "結"));
+    return chars.length > 3 ? chars.slice(0, 3).join("") + "…" : chars.join("");
   }
 
   function wait(ms) {
@@ -548,6 +678,18 @@
     const elB = cardEl(b);
     if (elA) elA.classList.add("is-matched");
     if (elB) elB.classList.add("is-matched");
+    if (elA) elA.dataset.owner = String(state.currentPlayer);
+    if (elB) elB.dataset.owner = String(state.currentPlayer);
+    if (elA) elA.dataset.matchLabel = matchAnchorLabel(state.deck[a]);
+    if (elB) elB.dataset.matchLabel = matchAnchorLabel(state.deck[b]);
+    state.matchTraces.push({
+      a,
+      b,
+      pairKey,
+      player: state.currentPlayer,
+      createdAt: Date.now(),
+    });
+    scheduleCordRender();
     state.scores[state.currentPlayer] += 1;
     state.flipped = [];
     state.lock = false;
@@ -561,6 +703,10 @@
 
   function handleMismatch(a, b) {
     Sound.playSfx("mismatch");
+    const elA = cardEl(a);
+    const elB = cardEl(b);
+    if (elA) elA.classList.add("is-mismatch");
+    if (elB) elB.classList.add("is-mismatch");
     state.flipped = [];
     state.lock = false;
     // 失敗牌先保持翻開；滿 900ms 或下一張被翻開時才蓋回
@@ -752,6 +898,30 @@
         closeMenu();
       }
     });
+    els.menuOverlay.addEventListener("keydown", (event) => {
+      if (els.menuOverlay.hidden) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        Sound.playSfx("select");
+        closeMenu();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = qsa(
+        'button:not([disabled]), input:not([disabled]), select:not([disabled])',
+        els.menuOverlay
+      ).filter((element) => element.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
   }
 
   function fillRowSelects() {
@@ -846,6 +1016,7 @@
   fillRowSelects();
   fillSetupSelects();
   bindSetup();
+  window.addEventListener("resize", scheduleCordRender);
   syncAudioSettings();
   syncSetupUI();
   showScreen("setup");
