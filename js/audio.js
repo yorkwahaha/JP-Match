@@ -18,7 +18,7 @@ window.JPMatchAudio = (() => {
   const TTS_PROXY_URL = "https://jpapp-tts-proxy.yorkwahaha.workers.dev/tts";
   const TTS_SESSION_URL = "https://jpapp-tts-proxy.yorkwahaha.workers.dev/session";
   const DEFAULT_TTS_VOICE = "ja-JP-Neural2-B";
-  const DEFAULT_WORD_VOICE = "classic";
+  const DEFAULT_WORD_VOICE = "lively";
 
   const WORD_VOICES = {
     classic: {
@@ -434,6 +434,7 @@ window.JPMatchAudio = (() => {
 
   return {
     settings: settings,
+    defaultWordVoice: DEFAULT_WORD_VOICE,
     wordVoices: WORD_VOICES,
     unlock: unlock,
     playSfx: playSfx,

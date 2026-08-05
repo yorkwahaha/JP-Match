@@ -195,11 +195,11 @@
     } catch (err) {
       /* ignore */
     }
-    return "classic";
+    return Sound.defaultWordVoice;
   }
 
   function applyWordVoice(voiceId) {
-    const id = Sound.wordVoices[voiceId] ? voiceId : "classic";
+    const id = Sound.wordVoices[voiceId] ? voiceId : Sound.defaultWordVoice;
     Sound.setWordVoice(id);
     try {
       window.localStorage.setItem(WORD_VOICE_STORAGE_KEY, id);
