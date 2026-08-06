@@ -1,7 +1,7 @@
 {
   "model": "s2.1-pro-free",
   "referenceId": "962b6d7385574187bbf4b73bb1ec49f6",
-  "promptStrategy": "approved samples plus explicit Japanese reading tags; six approved rerecords applied 2026-08-06",
+  "promptStrategy": "approved samples plus explicit Japanese reading tags; nine approved rerecords applied 2026-08-06",
   "words": [
     {
       "key": "neko",
@@ -386,8 +386,8 @@
       "written": "肉",
       "prompt": "[日本語で「にく」と読んで] 肉。",
       "filename": "niku.mp3",
-      "source": "generated",
-      "bytes": 12119,
+      "source": "approved-candidate-3-20260806",
+      "bytes": 10866,
       "status": "ok"
     },
     {
@@ -396,8 +396,8 @@
       "written": "野菜",
       "prompt": "[日本語で「やさい」と読んで] 野菜。",
       "filename": "yasai.mp3",
-      "source": "generated",
-      "bytes": 16717,
+      "source": "approved-candidate-3-20260806",
+      "bytes": 11283,
       "status": "ok"
     },
     {
@@ -595,8 +595,9 @@
       "written": "米",
       "prompt": "[日本語で「こめ」と読んで] 米。",
       "filename": "kome.mp3",
-      "source": "approved-sample",
-      "status": "ok"
+      "source": "approved-reading-hint-20260806",
+      "status": "ok",
+      "bytes": 9194
     },
     {
       "key": "onigiri",
@@ -1575,5 +1576,6 @@
       "bytes": 15881,
       "status": "ok"
     }
-  ]
+  ],
+  "generatedAt": "2026-08-06T00:46:48.697Z"
 }

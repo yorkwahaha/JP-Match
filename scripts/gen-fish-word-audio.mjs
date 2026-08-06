@@ -157,14 +157,25 @@ process.stdout.write(
 let completed = 0;
 let failed = 0;
 let consecutiveFailures = 0;
+const generatedRecords = [];
 
 for (let index = 0; index < pending.length; index += 1) {
   const word = pending[index];
   const destination = path.join(OUT_DIR, `${word.key}.mp3`);
   try {
-    const spokenText = `${word.tts || word.hira}。`;
+    const spokenText = `${word.fishTts || word.tts || word.hira}。`;
     const audio = await synthesize(spokenText);
     fs.writeFileSync(destination, audio);
+    generatedRecords.push({
+      key: word.key,
+      reading: word.hira,
+      written: word.tts || word.hira,
+      prompt: spokenText,
+      filename: `${word.key}.mp3`,
+      source: "generated-rerecord",
+      bytes: audio.length,
+      status: "ok",
+    });
     completed += 1;
     consecutiveFailures = 0;
     process.stdout.write(
@@ -188,19 +199,33 @@ const generatedFiles = fs
   .filter((filename) => filename.endsWith(".mp3"))
   .sort();
 
-fs.writeFileSync(
-  path.join(OUT_DIR, "pack.json"),
-  `${JSON.stringify({
-    id: PACK_ID,
-    provider: "Fish Audio",
-    model: MODEL,
-    referenceId: REFERENCE_ID,
-    generatedAt: new Date().toISOString(),
-    expectedWords: uniqueWords.length,
-    generatedFiles: generatedFiles.length,
-  }, null, 2)}\n`,
-  "utf8",
-);
+const manifestPath = path.join(OUT_DIR, "pack.json");
+let existingManifest = null;
+try {
+  existingManifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+} catch {}
+
+const generatedByKey = new Map(generatedRecords.map((record) => [record.key, record]));
+const manifest =
+  existingManifest && Array.isArray(existingManifest.words)
+    ? {
+        ...existingManifest,
+        model: MODEL,
+        referenceId: REFERENCE_ID,
+        generatedAt: new Date().toISOString(),
+        words: existingManifest.words.map((record) => generatedByKey.get(record.key) || record),
+      }
+    : {
+        id: PACK_ID,
+        provider: "Fish Audio",
+        model: MODEL,
+        referenceId: REFERENCE_ID,
+        generatedAt: new Date().toISOString(),
+        expectedWords: uniqueWords.length,
+        generatedFiles: generatedFiles.length,
+      };
+
+fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 
 process.stdout.write(
   `done=${completed} failed=${failed} totalFiles=${generatedFiles.length} dir=${OUT_DIR}\n`,

@@ -615,6 +615,25 @@ body.turn-switched .turn-banner {
   line-height: 1.3;
 }
 
+.btn-settle {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  min-height: 44px;
+  padding: 9px 18px;
+  border: 1px solid var(--thread-success);
+  background: var(--thread-success);
+  color: var(--page-bg);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 6px 50%);
+}
+
+.btn-settle:hover,
+.btn-settle:focus-visible {
+  filter: brightness(1.08);
+}
+
 .hud-dual,
 .hud-solo {
   display: grid;

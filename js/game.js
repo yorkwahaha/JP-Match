@@ -73,6 +73,7 @@
     lock: false,
     moves: 0,
     startedAt: null,
+    completedAt: null,
     ended: false,
     // 每次開局遞增；async 流程 await 回來須比對，避免舊局殘留的回呼污染新局
     runId: 0,
@@ -92,6 +93,7 @@
     hudDual: document.getElementById("hud-dual"),
     hudSolo: document.getElementById("hud-solo"),
     modeChip: document.getElementById("mode-chip"),
+    btnSettle: document.getElementById("btn-settle"),
     resultTitle: document.getElementById("result-title"),
     resultScoreboard: document.getElementById("result-scoreboard"),
     resultNameP1: document.getElementById("result-name-p1"),
@@ -353,6 +355,9 @@
         toRow: state.rowTo,
       });
     }
+    if (state.kind === "words" && Sound.preloadWords) {
+      Sound.preloadWords(state.deck.map((card) => card.voiceKey).filter(Boolean));
+    }
     clearMismatchTimer();
     state.flipped = [];
     state.pendingClose = [];
@@ -363,8 +368,12 @@
     state.lock = false;
     state.moves = 0;
     state.startedAt = Date.now();
+    state.completedAt = null;
     state.ended = false;
     state.runId += 1;
+
+    els.btnSettle.hidden = true;
+    els.modeChip.hidden = false;
 
     els.board.style.setProperty("--cols", String(grid.cols));
     els.board.style.setProperty("--rows", String(grid.rows));
@@ -703,9 +712,9 @@
 
   async function handleMatch(a, b, pairKey) {
     const run = state.runId;
+    Sound.playSfx("match");
     await wait(MATCH_HOLD_MS);
     if (run !== state.runId) return;
-    Sound.playSfx("match");
     state.matched.add(pairKey);
     const elA = cardEl(a);
     const elB = cardEl(b);
@@ -729,7 +738,16 @@
     updateHud();
 
     if (state.matched.size === state.deck.length / 2) {
-      endGame();
+      state.ended = true;
+      state.completedAt = Date.now();
+      els.turnBanner.textContent = "配對完成，可以慢慢複習";
+      els.modeChip.hidden = true;
+      els.btnSettle.hidden = false;
+      try {
+        els.btnSettle.focus({ preventScroll: true });
+      } catch (e) {
+        els.btnSettle.focus();
+      }
     }
     // 答對可連續翻牌，不換手
   }
@@ -756,7 +774,7 @@
     state.ended = true;
     Sound.stopBgm();
     if (Sound.stopReading) Sound.stopReading();
-    const elapsed = Math.round((Date.now() - state.startedAt) / 1000);
+    const elapsed = Math.round(((state.completedAt || Date.now()) - state.startedAt) / 1000);
     const mins = Math.floor(elapsed / 60);
     const secs = elapsed % 60;
     const timeText = mins > 0 ? mins + " 分 " + secs + " 秒" : secs + " 秒";
@@ -909,6 +927,10 @@
     els.optBgmVolume.addEventListener("input", syncAudioSettings);
 
     els.btnStart.addEventListener("click", startGame);
+    els.btnSettle.addEventListener("click", () => {
+      Sound.playSfx("select");
+      endGame();
+    });
     qs("#btn-restart").addEventListener("click", startGame);
     qs("#btn-to-setup").addEventListener("click", () => {
       Sound.playSfx("select");

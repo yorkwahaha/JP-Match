@@ -45,8 +45,8 @@ window.JPMatchWords = (() => {
     { key: "ichigo", hira: "いちご", romaji: "ichigo", pic: "🍓", label: "草莓", category: "food" },
     { key: "suika", hira: "すいか", romaji: "suika", pic: "🍉", label: "西瓜", category: "food" },
     { key: "mikan", hira: "みかん", romaji: "mikan", pic: "🍊", label: "橘子", category: "food" },
-    { key: "niku", hira: "にく", romaji: "niku", pic: "🥩", label: "肉", category: "food" },
-    { key: "yasai", hira: "やさい", romaji: "yasai", pic: "🥬", label: "蔬菜", category: "food" },
+    { key: "niku", hira: "にく", tts: "肉", fishTts: "[日本語で「にく」と読んで] 肉", romaji: "niku", pic: "🥩", label: "肉", category: "food" },
+    { key: "yasai", hira: "やさい", tts: "野菜", fishTts: "[日本語で「やさい」と読んで] 野菜", romaji: "yasai", pic: "🥬", label: "蔬菜", category: "food" },
     { key: "ramen", hira: "ラーメン", romaji: "ramen", pic: "🍜", label: "拉麵", category: "food" },
     { key: "sushi", hira: "すし", romaji: "sushi", pic: "🍣", label: "壽司", category: "food" },
     { key: "ocha", hira: "おちゃ", romaji: "ocha", pic: "🍵", label: "茶", category: "food" },
@@ -66,7 +66,7 @@ window.JPMatchWords = (() => {
     { key: "okashi", hira: "おかし", romaji: "okashi", pic: "🍬", label: "點心", category: "food" },
     { key: "osake", hira: "おさけ", romaji: "osake", pic: "🍶", label: "酒", category: "food" },
     { key: "biiru", hira: "ビール", romaji: "biiru", pic: "🍺", label: "啤酒", category: "food" },
-    { key: "kome", hira: "こめ", tts: "米", romaji: "kome", pic: "🌾", label: "米", category: "food" },
+    { key: "kome", hira: "こめ", tts: "米", fishTts: "[日本語で「こめ」と読んで] 米", romaji: "kome", pic: "🌾", label: "米", category: "food" },
     { key: "onigiri", hira: "おにぎり", romaji: "onigiri", pic: "🍙", label: "飯糰", category: "food" },
 
     // 顏色

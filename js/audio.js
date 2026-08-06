@@ -30,7 +30,7 @@ window.JPMatchAudio = (() => {
       id: "lively",
       label: "活力聲線",
       dir: BASE + "/word-voices/fish-962b6d73/",
-      revision: "s2-1-kanji-r2",
+      revision: "s2-1-reading-hint-r4",
     },
   };
 
@@ -51,6 +51,8 @@ window.JPMatchAudio = (() => {
   };
 
   const sfxCache = {};
+  const audioBufferCache = new Map();
+  const audioBufferPending = new Map();
   let bgmEl = null;
   let bgmIndex = -1;
   let bgmPausedByHide = false;
@@ -61,6 +63,8 @@ window.JPMatchAudio = (() => {
   let localReadingAudio = null;
   let readingAudio = null;
   let readingObjectUrl = null;
+  let lowLatencyContext = null;
+  let activeReadingSource = null;
 
   const settings = {
     voice: true,
@@ -75,6 +79,10 @@ window.JPMatchAudio = (() => {
   function unlock() {
     if (unlocked) return;
     unlocked = true;
+    const context = getLowLatencyContext();
+    if (context && context.state === "suspended") {
+      context.resume().catch(function () {});
+    }
     try {
       const silent = new Audio(
         "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"
@@ -100,6 +108,141 @@ window.JPMatchAudio = (() => {
       const p = el.play();
       if (p && p.catch) p.catch(function () {});
     } catch (e) {}
+  }
+
+  function getLowLatencyContext() {
+    if (lowLatencyContext) return lowLatencyContext;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    try {
+      lowLatencyContext = new AudioContextClass({ latencyHint: "interactive" });
+    } catch (e) {
+      try {
+        lowLatencyContext = new AudioContextClass();
+      } catch (err) {
+        lowLatencyContext = null;
+      }
+    }
+    return lowLatencyContext;
+  }
+
+  function computeVoiceGain(buffer) {
+    let peak = 0;
+    let energy = 0;
+    let activeSamples = 0;
+    const stride = Math.max(1, Math.floor(buffer.sampleRate / 22050));
+
+    for (let channel = 0; channel < buffer.numberOfChannels; channel += 1) {
+      const data = buffer.getChannelData(channel);
+      for (let index = 0; index < data.length; index += stride) {
+        peak = Math.max(peak, Math.abs(data[index]));
+      }
+    }
+
+    const activeThreshold = Math.max(0.0015, peak * 0.025);
+    for (let channel = 0; channel < buffer.numberOfChannels; channel += 1) {
+      const data = buffer.getChannelData(channel);
+      for (let index = 0; index < data.length; index += stride) {
+        const sample = data[index];
+        if (Math.abs(sample) < activeThreshold) continue;
+        energy += sample * sample;
+        activeSamples += 1;
+      }
+    }
+
+    if (!activeSamples || !peak) return 1;
+    const activeRms = Math.sqrt(energy / activeSamples);
+    const targetRms = 0.1;
+    const rmsGain = targetRms / activeRms;
+    const peakSafeGain = 0.92 / peak;
+    return Math.max(0.55, Math.min(1.8, rmsGain, peakSafeGain));
+  }
+
+  function computeStartOffset(buffer) {
+    let peak = 0;
+    for (let channel = 0; channel < buffer.numberOfChannels; channel += 1) {
+      const data = buffer.getChannelData(channel);
+      for (let index = 0; index < data.length; index += 1) {
+        peak = Math.max(peak, Math.abs(data[index]));
+      }
+    }
+    const threshold = Math.max(0.001, peak * 0.02);
+    let firstActiveSample = buffer.length;
+    for (let channel = 0; channel < buffer.numberOfChannels; channel += 1) {
+      const data = buffer.getChannelData(channel);
+      for (let index = 0; index < data.length; index += 1) {
+        if (Math.abs(data[index]) < threshold) continue;
+        firstActiveSample = Math.min(firstActiveSample, index);
+        break;
+      }
+    }
+    if (firstActiveSample === buffer.length) return 0;
+    return Math.max(0, firstActiveSample / buffer.sampleRate - 0.008);
+  }
+
+  function loadAudioBuffer(src, normalizeVoice) {
+    const cacheKey = src + (normalizeVoice ? "#voice" : "#raw");
+    if (audioBufferCache.has(cacheKey)) {
+      return Promise.resolve(audioBufferCache.get(cacheKey));
+    }
+    if (audioBufferPending.has(cacheKey)) return audioBufferPending.get(cacheKey);
+
+    const context = getLowLatencyContext();
+    if (!context) return Promise.reject(new Error("Web Audio unavailable"));
+    const pending = fetch(src)
+      .then((response) => {
+        if (!response.ok) throw new Error("Audio fetch failed: " + response.status);
+        return response.arrayBuffer();
+      })
+      .then((data) => context.decodeAudioData(data))
+      .then((buffer) => {
+        const entry = {
+          buffer,
+          gain: normalizeVoice ? computeVoiceGain(buffer) : 1,
+          offset: computeStartOffset(buffer),
+        };
+        audioBufferCache.set(cacheKey, entry);
+        audioBufferPending.delete(cacheKey);
+        return entry;
+      })
+      .catch((error) => {
+        audioBufferPending.delete(cacheKey);
+        throw error;
+      });
+    audioBufferPending.set(cacheKey, pending);
+    return pending;
+  }
+
+  function playDecodedSfx(src, volume) {
+    const context = getLowLatencyContext();
+    const entry = audioBufferCache.get(src + "#raw");
+    if (!context || !entry) return false;
+    if (context.state === "suspended") context.resume().catch(function () {});
+    try {
+      const source = context.createBufferSource();
+      const gain = context.createGain();
+      source.buffer = entry.buffer;
+      gain.gain.value = volume;
+      source.connect(gain);
+      gain.connect(context.destination);
+      source.start(0, entry.offset);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function primeSfx() {
+    Object.keys(PATHS.sfx).forEach((name) => {
+      const src = PATHS.sfx[name];
+      try {
+        const el = new Audio(src);
+        el.preload = "auto";
+        el.load();
+        sfxCache[src] = el;
+      } catch (e) {}
+      loadAudioBuffer(src, false).catch(function () {});
+    });
   }
 
   function playLocalReading(src, volume, onError) {
@@ -130,7 +273,10 @@ window.JPMatchAudio = (() => {
     if (!settings.sfx) return;
     const src = PATHS.sfx[name];
     if (!src) return;
-    playSrc(src, settings.sfxVolume, sfxCache);
+    if (!playDecodedSfx(src, settings.sfxVolume)) {
+      playSrc(src, settings.sfxVolume, sfxCache);
+      loadAudioBuffer(src, false).catch(function () {});
+    }
   }
 
   function stopReading() {
@@ -155,6 +301,12 @@ window.JPMatchAudio = (() => {
         readingAudio.onerror = null;
       } catch (e) {}
       readingAudio = null;
+    }
+    if (activeReadingSource) {
+      try {
+        activeReadingSource.stop();
+      } catch (e) {}
+      activeReadingSource = null;
     }
     if (readingObjectUrl) {
       try {
@@ -188,7 +340,43 @@ window.JPMatchAudio = (() => {
       if (sessionId !== readingSessionId) return;
       if (fallbackText) playReading(fallbackText);
     };
-    playLocalReading(src, settings.voiceVolume, onError);
+    const context = getLowLatencyContext();
+    if (!context) {
+      playLocalReading(src, settings.voiceVolume, onError);
+      return;
+    }
+    loadAudioBuffer(src, true)
+      .then((entry) => {
+        if (sessionId !== readingSessionId) return;
+        if (context.state === "suspended") context.resume().catch(function () {});
+        try {
+          const source = context.createBufferSource();
+          const gain = context.createGain();
+          source.buffer = entry.buffer;
+          gain.gain.value = settings.voiceVolume * entry.gain;
+          source.connect(gain);
+          gain.connect(context.destination);
+          source.onended = function () {
+            if (activeReadingSource === source) activeReadingSource = null;
+          };
+          activeReadingSource = source;
+          source.start(0, entry.offset);
+        } catch (e) {
+          onError();
+        }
+      })
+      .catch(onError);
+  }
+
+  function preloadWords(wordKeys) {
+    const voice = WORD_VOICES[settings.wordVoice] || WORD_VOICES[DEFAULT_WORD_VOICE];
+    const keys = Array.from(new Set(wordKeys || []));
+    keys.forEach((wordKey) => {
+      if (!wordKey) return;
+      const key = String(wordKey).toLowerCase();
+      const src = voice.dir + key + ".mp3" + (voice.revision ? `?v=${voice.revision}` : "");
+      loadAudioBuffer(src, true).catch(function () {});
+    });
   }
 
   async function getSessionToken() {
@@ -434,6 +622,8 @@ window.JPMatchAudio = (() => {
     if (bgmEl) bgmEl.volume = settings.bgmVolume;
   }
 
+  primeSfx();
+
   return {
     settings: settings,
     defaultWordVoice: DEFAULT_WORD_VOICE,
@@ -442,6 +632,7 @@ window.JPMatchAudio = (() => {
     playSfx: playSfx,
     playKana: playKana,
     playWord: playWord,
+    preloadWords: preloadWords,
     playReading: playReading,
     stopReading: stopReading,
     startBgm: startBgm,
