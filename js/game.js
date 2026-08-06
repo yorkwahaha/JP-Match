@@ -299,14 +299,13 @@
     const need = pairCount();
     const ok = size >= need;
     const hintEl = state.kind === "words" ? els.wordHint : els.rangeHint;
-    if (!hintEl || !els.btnStart) return;
+    if (!els.btnStart) return;
 
     let text = "";
     if (state.kind === "words") {
-      const cat =
-        WORD_CATEGORIES.find((c) => c.id === state.wordCategory) ||
-        WORD_CATEGORIES[0];
-      text = cat.label + " · 題池 " + size + " 個單字";
+      if (!ok) {
+        text = "目前盤面需 " + need + " 組，請縮小盤面或選擇更多單字";
+      }
     } else {
       const range = normalizeRowRange(state.rowFrom, state.rowTo);
       const fromLabel = ROWS[range.from].label;
@@ -317,12 +316,15 @@
         " · 題池 " +
         size +
         " 個假名";
+      if (!ok) {
+        text += " · 目前盤面需 " + need + " 組，請縮小盤面或擴大範圍";
+      }
     }
-    if (!ok) {
-      text += " · 目前盤面需 " + need + " 組，請縮小盤面或擴大範圍";
+    if (hintEl) {
+      hintEl.textContent = text;
+      hintEl.hidden = state.kind === "words" && ok;
+      hintEl.classList.toggle("is-warn", !ok);
     }
-    hintEl.textContent = text;
-    hintEl.classList.toggle("is-warn", !ok);
     if (els.rangeHint && hintEl !== els.rangeHint) {
       els.rangeHint.classList.remove("is-warn");
     }
@@ -1011,11 +1013,12 @@
     els.selGrid.value = state.gridId;
 
     els.selWordCategory.innerHTML = WORD_CATEGORIES.map((cat) => {
+      const count = getWordsInCategory(cat.id).length;
       return (
         '<option value="' +
         escapeHtml(cat.id) +
         '">' +
-        escapeHtml(cat.label) +
+        escapeHtml(cat.label + " × " + count) +
         "</option>"
       );
     }).join("");

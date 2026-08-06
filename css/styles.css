@@ -1702,19 +1702,6 @@ html[data-theme="yuzu"] {
     repeating-linear-gradient(90deg, transparent 0 71px, var(--cloth-line) 71px 72px);
 }
 
-.setup-bg::before {
-  content: "";
-  position: absolute;
-  left: 7vw;
-  top: 18%;
-  width: min(34vw, 440px);
-  height: 58%;
-  border-left: 2px solid var(--thread-p1);
-  border-bottom: 2px solid var(--thread-p2);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-  opacity: 0.35;
-}
-
 .brand {
   text-align: left;
   align-self: center;
@@ -2301,11 +2288,6 @@ body[data-turn="1"] {
     align-content: start;
     gap: 18px;
     padding-inline: max(16px, 6vw);
-  }
-
-  .setup-bg::before {
-    width: 62vw;
-    height: 22%;
   }
 
   .brand {

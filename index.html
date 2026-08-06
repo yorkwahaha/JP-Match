@@ -15,7 +15,7 @@
       href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./css/styles.css?v=kotoba-musubi-5" />
+    <link rel="stylesheet" href="./css/styles.css?v=kotoba-musubi-6" />
   </head>
   <body data-screen="setup" data-players="2" data-turn="0">
     <div id="app" class="app">
@@ -75,7 +75,7 @@
           <div class="field" id="field-word-category" hidden>
             <label class="field-label" for="sel-word-category">單字主題</label>
             <select id="sel-word-category" class="setup-select" aria-label="單字主題"></select>
-            <p id="word-hint" class="range-hint">題池 18 個單字</p>
+            <p id="word-hint" class="range-hint" hidden></p>
           </div>
 
           <div class="field field-ui-theme">
@@ -85,8 +85,7 @@
 
           <div class="field field-word-voice">
             <label class="field-label" for="sel-word-voice">單字聲線</label>
-            <select id="sel-word-voice" class="setup-select" aria-describedby="word-voice-hint"></select>
-            <p id="word-voice-hint" class="range-hint">活力聲線由 Fish Audio 產生；音檔缺漏時使用備援語音。</p>
+            <select id="sel-word-voice" class="setup-select"></select>
           </div>
 
           <button type="button" id="btn-start" class="btn-primary">開始遊戲</button>
@@ -234,6 +233,6 @@
     <script src="./js/kana.js"></script>
     <script src="./js/words.js"></script>
     <script src="./js/audio.js?v=word-voices-3"></script>
-    <script src="./js/game.js?v=kotoba-musubi-8"></script>
+    <script src="./js/game.js?v=kotoba-musubi-9"></script>
   </body>
 </html>
