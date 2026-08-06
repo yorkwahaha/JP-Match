@@ -6,6 +6,11 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' blob: data:; connect-src 'self' https://jpapp-tts-proxy.yorkwahaha.workers.dev; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#142033" id="meta-theme-color" />
     <title>JP Match · 五十音配對</title>
@@ -15,7 +20,7 @@
       href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./css/styles.css?v=kotoba-musubi-7" />
+    <link rel="stylesheet" href="./css/styles.css?v=kotoba-musubi-9" />
   </head>
   <body data-screen="setup" data-players="2" data-turn="0">
     <div id="app" class="app">
@@ -233,7 +238,7 @@
 
     <script src="./js/kana.js"></script>
     <script src="./js/words.js"></script>
-    <script src="./js/audio.js?v=word-voices-4"></script>
-    <script src="./js/game.js?v=kotoba-musubi-10"></script>
+    <script src="./js/audio.js?v=word-voices-5"></script>
+    <script src="./js/game.js?v=kotoba-musubi-12"></script>
   </body>
 </html>

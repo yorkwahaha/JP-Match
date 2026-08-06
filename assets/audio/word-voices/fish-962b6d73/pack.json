@@ -1,6 +1,8 @@
 {
   "model": "s2.1-pro-free",
   "referenceId": "962b6d7385574187bbf4b73bb1ec49f6",
+  "expectedWords": 159,
+  "generatedFiles": 159,
   "promptStrategy": "approved samples plus explicit Japanese reading tags; nine approved rerecords applied 2026-08-06",
   "words": [
     {
@@ -1221,11 +1223,11 @@
       "status": "ok"
     },
     {
-      "key": "meggane",
+      "key": "megane",
       "reading": "めがね",
       "written": "眼鏡",
       "prompt": "[日本語で「めがね」と読んで] 眼鏡。",
-      "filename": "meggane.mp3",
+      "filename": "megane.mp3",
       "source": "generated",
       "bytes": 15881,
       "status": "ok"

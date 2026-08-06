@@ -3,5 +3,6 @@ Thumbs.db
 *.log
 .vscode/
 .idea/
+node_modules/
 
 scripts/_tmp-resvg/

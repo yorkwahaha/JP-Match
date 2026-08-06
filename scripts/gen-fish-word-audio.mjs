@@ -206,24 +206,37 @@ try {
 } catch {}
 
 const generatedByKey = new Map(generatedRecords.map((record) => [record.key, record]));
-const manifest =
+const existingByKey = new Map(
   existingManifest && Array.isArray(existingManifest.words)
-    ? {
-        ...existingManifest,
-        model: MODEL,
-        referenceId: REFERENCE_ID,
-        generatedAt: new Date().toISOString(),
-        words: existingManifest.words.map((record) => generatedByKey.get(record.key) || record),
-      }
-    : {
-        id: PACK_ID,
-        provider: "Fish Audio",
-        model: MODEL,
-        referenceId: REFERENCE_ID,
-        generatedAt: new Date().toISOString(),
-        expectedWords: uniqueWords.length,
-        generatedFiles: generatedFiles.length,
-      };
+    ? existingManifest.words.map((record) => [record.key, record])
+    : [],
+);
+const manifestWords = uniqueWords.map((word) => {
+  const filename = `${word.key}.mp3`;
+  return (
+    generatedByKey.get(word.key) ||
+    existingByKey.get(word.key) || {
+      key: word.key,
+      reading: word.hira,
+      written: word.tts || word.hira,
+      filename,
+      source: "existing-file",
+      bytes: fs.statSync(path.join(OUT_DIR, filename)).size,
+      status: "ok",
+    }
+  );
+});
+const manifest = {
+  ...(existingManifest || {}),
+  id: existingManifest?.id || PACK_ID,
+  provider: existingManifest?.provider || "Fish Audio",
+  model: MODEL,
+  referenceId: REFERENCE_ID,
+  generatedAt: new Date().toISOString(),
+  expectedWords: uniqueWords.length,
+  generatedFiles: generatedFiles.length,
+  words: manifestWords,
+};
 
 fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 

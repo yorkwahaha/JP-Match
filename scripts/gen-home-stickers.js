@@ -4,8 +4,9 @@
  * 用法：node scripts/gen-home-stickers.js
  */
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
-const { Resvg } = require("./_tmp-resvg/node_modules/@resvg/resvg-js");
+const { Resvg } = require("@resvg/resvg-js");
 
 const OUT = path.join("assets", "icons", "home");
 const SIZE = 256;
@@ -30,7 +31,7 @@ const MAP = {
   toire: "fluent-emoji:toilet",
   houki: "fluent-emoji:broom",
   sekken: "fluent-emoji:soap",
-  meggane: "fluent-emoji:glasses",
+  megane: "fluent-emoji:glasses",
   gomibako: "fluent-emoji:wastebasket",
   hasami: "fluent-emoji:scissors",
   denchi: "fluent-emoji:battery",
@@ -56,27 +57,47 @@ function svgToPng(svgBuf) {
 
 async function main() {
   fs.mkdirSync(OUT, { recursive: true });
-  for (const f of fs.readdirSync(OUT)) {
-    if (f.endsWith(".svg") || f.endsWith(".png")) {
-      fs.unlinkSync(path.join(OUT, f));
-    }
-  }
+  const stagingDir = fs.mkdtempSync(path.join(os.tmpdir(), "jp-match-home-"));
 
   let ok = 0;
-  for (const [name, iconId] of Object.entries(MAP)) {
-    process.stdout.write(name + " <- " + iconId + " ... ");
-    try {
-      const svg = await fetchSvg(iconId);
-      const png = svgToPng(svg);
-      fs.writeFileSync(path.join(OUT, name + ".png"), png);
-      console.log(png.length + " bytes");
-      ok += 1;
-    } catch (e) {
-      console.log("FAIL " + e.message);
+  try {
+    for (const [name, iconId] of Object.entries(MAP)) {
+      process.stdout.write(name + " <- " + iconId + " ... ");
+      try {
+        const svg = await fetchSvg(iconId);
+        const png = svgToPng(svg);
+        fs.writeFileSync(path.join(stagingDir, name + ".png"), png);
+        console.log(png.length + " bytes");
+        ok += 1;
+      } catch (e) {
+        console.log("FAIL " + e.message);
+      }
     }
+
+    if (ok !== Object.keys(MAP).length) {
+      throw new Error("generation incomplete; existing icons were preserved");
+    }
+
+    const expected = new Set(Object.keys(MAP).map((name) => name + ".png"));
+    expected.forEach((filename) => {
+      fs.copyFileSync(path.join(stagingDir, filename), path.join(OUT, filename));
+    });
+    for (const filename of fs.readdirSync(OUT)) {
+      if (
+        (filename.endsWith(".svg") || filename.endsWith(".png")) &&
+        !expected.has(filename)
+      ) {
+        fs.unlinkSync(path.join(OUT, filename));
+      }
+    }
+  } finally {
+    fs.rmSync(stagingDir, { recursive: true, force: true });
   }
+
   console.log("done", ok + "/" + Object.keys(MAP).length);
-  if (ok !== Object.keys(MAP).length) process.exitCode = 1;
 }
 
-main();
+main().catch((error) => {
+  console.error(error.message);
+  process.exitCode = 1;
+});

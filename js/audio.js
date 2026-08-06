@@ -19,6 +19,7 @@ window.JPMatchAudio = (() => {
   const TTS_SESSION_URL = "https://jpapp-tts-proxy.yorkwahaha.workers.dev/session";
   const DEFAULT_TTS_VOICE = "ja-JP-Neural2-B";
   const DEFAULT_WORD_VOICE = "lively";
+  const MAX_VOICE_BUFFER_CACHE = 64;
 
   const WORD_VOICES = {
     classic: {
@@ -53,6 +54,7 @@ window.JPMatchAudio = (() => {
   const sfxCache = {};
   const audioBufferCache = new Map();
   const audioBufferPending = new Map();
+  const reportedAudioIssues = new Set();
   let bgmEl = null;
   let bgmIndex = -1;
   let bgmPausedByHide = false;
@@ -75,6 +77,36 @@ window.JPMatchAudio = (() => {
     voiceVolume: 1,
     wordVoice: DEFAULT_WORD_VOICE,
   };
+
+  function reportAudioIssue(scope, error) {
+    const detail = error && error.message ? error.message : String(error || "unknown error");
+    const key = scope + ":" + detail;
+    if (reportedAudioIssues.has(key)) return;
+    reportedAudioIssues.add(key);
+    console.warn("[JP Match audio] " + scope + ": " + detail);
+  }
+
+  function getCachedAudioBuffer(cacheKey) {
+    const entry = audioBufferCache.get(cacheKey);
+    if (!entry) return null;
+    audioBufferCache.delete(cacheKey);
+    audioBufferCache.set(cacheKey, entry);
+    return entry;
+  }
+
+  function pruneVoiceBufferCache() {
+    let voiceCount = 0;
+    audioBufferCache.forEach((entry, key) => {
+      if (key.endsWith("#voice")) voiceCount += 1;
+    });
+    if (voiceCount <= MAX_VOICE_BUFFER_CACHE) return;
+    for (const key of audioBufferCache.keys()) {
+      if (!key.endsWith("#voice")) continue;
+      audioBufferCache.delete(key);
+      voiceCount -= 1;
+      if (voiceCount <= MAX_VOICE_BUFFER_CACHE) break;
+    }
+  }
 
   function unlock() {
     if (unlocked) return;
@@ -106,8 +138,14 @@ window.JPMatchAudio = (() => {
       el.currentTime = 0;
       el.volume = volume;
       const p = el.play();
-      if (p && p.catch) p.catch(function () {});
-    } catch (e) {}
+      if (p && p.catch) {
+        p.catch(function (error) {
+          reportAudioIssue("play " + src, error);
+        });
+      }
+    } catch (e) {
+      reportAudioIssue("play " + src, e);
+    }
   }
 
   function getLowLatencyContext() {
@@ -182,9 +220,8 @@ window.JPMatchAudio = (() => {
 
   function loadAudioBuffer(src, normalizeVoice) {
     const cacheKey = src + (normalizeVoice ? "#voice" : "#raw");
-    if (audioBufferCache.has(cacheKey)) {
-      return Promise.resolve(audioBufferCache.get(cacheKey));
-    }
+    const cached = getCachedAudioBuffer(cacheKey);
+    if (cached) return Promise.resolve(cached);
     if (audioBufferPending.has(cacheKey)) return audioBufferPending.get(cacheKey);
 
     const context = getLowLatencyContext();
@@ -202,6 +239,7 @@ window.JPMatchAudio = (() => {
           offset: computeStartOffset(buffer),
         };
         audioBufferCache.set(cacheKey, entry);
+        pruneVoiceBufferCache();
         audioBufferPending.delete(cacheKey);
         return entry;
       })
@@ -240,8 +278,12 @@ window.JPMatchAudio = (() => {
         el.preload = "auto";
         el.load();
         sfxCache[src] = el;
-      } catch (e) {}
-      loadAudioBuffer(src, false).catch(function () {});
+      } catch (e) {
+        reportAudioIssue("prime " + src, e);
+      }
+      loadAudioBuffer(src, false).catch(function (error) {
+        reportAudioIssue("decode " + src, error);
+      });
     });
   }
 
@@ -390,6 +432,7 @@ window.JPMatchAudio = (() => {
       sessionTokenData = data;
       return data.token;
     } catch (e) {
+      reportAudioIssue("TTS session", e);
       return null;
     }
   }
@@ -406,7 +449,9 @@ window.JPMatchAudio = (() => {
       utter.rate = 0.92;
       utter.volume = settings.voiceVolume;
       window.speechSynthesis.speak(utter);
-    } catch (e) {}
+    } catch (e) {
+      reportAudioIssue("Web Speech fallback", e);
+    }
   }
 
   async function speakCloudTts(text, sessionId) {
@@ -439,6 +484,7 @@ window.JPMatchAudio = (() => {
         }
         success = true;
       } catch (e) {
+        reportAudioIssue("Cloud TTS request", e);
         return false;
       }
     }
@@ -504,11 +550,17 @@ window.JPMatchAudio = (() => {
       .trim();
     if (!clean) return;
 
-    speakCloudTts(clean, sessionId).then(function (ok) {
-      if (ok) return;
-      if (sessionId !== readingSessionId) return;
-      playWebSpeechFallback(clean, sessionId);
-    });
+    speakCloudTts(clean, sessionId)
+      .then(function (ok) {
+        if (ok) return;
+        if (sessionId !== readingSessionId) return;
+        playWebSpeechFallback(clean, sessionId);
+      })
+      .catch(function (error) {
+        reportAudioIssue("Cloud TTS fallback", error);
+        if (sessionId !== readingSessionId) return;
+        playWebSpeechFallback(clean, sessionId);
+      });
   }
 
   function pickBgm() {
@@ -542,7 +594,11 @@ window.JPMatchAudio = (() => {
     bgmPausedByHide = false;
     bgmEl.volume = settings.bgmVolume;
     const p = bgmEl.play();
-    if (p && p.catch) p.catch(function () {});
+    if (p && p.catch) {
+      p.catch(function (error) {
+        reportAudioIssue("start BGM", error);
+      });
+    }
   }
 
   function stopBgm() {
@@ -568,7 +624,11 @@ window.JPMatchAudio = (() => {
     if (document.hidden) return;
     bgmEl.volume = settings.bgmVolume;
     const p = bgmEl.play();
-    if (p && p.catch) p.catch(function () {});
+    if (p && p.catch) {
+      p.catch(function (error) {
+        reportAudioIssue("resume BGM", error);
+      });
+    }
   }
 
   function onPageHide() {
@@ -608,7 +668,11 @@ window.JPMatchAudio = (() => {
       bgmPausedByHide = false;
       bgmEl.volume = settings.bgmVolume;
       const p = bgmEl.play();
-      if (p && p.catch) p.catch(function () {});
+      if (p && p.catch) {
+        p.catch(function (error) {
+          reportAudioIssue("enable BGM", error);
+        });
+      }
     }
   }
 

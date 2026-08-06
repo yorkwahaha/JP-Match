@@ -80,6 +80,25 @@ npx --yes serve -p 5173
 
 `http://localhost:5173`（手機請改成電腦的區網 IP）
 
+## 開發與驗證
+
+```bash
+npm install
+npm test
+```
+
+`npm test` 會檢查牌組規則、HTML/JS 引用、教材資料、音訊與圖示資產、聲線 manifest，以及 CSS 死碼契約。
+
+資產產生工具：
+
+```bash
+npm run generate:home-stickers
+npm run generate:word-audio
+FISH_AUDIO_API_KEY=... npm run generate:fish-audio
+```
+
+家裡物品圖示會先在暫存目錄完整產生；只有全部成功後才覆寫正式資產。
+
 ## 音訊
 
 | 路徑 | 用途 |

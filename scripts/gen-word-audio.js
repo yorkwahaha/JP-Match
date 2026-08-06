@@ -13,6 +13,7 @@ const TTS_URL = "https://jpapp-tts-proxy.yorkwahaha.workers.dev/tts";
 const VOICE = "ja-JP-Neural2-B";
 const OUT_DIR = path.join("assets", "audio", "words");
 const DELAY_MS = 2200;
+const MAX_RATE_RETRIES = 5;
 const FORCE = process.argv.includes("--force");
 
 function loadWords() {
@@ -25,6 +26,12 @@ function loadWords() {
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+function isMp3(buffer) {
+  if (!buffer || buffer.length < 4) return false;
+  if (buffer.subarray(0, 3).toString("ascii") === "ID3") return true;
+  return buffer[0] === 0xff && (buffer[1] & 0xe0) === 0xe0;
 }
 
 async function getToken() {
@@ -51,14 +58,18 @@ async function fetchMp3(token, text) {
   });
   if (res.status === 401) return { kind: "auth" };
   if (res.status === 429) {
-    const retry = Number(res.headers.get("Retry-After") || "20");
-    return { kind: "rate", retry: Math.max(5, retry) };
+    const parsedRetry = Number(res.headers.get("Retry-After") || "20");
+    const retry = Number.isFinite(parsedRetry) ? parsedRetry : 20;
+    return { kind: "rate", retry: Math.min(60, Math.max(5, retry)) };
   }
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     return { kind: "error", status: res.status, body: body.slice(0, 120) };
   }
   const buf = Buffer.from(await res.arrayBuffer());
+  if (!isMp3(buf)) {
+    return { kind: "error", status: "invalid-audio", body: "response is not an MP3" };
+  }
   return { kind: "ok", buf: buf };
 }
 
@@ -106,9 +117,12 @@ async function main() {
       session = await getToken();
       result = await fetchMp3(session.token, w.hira);
     }
-    while (result.kind === "rate") {
+    let rateRetries = 0;
+    while (result.kind === "rate" && rateRetries < MAX_RATE_RETRIES) {
+      rateRetries += 1;
       console.log("rate-limited, wait " + result.retry + "s");
       await sleep(result.retry * 1000 + 500);
+      if (session.exp < Date.now() + 15000) session = await getToken();
       result = await fetchMp3(session.token, w.hira);
     }
 

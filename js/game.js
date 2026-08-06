@@ -359,6 +359,7 @@
       Sound.preloadWords(state.deck.map((card) => card.voiceKey).filter(Boolean));
     }
     clearMismatchTimer();
+    clearTurnSwitchFeedback();
     state.flipped = [];
     state.pendingClose = [];
     state.matched = new Set();
@@ -458,14 +459,12 @@
         '<span class="card-inner">' +
         '<span class="card-face card-back" aria-hidden="true">' +
         '<span class="card-back-pattern"></span>' +
-        '<span class="card-corners" aria-hidden="true"></span>' +
-        '<span class="seal"><span class="seal-ring"></span><span class="seal-char"></span></span>' +
+        '<span class="seal"><span class="seal-ring"></span></span>' +
         "</span>" +
         '<span class="card-face card-front" data-side="' +
         escapeHtml(card.side) +
         '">' +
         '<span class="card-front-frame"></span>' +
-        '<span class="card-corners card-corners-ink" aria-hidden="true"></span>' +
         contentHtml +
         "</span></span>";
       btn.addEventListener("click", () => onCardTap(index));
@@ -589,7 +588,7 @@
       els.turnBanner.textContent = "自由練習 · 配對取走";
       els.turnBanner.classList.remove("is-p2");
       document.body.dataset.turn = "";
-      document.body.classList.remove("turn-switched");
+      clearTurnSwitchFeedback();
       return;
     }
 
@@ -607,15 +606,21 @@
     document.body.dataset.turn = String(state.currentPlayer);
 
     if (opts && opts.turnSwitched) {
-      document.body.classList.remove("turn-switched");
+      clearTurnSwitchFeedback();
       // 重觸發動畫
       void document.body.offsetWidth;
       document.body.classList.add("turn-switched");
-      window.clearTimeout(updateHud._switchTimer);
       updateHud._switchTimer = window.setTimeout(() => {
         document.body.classList.remove("turn-switched");
+        updateHud._switchTimer = null;
       }, 1600);
     }
+  }
+
+  function clearTurnSwitchFeedback() {
+    window.clearTimeout(updateHud._switchTimer);
+    updateHud._switchTimer = null;
+    document.body.classList.remove("turn-switched");
   }
 
   function clearMismatchTimer() {
@@ -687,7 +692,6 @@
     Sound.playSfx("flip");
     if (!card) return;
     if (card.voiceKey) Sound.playWord(card.voiceKey, card.voiceText);
-    else if (card.voiceText) Sound.playReading(card.voiceText);
     else if (card.audioKey) Sound.playKana(card.audioKey);
   }
 
@@ -720,6 +724,8 @@
     const elB = cardEl(b);
     if (elA) elA.classList.add("is-matched");
     if (elB) elB.classList.add("is-matched");
+    if (elA) elA.disabled = true;
+    if (elB) elB.disabled = true;
     if (elA) elA.dataset.owner = String(state.currentPlayer);
     if (elB) elB.dataset.owner = String(state.currentPlayer);
     if (elA) elA.dataset.matchLabel = matchAnchorLabel(state.deck[a]);
@@ -778,7 +784,7 @@
     const mins = Math.floor(elapsed / 60);
     const secs = elapsed % 60;
     const timeText = mins > 0 ? mins + " 分 " + secs + " 秒" : secs + " 秒";
-    const metaText = state.moves + " 次翻牌 · " + timeText;
+    const metaText = state.moves + " 次嘗試 · " + timeText;
 
     showScreen("result");
 

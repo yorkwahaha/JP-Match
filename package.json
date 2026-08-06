@@ -1,0 +1,14 @@
+{
+  "name": "jp-match",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/contracts.test.cjs",
+    "generate:home-stickers": "node scripts/gen-home-stickers.js",
+    "generate:word-audio": "node scripts/gen-word-audio.js",
+    "generate:fish-audio": "node scripts/gen-fish-word-audio.mjs"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "2.6.2"
+  }
+}
