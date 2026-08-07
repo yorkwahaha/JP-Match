@@ -99,6 +99,11 @@ function bump(room, now) {
   room.lastActiveAt = now;
 }
 
+function currentHostSeat(room) {
+  if (Number.isInteger(room?.hostSeat) && room.players?.[room.hostSeat]) return room.hostSeat;
+  return room?.players?.findIndex(Boolean) ?? -1;
+}
+
 function startRound(room, now, random = Math.random) {
   room.deck = shuffle(room.deck, random);
   room.slots = newSlots(room.deck.length);
@@ -116,6 +121,22 @@ function startRound(room, now, random = Math.random) {
   });
 }
 
+function resetRoundToLobby(room) {
+  room.phase = "lobby";
+  room.slots = newSlots(room.deck.length);
+  room.currentPlayer = 0;
+  room.scores = [0, 0];
+  room.flipped = [];
+  room.pending = null;
+  room.moves = 0;
+  room.matchTraces = [];
+  room.startedAt = null;
+  room.completedAt = null;
+  room.players.forEach((player) => {
+    if (player) player.ready = false;
+  });
+}
+
 export function createRoomState({ roomCode, hostName, hostToken, config, deck, now = Date.now(), random = Math.random }) {
   const cleanConfig = sanitizeConfig(config);
   const cleanDeck = prepareDeck(deck, random);
@@ -125,6 +146,7 @@ export function createRoomState({ roomCode, hostName, hostToken, config, deck, n
   return {
     roomCode: sanitizeRoomCode(roomCode),
     phase: "lobby",
+    hostSeat: 0,
     version: 1,
     config: cleanConfig,
     players: [
@@ -163,18 +185,21 @@ export function joinRoom(room, { name, token, now = Date.now() }) {
   if (!room || room.phase !== "lobby") return { ok: false, error: "ROOM_ALREADY_STARTED" };
   const existingSeat = seatForToken(room, token);
   if (existingSeat >= 0) return { ok: true, seat: existingSeat, reconnected: true };
-  if (room.players[1]) return { ok: false, error: "ROOM_FULL" };
-  room.players[1] = {
-    seat: 1,
-    name: sanitizePlayerName(name, "玩家 2"),
+  const openSeat = room.players.findIndex((player) => !player);
+  if (openSeat < 0) return { ok: false, error: "ROOM_FULL" };
+  const previousHostSeat = currentHostSeat(room);
+  room.players[openSeat] = {
+    seat: openSeat,
+    name: sanitizePlayerName(name, "玩家 " + (openSeat + 1)),
     token: cleanText(token, 128),
     ready: false,
     connected: false,
     disconnectedAt: null,
     leftAt: null,
   };
+  room.hostSeat = previousHostSeat < 0 ? openSeat : previousHostSeat;
   bump(room, now);
-  return { ok: true, seat: 1, reconnected: false };
+  return { ok: true, seat: openSeat, reconnected: false };
 }
 
 export function setConnected(room, seat, connected, now = Date.now()) {
@@ -190,17 +215,21 @@ export function setConnected(room, seat, connected, now = Date.now()) {
 export function leaveRoom(room, seat, now = Date.now()) {
   const player = room?.players?.[seat];
   if (!player) return { ok: false, error: "INVALID_SESSION" };
-  player.connected = false;
-  player.ready = false;
-  player.disconnectedAt = now;
-  player.leftAt = now;
+  const hostSeat = currentHostSeat(room);
+  room.players[seat] = null;
+  if (hostSeat === seat) {
+    room.hostSeat = room.players.findIndex(Boolean);
+  } else {
+    room.hostSeat = hostSeat;
+  }
+  resetRoundToLobby(room);
   bump(room, now);
-  return { ok: true };
+  return { ok: true, releasedSeat: seat, hostSeat: room.hostSeat };
 }
 
 export function setReady(room, seat, ready, now = Date.now(), random = Math.random) {
   const player = room?.players?.[seat];
-  if (!player || (room.phase !== "lobby" && room.phase !== "complete")) {
+  if (!player || room.phase !== "lobby") {
     return { ok: false, error: "NOT_IN_READY_PHASE" };
   }
   if (!player.connected || player.leftAt) return { ok: false, error: "PLAYER_NOT_CONNECTED" };
@@ -212,6 +241,31 @@ export function setReady(room, seat, ready, now = Date.now(), random = Math.rand
     return { ok: true, started: true };
   }
   return { ok: true, started: false };
+}
+
+export function configureNextRound(room, seat, config, deck, now = Date.now(), random = Math.random) {
+  if (!room || (room.phase !== "complete" && room.phase !== "lobby")) {
+    return { ok: false, error: "ROUND_NOT_COMPLETE" };
+  }
+  if (seat !== currentHostSeat(room)) return { ok: false, error: "ONLY_HOST_CAN_CONFIGURE" };
+
+  let cleanConfig;
+  let cleanDeck;
+  try {
+    cleanConfig = sanitizeConfig(config);
+    cleanDeck = prepareDeck(deck, random);
+  } catch (error) {
+    return { ok: false, error: error.message || "INVALID_CONFIG" };
+  }
+  if (!Number.isInteger(cleanConfig.pairCount) || cleanConfig.pairCount * 2 !== cleanDeck.length) {
+    return { ok: false, error: "INVALID_CONFIG_PAIR_COUNT" };
+  }
+
+  room.config = cleanConfig;
+  room.deck = cleanDeck;
+  resetRoundToLobby(room);
+  bump(room, now);
+  return { ok: true };
 }
 
 export function applyFlip(room, seat, index, now = Date.now()) {
@@ -298,6 +352,7 @@ export function publicRoomState(room, forSeat = -1, now = Date.now()) {
   return {
     roomCode: room.roomCode,
     phase: room.phase,
+    hostSeat: currentHostSeat(room),
     version: room.version,
     youSeat: forSeat,
     config: room.config,

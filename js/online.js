@@ -31,6 +31,8 @@ window.JPMatchOnline = (() => {
     BOARD_LOCKED: "請等這兩張牌完成判定。",
     CARD_UNAVAILABLE: "這張牌目前不能翻開。",
     STALE_STATE: "盤面剛剛更新，已替你同步到最新狀態。",
+    ONLY_HOST_CAN_CONFIGURE: "只有房主可以調整下一局設定。",
+    ROUND_NOT_COMPLETE: "目前還不能調整下一局設定。",
     PLAYER_NOT_CONNECTED: "連線尚未完成，請稍候再準備。",
     OPPONENT_UNAVAILABLE: "對手目前不在線上，牌局已暫停。",
     ORIGIN_NOT_ALLOWED: "目前的網站來源尚未獲准使用線上房間。",
@@ -324,6 +326,9 @@ window.JPMatchOnline = (() => {
     resume,
     ready(ready = true) {
       return send("ready", { ready });
+    },
+    configure(config, deck) {
+      return send("configure", { config, deck });
     },
     flip(index) {
       return send("flip", { index });

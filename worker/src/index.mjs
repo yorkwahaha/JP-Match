@@ -2,6 +2,7 @@ import { DurableObject } from "cloudflare:workers";
 import {
   ROOM_TTL_MS,
   applyFlip,
+  configureNextRound,
   createRoomState,
   joinRoom,
   leaveRoom,
@@ -243,6 +244,8 @@ export class RoomObject extends DurableObject {
     let result = { ok: false, error: "UNKNOWN_COMMAND" };
     if (command.type === "ready") {
       result = setReady(this.room, seat, command.ready !== false);
+    } else if (command.type === "configure") {
+      result = configureNextRound(this.room, seat, command.config, command.deck);
     } else if (command.type === "flip") {
       result = applyFlip(this.room, seat, Number(command.index));
     } else if (command.type === "leave") {

@@ -4,6 +4,7 @@ import {
   MATCH_HOLD_MS,
   MISMATCH_HOLD_MS,
   applyFlip,
+  configureNextRound,
   createRoomState,
   joinRoom,
   leaveRoom,
@@ -119,7 +120,7 @@ test("stale, duplicate, and out-of-turn flips are rejected", () => {
   assert.equal(applyFlip(state, 0, 0, 1520).error, "CARD_UNAVAILABLE");
 });
 
-test("an intentional departure is announced, pauses play, and clears on reconnect", () => {
+test("an intentional guest departure frees the seat for the same nickname", () => {
   const state = room();
   joinRoom(state, { name: "太郎", token: "guest-token", now: 1100 });
   setConnected(state, 0, true, 1200);
@@ -128,16 +129,40 @@ test("an intentional departure is announced, pauses play, and clears on reconnec
   setReady(state, 1, true, 1400, () => 0.999);
 
   assert.equal(leaveRoom(state, 1, 1500).ok, true);
-  assert.equal(state.players[1].ready, false);
-  assert.equal(publicRoomState(state, 0, 1500).players[1].left, true);
-  assert.equal(applyFlip(state, 0, 0, 1510).error, "OPPONENT_UNAVAILABLE");
-
-  setConnected(state, 1, true, 1600);
-  assert.equal(publicRoomState(state, 0, 1600).players[1].left, false);
-  assert.equal(applyFlip(state, 0, 0, 1610).ok, true);
+  assert.equal(state.phase, "lobby");
+  assert.equal(state.players[1], null);
+  assert.equal(state.hostSeat, 0);
+  assert.deepEqual(joinRoom(state, { name: "太郎", token: "new-guest-token", now: 1600 }), {
+    ok: true,
+    seat: 1,
+    reconnected: false,
+  });
+  assert.equal(state.players[1].name, "太郎");
 });
 
-test("completion reveals the result and two rematch-ready seats start a clean round", () => {
+test("an intentional host departure promotes the remaining player", () => {
+  const state = room();
+  joinRoom(state, { name: "太郎", token: "guest-token", now: 1100 });
+  setConnected(state, 0, true, 1200);
+  setConnected(state, 1, true, 1200);
+  setReady(state, 0, true, 1300);
+  setReady(state, 1, true, 1400, () => 0.999);
+
+  assert.equal(leaveRoom(state, 0, 1500).hostSeat, 1);
+  assert.equal(state.phase, "lobby");
+  assert.equal(state.players[0], null);
+  assert.equal(publicRoomState(state, 1, 1500).hostSeat, 1);
+  assert.equal(configureNextRound(state, 1, state.config, deck(), 1600, () => 0.999).ok, true);
+  assert.deepEqual(joinRoom(state, { name: "小春", token: "new-host-token", now: 1700 }), {
+    ok: true,
+    seat: 0,
+    reconnected: false,
+  });
+  assert.equal(state.hostSeat, 1);
+  assert.equal(configureNextRound(state, 0, state.config, deck(), 1800).error, "ONLY_HOST_CAN_CONFIGURE");
+});
+
+test("the host can configure a different rematch before both seats ready", () => {
   const state = room();
   joinRoom(state, { name: "太郎", token: "guest-token", now: 1100 });
   setConnected(state, 0, true, 1200);
@@ -153,8 +178,23 @@ test("completion reveals the result and two rematch-ready seats start a clean ro
   }
   assert.equal(state.phase, "complete");
   assert.equal(publicRoomState(state, 0, now).winner, 0);
-  assert.equal(setReady(state, 0, true, now + 1).started, false);
-  assert.equal(setReady(state, 1, true, now + 2, () => 0.999).started, true);
+  assert.equal(setReady(state, 0, true, now + 1).error, "NOT_IN_READY_PHASE");
+  assert.equal(configureNextRound(state, 1, { pairCount: 6 }, deck(), now + 1).error, "ONLY_HOST_CAN_CONFIGURE");
+  const configured = configureNextRound(
+    state,
+    0,
+    { kind: "kana", pairMode: "hira-kata", pairCount: 6, gridId: "4x3", gridLabel: "4×3" },
+    deck(),
+    now + 2,
+    () => 0.999,
+  );
+  assert.equal(configured.ok, true);
+  assert.equal(state.phase, "lobby");
+  assert.equal(state.config.pairMode, "hira-kata");
+  assert.deepEqual(state.scores, [0, 0]);
+  assert.ok(publicRoomState(state, 1, now + 2).deck.every((slot) => slot.card === null));
+  assert.equal(setReady(state, 0, true, now + 3).started, false);
+  assert.equal(setReady(state, 1, true, now + 4, () => 0.999).started, true);
   assert.equal(state.phase, "playing");
   assert.deepEqual(state.scores, [0, 0]);
   assert.ok(state.slots.every((slot) => slot.state === "down"));

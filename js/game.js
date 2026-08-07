@@ -82,6 +82,9 @@
     onlineSnapshot: null,
     onlineConnection: "idle",
     onlineResultShownForVersion: null,
+    onlineRematchSetup: false,
+    onlineConfigPending: false,
+    onlineReadyAfterConfig: false,
     // 每次開局遞增；async 流程 await 回來須比對，避免舊局殘留的回呼污染新局
     runId: 0,
   };
@@ -310,8 +313,10 @@
   }
 
   function syncSetupUI() {
+    const configuringRematch = state.onlineRematchSetup && state.playMode === "online";
     qsa('[data-group="play-mode"] .opt').forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.value === state.playMode);
+      btn.disabled = configuringRematch;
     });
     qsa('[data-group="kind"] .opt').forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.value === state.kind);
@@ -326,11 +331,15 @@
     const isWords = state.kind === "words";
     if (els.fieldKanaRange) els.fieldKanaRange.hidden = isWords;
     if (els.fieldWordCategory) els.fieldWordCategory.hidden = !isWords;
-    if (els.fieldOnline) els.fieldOnline.hidden = state.playMode !== "online";
+    if (els.fieldOnline) els.fieldOnline.hidden = state.playMode !== "online" || configuringRematch;
     if (els.fieldUiTheme) els.fieldUiTheme.hidden = state.playMode === "online";
     if (els.fieldWordVoice) els.fieldWordVoice.hidden = state.playMode === "online";
     document.body.dataset.playMode = state.playMode;
-    els.btnStart.textContent = state.playMode === "online" ? "建立線上房間" : "開始遊戲";
+    els.btnStart.textContent = configuringRematch
+      ? "套用設定，返回房間"
+      : state.playMode === "online"
+        ? "建立線上房間"
+        : "開始遊戲";
 
     syncThemeUI();
     syncWordVoiceUI();
@@ -374,8 +383,8 @@
     if (els.wordHint && hintEl !== els.wordHint) {
       els.wordHint.classList.remove("is-warn");
     }
-    const onlineNameOk = state.playMode !== "online" || Boolean(els.onlineName.value.trim());
-    els.btnStart.disabled = !ok || !onlineNameOk;
+    const onlineNameOk = state.playMode !== "online" || state.onlineRematchSetup || Boolean(els.onlineName.value.trim());
+    els.btnStart.disabled = !ok || !onlineNameOk || state.onlineConfigPending;
     if (els.btnJoinRoom) {
       const roomCode = els.onlineRoomCode.value.toUpperCase().replace(/[^A-Z2-9]/g, "");
       els.btnJoinRoom.disabled = !onlineNameOk || roomCode.length !== 6;
@@ -396,6 +405,10 @@
 
   function startGame() {
     if (state.playMode === "online") {
+      if (state.onlineRematchSetup) {
+        configureOnlineRematch();
+        return;
+      }
       createOnlineRoom();
       return;
     }
@@ -902,6 +915,48 @@
     };
   }
 
+  function applyOnlineConfigToSetup(config = {}) {
+    state.kind = config.kind === "words" ? "words" : "kana";
+    renderModeOptions();
+    if (config.pairMode && currentModes()[config.pairMode]) state.pairMode = config.pairMode;
+    if (GRID_PRESETS.some((item) => item.id === config.gridId)) state.gridId = config.gridId;
+    if (ROWS.some((item) => item.id === config.rowFrom)) state.rowFrom = config.rowFrom;
+    if (ROWS.some((item) => item.id === config.rowTo)) state.rowTo = config.rowTo;
+    if (WORD_CATEGORIES.some((item) => item.id === config.wordCategory)) {
+      state.wordCategory = config.wordCategory;
+    }
+    syncRangePresetFromRows();
+  }
+
+  function openOnlineRematchSetup() {
+    const snapshot = state.onlineSnapshot;
+    if (!snapshot || (snapshot.phase !== "complete" && snapshot.phase !== "lobby")) return;
+    if (snapshot.youSeat !== snapshot.hostSeat) {
+      renderOnlineRoom(snapshot);
+      return;
+    }
+    applyOnlineConfigToSetup(snapshot.config);
+    state.onlineRematchSetup = true;
+    state.onlineConfigPending = false;
+    showScreen("setup");
+    syncSetupUI();
+  }
+
+  function configureOnlineRematch() {
+    if (poolSize() < pairCount() || state.onlineConfigPending) {
+      syncPoolHint();
+      return;
+    }
+    state.onlineConfigPending = true;
+    state.onlineReadyAfterConfig = true;
+    syncSetupUI();
+    if (!Online.configure(currentOnlineConfig(), buildCurrentDeck())) {
+      state.onlineConfigPending = false;
+      state.onlineReadyAfterConfig = false;
+      syncSetupUI();
+    }
+  }
+
   function saveOnlineName(name) {
     try {
       window.localStorage.setItem(ONLINE_NAME_STORAGE_KEY, name);
@@ -962,9 +1017,11 @@
     }
   }
 
-  function renderRoomPlayer(element, player, fallbackName) {
+  function renderRoomPlayer(element, player, fallbackName, seat, hostSeat) {
+    const label = qs(".room-player-label", element);
     const name = qs(".room-player-name", element);
     const status = qs(".room-player-state", element);
+    label.textContent = "玩家 " + (seat + 1) + (seat === hostSeat ? " · 房主" : " · 加入者");
     name.textContent = player ? player.name : fallbackName;
     element.classList.toggle("is-connected", Boolean(player?.connected));
     element.classList.toggle("is-ready", Boolean(player?.ready));
@@ -983,8 +1040,8 @@
     const opponent = players[snapshot.youSeat === 0 ? 1 : 0];
     const opponentLeft = Boolean(opponent?.left);
     const readyCount = players.filter((player) => player?.ready).length;
-    renderRoomPlayer(els.roomPlayerP1, players[0], "等待房主");
-    renderRoomPlayer(els.roomPlayerP2, players[1], "等待加入");
+    renderRoomPlayer(els.roomPlayerP1, players[0], "等待加入", 0, snapshot.hostSeat);
+    renderRoomPlayer(els.roomPlayerP2, players[1], "等待加入", 1, snapshot.hostSeat);
     els.roomStage.dataset.readyCount = String(readyCount);
     els.roomStage.dataset.p1Ready = String(Boolean(players[0]?.ready));
     els.roomStage.dataset.p2Ready = String(Boolean(players[1]?.ready));
@@ -1001,21 +1058,27 @@
     els.roomLessonSummary.textContent =
       [config.pairModeLabel, config.gridLabel, content].filter(Boolean).join(" · ");
     const myConnectionReady = Boolean(me && (me.connected || state.onlineConnection === "connected"));
+    const hostWaitingAlone =
+      snapshot.phase === "lobby" &&
+      snapshot.youSeat === snapshot.hostSeat &&
+      players.filter(Boolean).length < 2;
     els.btnRoomReady.disabled = !myConnectionReady || opponentLeft;
     els.btnRoomReady.textContent = opponentLeft
       ? "對手已離開"
-      : me?.ready
-        ? "取消準備"
-        : snapshot.phase === "complete"
-          ? "再玩一局"
-          : "我準備好了";
+      : hostWaitingAlone
+        ? "修改題目設定"
+        : me?.ready
+          ? "取消準備"
+          : snapshot.phase === "complete"
+            ? "再玩一局"
+            : "我準備好了";
     if (opponentLeft) {
       els.roomStatus.textContent = "對手已離開房間。請返回首頁後重新開房。";
     } else if (snapshot.phase === "complete") {
       els.roomStatus.textContent = readyCount
         ? "等待另一端再次鎖定線軸…"
         : "雙方都確認後，會用同一份內容重新洗牌。";
-    } else if (!players[1]) {
+    } else if (players.filter(Boolean).length < 2) {
       els.roomStatus.textContent = "把邀請連結傳給對手；座位不需要帳號。";
     } else if (!players.every((player) => player.connected)) {
       els.roomStatus.textContent = "另一端暫時斷線，房間會保留匿名座位。";
@@ -1133,7 +1196,13 @@
     state.onlineSnapshot = snapshot;
     state.playerNames = snapshot.players.map((player, index) => player?.name || PLAYER_NAMES[index]);
     if (snapshot.phase === "lobby") {
+      state.onlineRematchSetup = false;
+      state.onlineConfigPending = false;
       renderOnlineRoom(snapshot);
+      if (state.onlineReadyAfterConfig && snapshot.youSeat === snapshot.hostSeat) {
+        state.onlineReadyAfterConfig = false;
+        Online.ready(true);
+      }
       return;
     }
     if (snapshot.phase === "complete" && state.screen !== "game") {
@@ -1185,6 +1254,11 @@
   }
 
   function handleOnlineError(error) {
+    if (state.onlineConfigPending) {
+      state.onlineConfigPending = false;
+      state.onlineReadyAfterConfig = false;
+      syncSetupUI();
+    }
     setOnlineSetupStatus(error.message, true);
     if (state.screen === "room") els.roomStatus.textContent = error.message;
   }
@@ -1193,6 +1267,9 @@
     Online.leave();
     state.onlineSnapshot = null;
     state.onlineResultShownForVersion = null;
+    state.onlineRematchSetup = false;
+    state.onlineConfigPending = false;
+    state.onlineReadyAfterConfig = false;
     state.playerNames = PLAYER_NAMES.slice();
     showScreen("setup");
     syncSetupUI();
@@ -1337,6 +1414,14 @@
     els.btnRoomReady.addEventListener("click", () => {
       const me = state.onlineSnapshot?.players?.[state.onlineSnapshot.youSeat];
       Sound.playSfx("select");
+      if (
+        state.onlineSnapshot?.phase === "lobby" &&
+        state.onlineSnapshot.youSeat === state.onlineSnapshot.hostSeat &&
+        state.onlineSnapshot.players.filter(Boolean).length < 2
+      ) {
+        openOnlineRematchSetup();
+        return;
+      }
       Online.ready(!me?.ready);
     });
     els.btnRoomLeave.addEventListener("click", leaveOnlineRoom);
@@ -1346,9 +1431,8 @@
     });
     qs("#btn-restart").addEventListener("click", () => {
       if (state.playMode === "online") {
-        showScreen("room");
-        renderOnlineRoom(state.onlineSnapshot);
-        Online.ready(true);
+        Sound.playSfx("select");
+        openOnlineRematchSetup();
         return;
       }
       startGame();

@@ -100,7 +100,8 @@ test("a stale socket close cannot discard the current connection", () => {
   });
 
   assert.equal(online.ready(true), true);
-  assert.deepEqual(sockets[1].sent.map((message) => message.type), ["sync", "ready"]);
+  assert.equal(online.configure({ pairCount: 6 }, [{ pairKey: "a", side: "hira" }]), true);
+  assert.deepEqual(sockets[1].sent.map((message) => message.type), ["sync", "ready", "configure"]);
 });
 
 test("a websocket error without close schedules a replacement connection", () => {
