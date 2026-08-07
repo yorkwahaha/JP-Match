@@ -196,14 +196,16 @@ test("online room UI, transport, CSP, and Durable Object configuration stay conn
   assert.match(html, /wss:\/\/jp-match-online\.yorkwahaha\.workers\.dev/);
   assert.match(html, /<script src="\.\/js\/online\.js/);
   assert.match(html, /css\/styles\.css\?v=kotoba-musubi-10/);
-  assert.match(html, /js\/online\.js\?v=online-room-2/);
-  assert.match(html, /js\/game\.js\?v=online-room-2/);
+  assert.match(html, /js\/online\.js\?v=online-room-3/);
+  assert.match(html, /js\/game\.js\?v=online-room-3/);
   assert.match(game, /Online\.flip\(index\)/);
   assert.match(game, /Online\.resume\(invitedRoomCode\)/);
   assert.match(game, /對手已離開房間/);
   assert.match(online, /version: room\.version/);
   assert.match(online, /jp-match-online-session:/);
   assert.match(online, /type: "sync"/);
+  assert.match(online, /socket !== currentSocket/);
+  assert.match(online, /6000/);
   assert.match(online, /keepalive: true/);
   assert.match(worker, /acceptWebSocket\(server/);
   assert.match(worker, /serializeAttachment\(\{ seat \}\)/);

@@ -125,19 +125,32 @@ window.JPMatchOnline = (() => {
     clearReconnectTimer();
     intentionalClose = false;
     emitConnection(reconnectAttempts ? "reconnecting" : "connecting");
+    let currentSocket;
     try {
-      socket = new WebSocket(websocketUrl());
+      currentSocket = new WebSocket(websocketUrl());
+      socket = currentSocket;
     } catch (_) {
       scheduleReconnect();
       return;
     }
-    socket.addEventListener("open", () => {
+    let openTimer = window.setTimeout(() => {
+      if (socket !== currentSocket || intentionalClose) return;
+      socket = null;
+      try {
+        currentSocket.close();
+      } catch (_) {}
+      scheduleReconnect();
+    }, 6000);
+    currentSocket.addEventListener("open", () => {
+      if (socket !== currentSocket || intentionalClose) return;
+      window.clearTimeout(openTimer);
+      openTimer = null;
       reconnectAttempts = 0;
       emitConnection("connected");
-      socket.send(JSON.stringify({ type: "sync" }));
+      currentSocket.send(JSON.stringify({ type: "sync" }));
     });
-    socket.addEventListener("message", (event) => {
-      if (intentionalClose) return;
+    currentSocket.addEventListener("message", (event) => {
+      if (socket !== currentSocket || intentionalClose) return;
       let message;
       try {
         message = JSON.parse(event.data);
@@ -152,7 +165,10 @@ window.JPMatchOnline = (() => {
         emitError(message.code);
       }
     });
-    socket.addEventListener("close", (event) => {
+    currentSocket.addEventListener("close", (event) => {
+      if (socket !== currentSocket) return;
+      window.clearTimeout(openTimer);
+      openTimer = null;
       socket = null;
       if (intentionalClose) {
         emitConnection("closed");
@@ -166,8 +182,19 @@ window.JPMatchOnline = (() => {
       }
       scheduleReconnect();
     });
-    socket.addEventListener("error", () => {
+    currentSocket.addEventListener("error", () => {
+      if (socket !== currentSocket || intentionalClose) return;
       emitConnection("disconnected");
+      window.setTimeout(() => {
+        if (socket !== currentSocket || intentionalClose) return;
+        window.clearTimeout(openTimer);
+        openTimer = null;
+        socket = null;
+        try {
+          currentSocket.close();
+        } catch (_) {}
+        scheduleReconnect();
+      }, 250);
     });
   }
 
