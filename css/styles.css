@@ -1556,6 +1556,10 @@ html[data-theme="yuzu"] {
   grid-column: 2;
 }
 
+.setup-panel > .field-online {
+  grid-column: 1 / -1;
+}
+
 .setup-panel > .btn-primary {
   grid-column: 1 / -1;
   align-self: end;
@@ -1602,9 +1606,15 @@ html[data-theme="yuzu"] {
   box-shadow: inset 6px 0 0 var(--thread-p1);
 }
 
-[data-group="players"] .opt:nth-child(2).is-active,
+[data-group="play-mode"] .opt:nth-child(2).is-active,
 [data-group="theme-menu"] .opt:nth-child(2).is-active {
   box-shadow: inset 6px 0 0 var(--thread-p2);
+}
+
+[data-group="play-mode"] .opt:nth-child(3).is-active {
+  box-shadow:
+    inset 6px 0 0 var(--thread-p1),
+    inset -6px 0 0 var(--thread-p2);
 }
 
 .setup-select,
@@ -1630,6 +1640,286 @@ html[data-theme="yuzu"] {
 .btn-ghost {
   border-radius: 2px;
   clip-path: var(--cut-control);
+}
+
+.setup-input {
+  width: 100%;
+  min-height: 46px;
+  padding: 9px 14px;
+  border: 1px solid var(--rule-color);
+  border-radius: 2px;
+  clip-path: var(--cut-control);
+  background: var(--ui-surface);
+  color: var(--page-fg);
+  font: inherit;
+  box-shadow: inset 0 -1px 0 var(--thread-faint);
+}
+
+.setup-input:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 3px;
+}
+
+.online-entry-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.online-input-wrap {
+  display: grid;
+  gap: 6px;
+  color: var(--ui-muted-strong);
+  font-size: 0.78rem;
+}
+
+.room-code-input {
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+}
+
+.btn-join-room {
+  min-height: 46px;
+  white-space: nowrap;
+}
+
+/* Online room: the invitation is one cord with two owned endpoints. */
+.room-screen {
+  display: grid;
+  grid-template-rows: auto minmax(260px, 1fr) auto auto;
+  align-content: center;
+  gap: clamp(18px, 4vh, 34px);
+  padding-inline: max(20px, 7vw);
+  background-color: var(--page-bg);
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 53px, var(--cloth-line) 53px 54px),
+    repeating-linear-gradient(90deg, transparent 0 79px, var(--cloth-line) 79px 80px);
+}
+
+.room-heading {
+  max-width: 780px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.room-heading h2 {
+  margin: 5px 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  letter-spacing: 0.06em;
+}
+
+.room-heading p:last-child {
+  margin: 0;
+  color: var(--ui-muted-strong);
+}
+
+.room-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(150px, 0.58fr) minmax(180px, 1fr);
+  align-items: center;
+  width: min(980px, 100%);
+  margin: 0 auto;
+  isolation: isolate;
+}
+
+.room-cord {
+  position: absolute;
+  z-index: 0;
+  left: 12%;
+  right: 12%;
+  top: 50%;
+  height: 8px;
+  transform: translateY(-50%);
+}
+
+.room-cord::before {
+  content: "";
+  position: absolute;
+  inset: 3px 0 auto;
+  border-top: 2px dashed var(--thread-faint);
+}
+
+.room-cord span {
+  position: absolute;
+  inset: 2px 0 auto;
+  height: 3px;
+}
+
+.room-cord span::before,
+.room-cord span::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 3px;
+  opacity: 0.42;
+  transform: scaleX(0.12);
+  transition: transform 0.5s cubic-bezier(0.22, 0.8, 0.28, 1), opacity 0.25s ease;
+}
+
+.room-cord span::before {
+  right: 50%;
+  background: var(--thread-p1);
+  transform-origin: right;
+}
+
+.room-cord span::after {
+  left: 50%;
+  background: repeating-linear-gradient(90deg, var(--thread-p2) 0 9px, transparent 9px 14px);
+  transform-origin: left;
+}
+
+.room-stage.is-connected .room-cord span::before,
+.room-stage.is-connected .room-cord span::after {
+  transform: scaleX(0.58);
+  opacity: 0.68;
+}
+
+.room-stage[data-p1-ready="true"] .room-cord span::before,
+.room-stage[data-p2-ready="true"] .room-cord span::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.room-player {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 7px;
+  min-height: 142px;
+  padding: 24px clamp(18px, 3vw, 34px);
+  background: var(--ui-surface);
+  clip-path: var(--cut-control);
+  border-block: 1px solid var(--rule-color);
+}
+
+.room-player-p1 {
+  border-left: 5px solid var(--thread-p1);
+}
+
+.room-player-p2 {
+  border-right: 5px dashed var(--thread-p2);
+  text-align: right;
+}
+
+.room-player-label,
+.room-player-state {
+  color: var(--ui-muted-strong);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+}
+
+.room-player-name {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  overflow-wrap: anywhere;
+}
+
+.room-endpoint {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  background: var(--page-bg);
+}
+
+.room-player-p1 .room-endpoint {
+  right: -9px;
+  border: 3px solid var(--thread-p1);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.room-player-p2 .room-endpoint {
+  left: -9px;
+  border: 3px dashed var(--thread-p2);
+  transform: translateY(-50%);
+}
+
+.room-player.is-ready {
+  transform: translateY(-2px);
+}
+
+.room-player.is-ready .room-player-state {
+  color: var(--page-fg);
+  font-weight: 700;
+}
+
+.room-player.is-ready .room-endpoint::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid currentColor;
+}
+
+.room-midpoint {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+}
+
+.room-code-label,
+.room-copy-hint {
+  color: var(--ui-muted-strong);
+  font-size: 0.72rem;
+}
+
+.room-code {
+  min-width: 136px;
+  padding: 13px 16px;
+  border: 2px solid var(--thread-success);
+  border-radius: 2px;
+  background: var(--page-bg);
+  color: var(--page-fg);
+  font: 700 1.25rem/1 var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+
+.room-code:focus-visible {
+  outline: 3px solid var(--sky);
+  outline-offset: 4px;
+}
+
+.room-lesson {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding-block: 12px;
+  border-block: 1px solid var(--rule-color);
+  color: var(--ui-muted-strong);
+}
+
+.room-lesson strong {
+  color: var(--page-fg);
+  text-align: right;
+}
+
+.room-actions {
+  display: grid;
+  grid-template-columns: auto minmax(220px, 420px);
+  justify-content: center;
+  gap: 12px;
+}
+
+.online-connection {
+  color: var(--ui-muted-strong);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.online-connection.is-reconnecting {
+  color: var(--accent);
 }
 
 /* Game: tags hover above a persistent map of learned connections. */
@@ -1666,6 +1956,7 @@ body.turn-switched[data-turn="1"] .game::after {
 }
 
 .game-top {
+  grid-template-columns: auto 1fr auto auto;
   border-bottom: 1px solid var(--rule-color);
   padding-bottom: 7px;
 }
@@ -2092,8 +2383,127 @@ body[data-turn="1"] {
   #field-word-category,
   .setup-panel > .field-ui-theme,
   .setup-panel > .field-word-voice,
+  .setup-panel > .field-online,
   .setup-panel > .btn-primary {
     grid-column: 1;
+  }
+
+  .opt-row-three {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .opt-row-three .opt {
+    padding-inline: 8px;
+    font-size: 0.82rem;
+  }
+
+  .online-entry-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .room-screen {
+    grid-template-rows: auto minmax(330px, 1fr) auto auto;
+    gap: 14px;
+    padding-inline: 16px;
+  }
+
+  .room-heading h2 {
+    font-size: 2rem;
+  }
+
+  .room-stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr auto 1fr;
+    gap: 16px;
+  }
+
+  .room-player {
+    min-height: 98px;
+    padding: 16px 22px;
+  }
+
+  .room-player-p2 {
+    grid-row: 3;
+  }
+
+  .room-midpoint {
+    grid-row: 2;
+  }
+
+  .room-cord {
+    left: 50%;
+    right: auto;
+    top: 10%;
+    bottom: 10%;
+    width: 8px;
+    height: auto;
+    transform: translateX(-50%);
+  }
+
+  .room-cord::before {
+    inset: 0 auto 0 3px;
+    border-top: 0;
+    border-left: 2px dashed var(--thread-faint);
+  }
+
+  .room-cord span {
+    inset: 0 auto 0 2px;
+    width: 3px;
+    height: auto;
+  }
+
+  .room-cord span::before,
+  .room-cord span::after {
+    left: 0;
+    right: auto;
+    width: 3px;
+    height: 50%;
+    transform: scaleY(0.12);
+  }
+
+  .room-cord span::before {
+    bottom: 50%;
+    top: auto;
+    transform-origin: bottom;
+  }
+
+  .room-cord span::after {
+    top: 50%;
+    background: repeating-linear-gradient(180deg, var(--thread-p2) 0 9px, transparent 9px 14px);
+    transform-origin: top;
+  }
+
+  .room-stage.is-connected .room-cord span::before,
+  .room-stage.is-connected .room-cord span::after {
+    transform: scaleY(0.58);
+  }
+
+  .room-stage[data-p1-ready="true"] .room-cord span::before,
+  .room-stage[data-p2-ready="true"] .room-cord span::after {
+    transform: scaleY(1);
+  }
+
+  .room-player-p1 .room-endpoint {
+    right: 50%;
+    top: auto;
+    bottom: -9px;
+    transform: translateX(50%) rotate(45deg);
+  }
+
+  .room-player-p2 .room-endpoint {
+    left: 50%;
+    top: -9px;
+    transform: translateX(-50%);
+  }
+
+  .room-lesson {
+    gap: 8px;
+    font-size: 0.82rem;
+  }
+
+  .room-actions {
+    grid-template-columns: auto minmax(0, 1fr);
   }
 
   .menu-row-select {
@@ -2121,6 +2531,16 @@ body[data-turn="1"] {
     gap: 9px;
   }
 
+  .game-top {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .online-connection {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    text-align: center;
+  }
+
   .turn-banner {
     padding-inline: 24px 12px;
     font-size: 0.88rem;
@@ -2144,6 +2564,11 @@ body[data-turn="1"] {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .room-cord span,
+  .room-player {
+    transition: none;
+  }
+
   .pair-cord-draw {
     display: none;
   }

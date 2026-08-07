@@ -1,0 +1,27 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "jp-match-online",
+  "main": "src/index.mjs",
+  "compatibility_date": "2026-07-29",
+  "compatibility_flags": ["web_socket_auto_reply_to_close"],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "ROOMS",
+        "class_name": "RoomObject"
+      }
+    ]
+  },
+  "exports": {
+    "RoomObject": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
+  },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://yorkwahaha.github.io,http://127.0.0.1:5173,http://localhost:5173"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

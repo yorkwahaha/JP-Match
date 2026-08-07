@@ -173,3 +173,36 @@ test("security policy and Pages workflow retain least privilege gates", () => {
   const actionPins = [...workflow.matchAll(/uses:\s+[^\s]+@([a-f0-9]{40})/g)];
   assert.equal(actionPins.length, 5);
 });
+
+test("online room UI, transport, CSP, and Durable Object configuration stay connected", () => {
+  const html = read("index.html");
+  const game = read("js/game.js");
+  const online = read("js/online.js");
+  const worker = read("worker/src/index.mjs");
+  const wrangler = read("worker/wrangler.jsonc");
+
+  for (const id of [
+    "room-screen",
+    "online-name",
+    "online-room-code",
+    "btn-join-room",
+    "btn-room-ready",
+    "btn-copy-invite",
+    "online-connection",
+  ]) {
+    assert.match(html, new RegExp(`id="${id}"`));
+  }
+  assert.match(html, /https:\/\/jp-match-online\.yorkwahaha\.workers\.dev/);
+  assert.match(html, /wss:\/\/jp-match-online\.yorkwahaha\.workers\.dev/);
+  assert.match(html, /<script src="\.\/js\/online\.js/);
+  assert.match(game, /Online\.flip\(index\)/);
+  assert.match(game, /Online\.resume\(invitedRoomCode\)/);
+  assert.match(online, /version: room\.version/);
+  assert.match(online, /jp-match-online-session:/);
+  assert.match(worker, /acceptWebSocket\(server/);
+  assert.match(worker, /serializeAttachment\(\{ seat \}\)/);
+  assert.match(worker, /async alarm\(\)/);
+  assert.match(wrangler, /"storage": "sqlite"/);
+  assert.match(wrangler, /"ALLOWED_ORIGINS": "https:\/\/yorkwahaha\.github\.io/);
+  assert.doesNotMatch(wrangler, /"ALLOWED_ORIGINS": "\*"/);
+});

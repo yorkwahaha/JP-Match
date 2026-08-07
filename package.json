@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "node --test tests/contracts.test.cjs",
+    "dev": "node scripts/dev-server.mjs",
+    "test": "node --test tests/contracts.test.cjs tests/online-room.test.mjs",
     "generate:home-stickers": "node scripts/gen-home-stickers.js",
     "generate:word-audio": "node scripts/gen-word-audio.js",
     "generate:fish-audio": "node scripts/gen-fish-word-audio.mjs"

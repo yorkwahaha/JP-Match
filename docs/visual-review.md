@@ -107,3 +107,30 @@ Minor open consideration:
 - [x] Word-image pairs, scoring, remaining count, mismatch, player switch, menu, and result are verified.
 - [x] No current-version console errors or warnings.
 - [x] Two screenshot-based revision cycles completed.
+
+## Online room review — Direction B
+
+Reviewed stable room states at `1280x720`, `768x1024`, `390x844`, and `390x667`, including one player ready and reduced motion. The approved room keeps the board's connection metaphor: two player endpoints pull independent halves of one cord toward a central invite code.
+
+### Revision 1
+
+- Split the original symmetric ready cord into independently tensioned Player 1 and Player 2 halves.
+- Added a solid diamond endpoint for Player 1 and dashed square endpoint for Player 2, so ownership and readiness do not rely on color.
+- Added an inner readiness mark to the active endpoint.
+
+### Revision 2
+
+- Prevented the grouped room code from wrapping on tablet portrait.
+- Added focus entry for room, gameplay, and result state transitions.
+- Added the complete room code to the copy control's accessible name and enabled Enter-to-join from the code field.
+- Confirmed the primary room action remains visible without horizontal overflow on the `390x667` viewport.
+
+### Online-room severity result
+
+- Severity 1: none.
+- Severity 2: none.
+- Severity 3: perform a real-device reconnection pass after the production Worker is deployed.
+
+Stable comparison fixture: `visual-tests/online-room.html`
+
+Saved wide-state capture: `visual-tests/1280x720-online-room-one-ready-v2.png`

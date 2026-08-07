@@ -20,12 +20,14 @@
     buildDeck: buildWordDeck,
   } = window.JPMatchWords;
   const Sound = window.JPMatchAudio;
+  const Online = window.JPMatchOnline;
 
   const MISMATCH_HOLD_MS = 900;
   const MATCH_HOLD_MS = 280;
   const PLAYER_NAMES = ["玩家 1", "玩家 2"];
   const THEME_STORAGE_KEY = "jp-match-theme";
   const WORD_VOICE_STORAGE_KEY = "jp-match-word-voice";
+  const ONLINE_NAME_STORAGE_KEY = "jp-match-online-name";
   const THEMES = {
     night: { id: "night", label: "夜紺", meta: "#142033" },
     mist: { id: "mist", label: "水霧", meta: "#8fb4c8" },
@@ -53,6 +55,7 @@
 
   const state = {
     screen: "setup",
+    playMode: "local",
     players: 2,
     kind: DEFAULT_KIND,
     pairMode: "romaji-hira",
@@ -75,12 +78,17 @@
     startedAt: null,
     completedAt: null,
     ended: false,
+    playerNames: PLAYER_NAMES.slice(),
+    onlineSnapshot: null,
+    onlineConnection: "idle",
+    onlineResultShownForVersion: null,
     // 每次開局遞增；async 流程 await 回來須比對，避免舊局殘留的回呼污染新局
     runId: 0,
   };
 
   const els = {
     setup: document.getElementById("setup-screen"),
+    room: document.getElementById("room-screen"),
     game: document.getElementById("game-screen"),
     result: document.getElementById("result-screen"),
     board: document.getElementById("board"),
@@ -113,6 +121,8 @@
     wordHint: document.getElementById("word-hint"),
     fieldKanaRange: document.getElementById("field-kana-range"),
     fieldWordCategory: document.getElementById("field-word-category"),
+    fieldUiTheme: document.querySelector(".field-ui-theme"),
+    fieldWordVoice: document.querySelector(".field-word-voice"),
     selMode: document.getElementById("sel-mode"),
     selGrid: document.getElementById("sel-grid"),
     selRangePreset: document.getElementById("sel-range-preset"),
@@ -120,6 +130,21 @@
     selTheme: document.getElementById("sel-theme"),
     selWordVoice: document.getElementById("sel-word-voice"),
     btnStart: document.getElementById("btn-start"),
+    fieldOnline: document.getElementById("field-online"),
+    onlineName: document.getElementById("online-name"),
+    onlineRoomCode: document.getElementById("online-room-code"),
+    onlineSetupStatus: document.getElementById("online-setup-status"),
+    btnJoinRoom: document.getElementById("btn-join-room"),
+    roomStage: document.getElementById("room-stage"),
+    roomTitle: document.getElementById("room-title"),
+    roomStatus: document.getElementById("room-status"),
+    roomLessonSummary: document.getElementById("room-lesson-summary"),
+    roomPlayerP1: document.getElementById("room-player-p1"),
+    roomPlayerP2: document.getElementById("room-player-p2"),
+    btnCopyInvite: document.getElementById("btn-copy-invite"),
+    btnRoomReady: document.getElementById("btn-room-ready"),
+    btnRoomLeave: document.getElementById("btn-room-leave"),
+    onlineConnection: document.getElementById("online-connection"),
   };
 
   function qs(sel, root) {
@@ -128,6 +153,15 @@
 
   function qsa(sel, root) {
     return Array.prototype.slice.call((root || document).querySelectorAll(sel));
+  }
+
+  function focusWithoutScroll(element) {
+    if (!element) return;
+    try {
+      element.focus({ preventScroll: true });
+    } catch (_) {
+      element.focus();
+    }
   }
 
   function currentModes() {
@@ -237,6 +271,7 @@
   function openMenu() {
     if (state.screen !== "game" || state.ended) return;
     syncMenuUI();
+    qs("#btn-menu-restart").hidden = state.playMode === "online";
     menuReturnFocus = document.activeElement;
     els.menuOverlay.hidden = false;
     requestAnimationFrame(() => {
@@ -262,6 +297,7 @@
   function showScreen(name) {
     state.screen = name;
     els.setup.hidden = name !== "setup";
+    els.room.hidden = name !== "room";
     els.game.hidden = name !== "game";
     els.result.hidden = name !== "result";
     document.body.dataset.screen = name;
@@ -274,8 +310,8 @@
   }
 
   function syncSetupUI() {
-    qsa('[data-group="players"] .opt').forEach((btn) => {
-      btn.classList.toggle("is-active", Number(btn.dataset.value) === state.players);
+    qsa('[data-group="play-mode"] .opt').forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.value === state.playMode);
     });
     qsa('[data-group="kind"] .opt').forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.value === state.kind);
@@ -290,6 +326,11 @@
     const isWords = state.kind === "words";
     if (els.fieldKanaRange) els.fieldKanaRange.hidden = isWords;
     if (els.fieldWordCategory) els.fieldWordCategory.hidden = !isWords;
+    if (els.fieldOnline) els.fieldOnline.hidden = state.playMode !== "online";
+    if (els.fieldUiTheme) els.fieldUiTheme.hidden = state.playMode === "online";
+    if (els.fieldWordVoice) els.fieldWordVoice.hidden = state.playMode === "online";
+    document.body.dataset.playMode = state.playMode;
+    els.btnStart.textContent = state.playMode === "online" ? "建立線上房間" : "開始遊戲";
 
     syncThemeUI();
     syncWordVoiceUI();
@@ -333,10 +374,31 @@
     if (els.wordHint && hintEl !== els.wordHint) {
       els.wordHint.classList.remove("is-warn");
     }
-    els.btnStart.disabled = !ok;
+    const onlineNameOk = state.playMode !== "online" || Boolean(els.onlineName.value.trim());
+    els.btnStart.disabled = !ok || !onlineNameOk;
+    if (els.btnJoinRoom) {
+      const roomCode = els.onlineRoomCode.value.toUpperCase().replace(/[^A-Z2-9]/g, "");
+      els.btnJoinRoom.disabled = !onlineNameOk || roomCode.length !== 6;
+    }
+  }
+
+  function buildCurrentDeck() {
+    if (state.kind === "words") {
+      return buildWordDeck(state.pairMode, pairCount(), {
+        category: state.wordCategory,
+      });
+    }
+    return buildKanaDeck(state.pairMode, pairCount(), {
+      fromRow: state.rowFrom,
+      toRow: state.rowTo,
+    });
   }
 
   function startGame() {
+    if (state.playMode === "online") {
+      createOnlineRoom();
+      return;
+    }
     if (poolSize() < pairCount()) {
       syncPoolHint();
       return;
@@ -345,16 +407,7 @@
     Sound.unlock();
     Sound.playSfx("start");
     const grid = getGrid();
-    if (state.kind === "words") {
-      state.deck = buildWordDeck(state.pairMode, pairCount(), {
-        category: state.wordCategory,
-      });
-    } else {
-      state.deck = buildKanaDeck(state.pairMode, pairCount(), {
-        fromRow: state.rowFrom,
-        toRow: state.rowTo,
-      });
-    }
+    state.deck = buildCurrentDeck();
     if (state.kind === "words" && Sound.preloadWords) {
       Sound.preloadWords(state.deck.map((card) => card.voiceKey).filter(Boolean));
     }
@@ -394,6 +447,47 @@
     return "卡牌 " + (index + 1) + "（未翻開）";
   }
 
+  function cardContentHtml(card) {
+    const isImg = card.display === "img";
+    const isPic = card.display === "pic" || (card.side === "pic" && !isImg);
+    const isSymbol = card.display === "symbol";
+    if (isSymbol) {
+      const compact = card.text.length > 2 ? " is-compact" : "";
+      const stacked = card.picSub ? " is-stacked" : "";
+      return (
+        '<span class="card-symbol' + compact + stacked + '">' +
+        '<span class="card-symbol-main">' + escapeHtml(card.text) + "</span>" +
+        (card.picSub
+          ? '<span class="card-symbol-sub">' + escapeHtml(card.picSub) + "</span>"
+          : "") +
+        "</span>"
+      );
+    }
+    if (isImg || isPic) {
+      if (isImg) {
+        const src = safeAssetSrc(card.text);
+        return src
+          ? '<img class="card-img" src="' + escapeHtml(src) + '" alt="" draggable="false" />'
+          : '<span class="card-text">?</span>';
+      }
+      return '<span class="card-emoji" aria-hidden="true">' + escapeHtml(card.text) + "</span>";
+    }
+    return (
+      '<span class="card-text' + (card.text.length > 1 ? " is-compact" : "") + '">' +
+      escapeHtml(card.text) +
+      "</span>"
+    );
+  }
+
+  function fillCardFront(btn, card) {
+    if (!btn || !card) return;
+    btn.dataset.side = card.side;
+    const front = qs(".card-front", btn);
+    if (!front) return;
+    front.dataset.side = card.side;
+    front.innerHTML = '<span class="card-front-frame"></span>' + cardContentHtml(card);
+  }
+
   function renderBoard() {
     els.board.innerHTML = "";
     const cordLayer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -411,49 +505,7 @@
       btn.dataset.side = card.side;
       btn.setAttribute("aria-label", faceDownLabel(index));
 
-      const isImg = card.display === "img";
-      const isPic = card.display === "pic" || (card.side === "pic" && !isImg);
-      const isSymbol = card.display === "symbol";
-      let contentHtml;
-      if (isSymbol) {
-        const compact = card.text.length > 2 ? " is-compact" : "";
-        const stacked = card.picSub ? " is-stacked" : "";
-        contentHtml =
-          '<span class="card-symbol' +
-          compact +
-          stacked +
-          '">' +
-          '<span class="card-symbol-main">' +
-          escapeHtml(card.text) +
-          "</span>" +
-          (card.picSub
-            ? '<span class="card-symbol-sub">' +
-              escapeHtml(card.picSub) +
-              "</span>"
-            : "") +
-          "</span>";
-      } else if (isImg || isPic) {
-        if (isImg) {
-          const src = safeAssetSrc(card.text);
-          contentHtml = src
-            ? '<img class="card-img" src="' +
-              escapeHtml(src) +
-              '" alt="" draggable="false" />'
-            : '<span class="card-text">?</span>';
-        } else {
-          contentHtml =
-            '<span class="card-emoji" aria-hidden="true">' +
-            escapeHtml(card.text) +
-            "</span>";
-        }
-      } else {
-        contentHtml =
-          '<span class="card-text' +
-          (card.text.length > 1 ? " is-compact" : "") +
-          '">' +
-          escapeHtml(card.text) +
-          "</span>";
-      }
+      const contentHtml = cardContentHtml(card);
 
       btn.innerHTML =
         '<span class="card-inner">' +
@@ -594,14 +646,19 @@
 
     els.hudDual.hidden = false;
     els.hudSolo.hidden = true;
-    els.scoreP1.querySelector(".score-name").textContent = PLAYER_NAMES[0];
-    els.scoreP2.querySelector(".score-name").textContent = PLAYER_NAMES[1];
+    const names = state.playerNames || PLAYER_NAMES;
+    els.scoreP1.querySelector(".score-name").textContent = names[0];
+    els.scoreP2.querySelector(".score-name").textContent = names[1];
     els.scoreP1.querySelector(".score-num").textContent = String(state.scores[0]);
     els.scoreP2.querySelector(".score-num").textContent = String(state.scores[1]);
     els.scoreP1.classList.toggle("is-active", state.currentPlayer === 0);
     els.scoreP2.classList.toggle("is-active", state.currentPlayer === 1);
 
-    els.turnBanner.textContent = PLAYER_NAMES[state.currentPlayer] + " 的回合";
+    const localTurn = state.playMode === "online" && state.onlineSnapshot
+      ? state.currentPlayer === state.onlineSnapshot.youSeat
+      : false;
+    els.turnBanner.textContent =
+      names[state.currentPlayer] + " 的回合" + (localTurn ? " · 輪到你了" : "");
     els.turnBanner.classList.toggle("is-p2", state.currentPlayer === 1);
     document.body.dataset.turn = String(state.currentPlayer);
 
@@ -650,6 +707,11 @@
 
   function onCardTap(index) {
     if (!els.menuOverlay.hidden) return;
+    if (state.playMode === "online") {
+      if (!state.onlineSnapshot || state.onlineSnapshot.phase !== "playing") return;
+      Online.flip(index);
+      return;
+    }
     if (state.lock || state.ended) return;
     if (state.matched.has(state.deck[index].pairKey)) return;
     if (state.flipped.indexOf(index) !== -1) return;
@@ -787,6 +849,7 @@
     const metaText = state.moves + " 次嘗試 · " + timeText;
 
     showScreen("result");
+    requestAnimationFrame(() => focusWithoutScroll(els.resultTitle));
 
     if (state.players === 1) {
       els.resultTitle.textContent = "全部配對完成！";
@@ -798,8 +861,9 @@
 
     const s1 = state.scores[0];
     const s2 = state.scores[1];
-    const n1 = PLAYER_NAMES[0];
-    const n2 = PLAYER_NAMES[1];
+    const names = state.playerNames || PLAYER_NAMES;
+    const n1 = names[0];
+    const n2 = names[1];
 
     if (s1 === s2) {
       els.resultTitle.textContent = "平手！";
@@ -819,6 +883,290 @@
       els.resultScoreP2.classList.toggle("is-winner", s2 > s1);
     }
     els.resultMeta.textContent = metaText;
+  }
+
+  function currentOnlineConfig() {
+    const grid = getGrid();
+    const mode = currentMode();
+    const category = WORD_CATEGORIES.find((item) => item.id === state.wordCategory);
+    const range = normalizeRowRange(state.rowFrom, state.rowTo);
+    const fromLabel = ROWS[range.from].label;
+    const toLabel = ROWS[range.to].label;
+    return {
+      kind: state.kind,
+      pairMode: state.pairMode,
+      pairModeLabel: mode ? mode.label : "",
+      gridId: state.gridId,
+      gridLabel: grid.label,
+      rowFrom: state.rowFrom,
+      rowTo: state.rowTo,
+      rangeLabel: fromLabel === toLabel ? fromLabel : fromLabel + "～" + toLabel,
+      wordCategory: state.wordCategory,
+      wordCategoryLabel: category ? category.label : "",
+      pairCount: pairCount(),
+    };
+  }
+
+  function saveOnlineName(name) {
+    try {
+      window.localStorage.setItem(ONLINE_NAME_STORAGE_KEY, name);
+    } catch (_) {}
+  }
+
+  function onlinePlayerName() {
+    return els.onlineName.value.trim().slice(0, 16);
+  }
+
+  function setOnlineSetupStatus(message, isError) {
+    els.onlineSetupStatus.textContent = message;
+    els.onlineSetupStatus.classList.toggle("is-warn", Boolean(isError));
+  }
+
+  async function createOnlineRoom() {
+    const playerName = onlinePlayerName();
+    if (!playerName || poolSize() < pairCount()) {
+      syncPoolHint();
+      return;
+    }
+    saveOnlineName(playerName);
+    setOnlineSetupStatus("正在建立私人房間…", false);
+    els.btnStart.disabled = true;
+    els.btnJoinRoom.disabled = true;
+    try {
+      await Online.create({
+        playerName,
+        config: currentOnlineConfig(),
+        deck: buildCurrentDeck(),
+      });
+      Sound.playSfx("start");
+    } catch (_) {
+      setOnlineSetupStatus("建立失敗。請確認線上服務已啟用，再重新嘗試。", true);
+    } finally {
+      syncPoolHint();
+    }
+  }
+
+  async function joinOnlineRoom() {
+    const playerName = onlinePlayerName();
+    const code = els.onlineRoomCode.value.toUpperCase().replace(/[^A-Z2-9]/g, "");
+    if (!playerName || code.length !== 6) {
+      setOnlineSetupStatus("請輸入暱稱與 6 碼房號。", true);
+      return;
+    }
+    saveOnlineName(playerName);
+    setOnlineSetupStatus("正在接上房間 " + code + "…", false);
+    els.btnStart.disabled = true;
+    els.btnJoinRoom.disabled = true;
+    try {
+      await Online.join({ playerName, code });
+      Sound.playSfx("start");
+    } catch (_) {
+      setOnlineSetupStatus("加入失敗。請確認房號、房間狀態與網路連線。", true);
+    } finally {
+      syncPoolHint();
+    }
+  }
+
+  function renderRoomPlayer(element, player, fallbackName) {
+    const name = qs(".room-player-name", element);
+    const status = qs(".room-player-state", element);
+    name.textContent = player ? player.name : fallbackName;
+    element.classList.toggle("is-connected", Boolean(player?.connected));
+    element.classList.toggle("is-ready", Boolean(player?.ready));
+    if (!player) status.textContent = "尚未加入";
+    else if (!player.connected) status.textContent = "連線中斷 · 保留座位";
+    else if (player.ready) status.textContent = "已準備 · 線軸鎖定";
+    else status.textContent = "已連線 · 尚未準備";
+  }
+
+  function renderOnlineRoom(snapshot) {
+    const enteringRoom = state.screen !== "room";
+    const players = snapshot.players || [];
+    const me = players[snapshot.youSeat];
+    const readyCount = players.filter((player) => player?.ready).length;
+    renderRoomPlayer(els.roomPlayerP1, players[0], "等待房主");
+    renderRoomPlayer(els.roomPlayerP2, players[1], "等待加入");
+    els.roomStage.dataset.readyCount = String(readyCount);
+    els.roomStage.dataset.p1Ready = String(Boolean(players[0]?.ready));
+    els.roomStage.dataset.p2Ready = String(Boolean(players[1]?.ready));
+    els.roomStage.classList.toggle("is-connected", players.every((player) => player?.connected));
+    els.roomStage.classList.toggle("is-both-ready", readyCount === 2);
+    els.btnCopyInvite.textContent = snapshot.roomCode.match(/.{1,2}/g).join(" · ");
+    els.btnCopyInvite.setAttribute(
+      "aria-label",
+      "房號 " + snapshot.roomCode + "，複製邀請連結",
+    );
+    const config = snapshot.config || {};
+    const content = config.kind === "words" ? config.wordCategoryLabel : config.rangeLabel;
+    els.roomLessonSummary.textContent =
+      [config.pairModeLabel, config.gridLabel, content].filter(Boolean).join(" · ");
+    els.btnRoomReady.disabled = !me?.connected;
+    els.btnRoomReady.textContent = me?.ready ? "取消準備" : snapshot.phase === "complete" ? "再玩一局" : "我準備好了";
+    if (snapshot.phase === "complete") {
+      els.roomStatus.textContent = readyCount
+        ? "等待另一端再次鎖定線軸…"
+        : "雙方都確認後，會用同一份內容重新洗牌。";
+    } else if (!players[1]) {
+      els.roomStatus.textContent = "把邀請連結傳給對手；座位不需要帳號。";
+    } else if (!players.every((player) => player.connected)) {
+      els.roomStatus.textContent = "另一端暫時斷線，房間會保留匿名座位。";
+    } else if (readyCount < 2) {
+      els.roomStatus.textContent = "兩端都準備後，繩線會拉緊並展開盤面。";
+    } else {
+      els.roomStatus.textContent = "雙方已準備，正在展開盤面…";
+    }
+    showScreen("room");
+    if (enteringRoom) requestAnimationFrame(() => focusWithoutScroll(els.roomTitle));
+  }
+
+  function hiddenOnlineCard() {
+    return { pairKey: "", side: "hidden", text: "", kindLabel: "卡牌" };
+  }
+
+  function initializeOnlineGame(snapshot) {
+    const grid = GRID_PRESETS.find((item) => item.id === snapshot.config.gridId) || getGrid();
+    state.players = 2;
+    state.playerNames = snapshot.players.map((player, index) => player?.name || PLAYER_NAMES[index]);
+    state.deck = snapshot.deck.map((slot) => slot.card || hiddenOnlineCard());
+    state.flipped = snapshot.flipped.slice();
+    state.pendingClose = [];
+    state.matched = new Set();
+    state.matchTraces = snapshot.matchTraces.slice();
+    state.scores = snapshot.scores.slice();
+    state.currentPlayer = snapshot.currentPlayer;
+    state.lock = Boolean(snapshot.pending);
+    state.moves = snapshot.moves;
+    state.startedAt = snapshot.startedAt;
+    state.completedAt = snapshot.completedAt;
+    state.ended = false;
+    state.runId += 1;
+    state.onlineResultShownForVersion = null;
+    document.body.dataset.players = "2";
+    document.body.dataset.turn = String(state.currentPlayer);
+    els.board.style.setProperty("--cols", String(grid.cols));
+    els.board.style.setProperty("--rows", String(grid.rows));
+    els.modeChip.textContent = snapshot.config.pairModeLabel || "線上配對";
+    els.modeChip.hidden = false;
+    els.btnSettle.hidden = true;
+    els.onlineConnection.hidden = false;
+    renderBoard();
+    updateHud();
+    showScreen("game");
+    requestAnimationFrame(() => focusWithoutScroll(els.turnBanner));
+    Sound.unlock();
+    Sound.startBgm();
+  }
+
+  function playOnlineReveal(card) {
+    Sound.playSfx("flip");
+    if (card.voiceKey) Sound.playWord(card.voiceKey, card.voiceText);
+    else if (card.audioKey) Sound.playKana(card.audioKey);
+  }
+
+  function applyOnlineGameState(snapshot, previous) {
+    const previousTurn = state.currentPlayer;
+    state.playerNames = snapshot.players.map((player, index) => player?.name || PLAYER_NAMES[index]);
+    state.scores = snapshot.scores.slice();
+    state.currentPlayer = snapshot.currentPlayer;
+    state.flipped = snapshot.flipped.slice();
+    state.lock = Boolean(snapshot.pending);
+    state.moves = snapshot.moves;
+    state.completedAt = snapshot.completedAt;
+    state.matchTraces = snapshot.matchTraces.slice();
+    state.matched = new Set();
+
+    snapshot.deck.forEach((slot, index) => {
+      const btn = cardEl(index);
+      if (slot.card && !state.deck[index].pairKey) {
+        state.deck[index] = slot.card;
+        fillCardFront(btn, slot.card);
+      }
+      const card = state.deck[index];
+      const wasDown = !previous || previous.deck[index]?.state === "down";
+      const revealed = slot.state === "up" || slot.state === "matched";
+      if (revealed && wasDown && slot.card) playOnlineReveal(slot.card);
+      btn.classList.toggle("is-flipped", revealed);
+      btn.classList.toggle("is-matched", slot.state === "matched");
+      btn.classList.toggle("is-mismatch", snapshot.pending?.type === "mismatch" && slot.state === "up");
+      if (slot.state === "matched" && card.pairKey) {
+        state.matched.add(card.pairKey);
+        btn.dataset.owner = String(slot.owner);
+        btn.dataset.matchLabel = matchAnchorLabel(card);
+      }
+      const myTurn = snapshot.youSeat === snapshot.currentPlayer;
+      btn.disabled = slot.state !== "down" || Boolean(snapshot.pending) || !myTurn;
+      btn.setAttribute(
+        "aria-label",
+        revealed && slot.card
+          ? slot.card.kindLabel + " " + (slot.card.label || slot.card.text)
+          : faceDownLabel(index),
+      );
+    });
+
+    if (!previous?.pending && snapshot.pending) {
+      Sound.playSfx(snapshot.pending.type === "match" ? "match" : "mismatch");
+    }
+    updateHud({ turnSwitched: previousTurn !== state.currentPlayer });
+    scheduleCordRender();
+
+    if (snapshot.phase === "complete" && state.onlineResultShownForVersion == null) {
+      state.onlineResultShownForVersion = snapshot.version;
+      window.setTimeout(() => {
+        if (state.onlineSnapshot?.phase === "complete") endGame();
+      }, 520);
+    }
+  }
+
+  function handleOnlineState(snapshot) {
+    const previous = state.onlineSnapshot;
+    state.onlineSnapshot = snapshot;
+    state.playerNames = snapshot.players.map((player, index) => player?.name || PLAYER_NAMES[index]);
+    if (snapshot.phase === "lobby") {
+      renderOnlineRoom(snapshot);
+      return;
+    }
+    if (snapshot.phase === "complete" && state.screen !== "game") {
+      if (state.screen === "room") renderOnlineRoom(snapshot);
+      return;
+    }
+    const newRound =
+      state.screen !== "game" ||
+      state.deck.length !== snapshot.deck.length ||
+      state.startedAt !== snapshot.startedAt;
+    if (newRound) initializeOnlineGame(snapshot);
+    applyOnlineGameState(snapshot, newRound ? null : previous);
+  }
+
+  function handleOnlineConnection(info) {
+    state.onlineConnection = info.status;
+    const connected = info.status === "connected";
+    const reconnecting = info.status === "reconnecting" || info.status === "disconnected";
+    els.onlineConnection.hidden = state.playMode !== "online";
+    els.onlineConnection.classList.toggle("is-reconnecting", reconnecting);
+    els.onlineConnection.textContent = connected
+      ? "已接線"
+      : reconnecting
+        ? "重新接線中…"
+        : info.status === "creating" || info.status === "joining"
+          ? "建立連線中…"
+          : "尚未接線";
+    if (state.screen === "room" && reconnecting) {
+      els.roomStatus.textContent = "連線暫時中斷，正在用匿名憑證重新接線…";
+    }
+  }
+
+  function handleOnlineError(error) {
+    setOnlineSetupStatus(error.message, true);
+    if (state.screen === "room") els.roomStatus.textContent = error.message;
+  }
+
+  function leaveOnlineRoom() {
+    Online.leave();
+    state.onlineSnapshot = null;
+    state.onlineResultShownForVersion = null;
+    state.playerNames = PLAYER_NAMES.slice();
+    showScreen("setup");
+    syncSetupUI();
   }
 
   function applyRangePreset(presetId) {
@@ -861,7 +1209,10 @@
         Sound.playSfx("select");
         return;
       }
-      if (group === "players") state.players = Number(value);
+      if (group === "play-mode") {
+        state.playMode = value;
+        state.players = value === "solo" ? 1 : 2;
+      }
       if (group === "kind") setKind(value);
       Sound.playSfx("select");
       syncSetupUI();
@@ -932,13 +1283,52 @@
     });
     els.optBgmVolume.addEventListener("input", syncAudioSettings);
 
+    els.onlineName.addEventListener("input", syncPoolHint);
+    els.onlineRoomCode.addEventListener("input", () => {
+      const cleaned = els.onlineRoomCode.value.toUpperCase().replace(/[^A-Z2-9]/g, "");
+      if (els.onlineRoomCode.value !== cleaned) els.onlineRoomCode.value = cleaned;
+      syncPoolHint();
+    });
+    els.onlineRoomCode.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !els.btnJoinRoom.disabled) {
+        event.preventDefault();
+        joinOnlineRoom();
+      }
+    });
+
     els.btnStart.addEventListener("click", startGame);
+    els.btnJoinRoom.addEventListener("click", joinOnlineRoom);
+    els.btnCopyInvite.addEventListener("click", async () => {
+      Sound.playSfx("select");
+      const copied = await Online.copyInvite();
+      els.roomStatus.textContent = copied
+        ? "邀請連結已複製，可以傳給另一位玩家。"
+        : "無法自動複製；請從瀏覽器網址列分享目前連結。";
+    });
+    els.btnRoomReady.addEventListener("click", () => {
+      const me = state.onlineSnapshot?.players?.[state.onlineSnapshot.youSeat];
+      Sound.playSfx("select");
+      Online.ready(!me?.ready);
+    });
+    els.btnRoomLeave.addEventListener("click", leaveOnlineRoom);
     els.btnSettle.addEventListener("click", () => {
       Sound.playSfx("select");
       endGame();
     });
-    qs("#btn-restart").addEventListener("click", startGame);
+    qs("#btn-restart").addEventListener("click", () => {
+      if (state.playMode === "online") {
+        showScreen("room");
+        renderOnlineRoom(state.onlineSnapshot);
+        Online.ready(true);
+        return;
+      }
+      startGame();
+    });
     qs("#btn-to-setup").addEventListener("click", () => {
+      if (state.playMode === "online") {
+        leaveOnlineRoom();
+        return;
+      }
       Sound.playSfx("select");
       showScreen("setup");
       syncSetupUI();
@@ -954,10 +1344,18 @@
     });
     qs("#btn-menu-restart").addEventListener("click", () => {
       closeMenu();
+      if (state.playMode === "online") {
+        leaveOnlineRoom();
+        return;
+      }
       startGame();
     });
     qs("#btn-menu-home").addEventListener("click", () => {
       Sound.playSfx("select");
+      if (state.playMode === "online") {
+        leaveOnlineRoom();
+        return;
+      }
       showScreen("setup");
       syncSetupUI();
     });
@@ -1103,8 +1501,34 @@
   fillRowSelects();
   fillSetupSelects();
   bindSetup();
+  try {
+    els.onlineName.value = window.localStorage.getItem(ONLINE_NAME_STORAGE_KEY) || "";
+  } catch (_) {}
+  Online.init({
+    onState: handleOnlineState,
+    onConnection: handleOnlineConnection,
+    onError: handleOnlineError,
+  });
   window.addEventListener("resize", scheduleCordRender);
   syncAudioSettings();
   syncSetupUI();
-  showScreen("setup");
+  const invitedRoomCode = new URL(window.location.href).searchParams
+    .get("room")
+    ?.toUpperCase()
+    .replace(/[^A-Z2-9]/g, "") || "";
+  if (invitedRoomCode.length === 6) {
+    state.playMode = "online";
+    state.players = 2;
+    els.onlineRoomCode.value = invitedRoomCode;
+    if (Online.resume(invitedRoomCode)) {
+      showScreen("room");
+      els.roomStatus.textContent = "正在用匿名憑證重新接上房間…";
+    } else {
+      showScreen("setup");
+      setOnlineSetupStatus("已填入邀請房號；輸入暱稱後即可加入。", false);
+    }
+    syncSetupUI();
+  } else {
+    showScreen("setup");
+  }
 })();

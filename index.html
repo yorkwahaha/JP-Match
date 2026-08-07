@@ -9,8 +9,9 @@
     <meta name="referrer" content="no-referrer" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' blob: data:; connect-src 'self' https://jpapp-tts-proxy.yorkwahaha.workers.dev; object-src 'none'; base-uri 'self'; form-action 'self'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' blob: data:; connect-src 'self' https://jpapp-tts-proxy.yorkwahaha.workers.dev https://jp-match-online.yorkwahaha.workers.dev wss://jp-match-online.yorkwahaha.workers.dev http://127.0.0.1:8787 ws://127.0.0.1:8787 http://localhost:8787 ws://localhost:8787; object-src 'none'; base-uri 'self'; form-action 'self'"
     />
+    <meta name="jp-match-online-api" content="https://jp-match-online.yorkwahaha.workers.dev" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#142033" id="meta-theme-color" />
     <title>JP Match · 五十音配對</title>
@@ -22,7 +23,7 @@
     />
     <link rel="stylesheet" href="./css/styles.css?v=kotoba-musubi-9" />
   </head>
-  <body data-screen="setup" data-players="2" data-turn="0">
+  <body data-screen="setup" data-players="2" data-play-mode="local" data-turn="0">
     <div id="app" class="app">
       <!-- SETUP -->
       <section id="setup-screen" class="screen setup">
@@ -35,10 +36,11 @@
 
         <div class="setup-panel">
           <div class="field">
-            <span class="field-label">人數</span>
-            <div class="opt-row" data-group="players">
-              <button type="button" class="opt" data-value="1">單人練習</button>
-              <button type="button" class="opt is-active" data-value="2">雙人對戰</button>
+            <span class="field-label">遊玩方式</span>
+            <div class="opt-row opt-row-three" data-group="play-mode">
+              <button type="button" class="opt" data-value="solo">單人</button>
+              <button type="button" class="opt is-active" data-value="local">同機雙人</button>
+              <button type="button" class="opt" data-value="online">線上雙人</button>
             </div>
           </div>
 
@@ -93,7 +95,66 @@
             <select id="sel-word-voice" class="setup-select"></select>
           </div>
 
+          <div class="field field-online" id="field-online" hidden>
+            <label class="field-label" for="online-name">線上房間</label>
+            <div class="online-entry-grid">
+              <label class="online-input-wrap">
+                <span>你的暱稱</span>
+                <input id="online-name" class="setup-input" maxlength="16" autocomplete="nickname" placeholder="例如：小春" />
+              </label>
+              <label class="online-input-wrap">
+                <span>加入房號</span>
+                <input id="online-room-code" class="setup-input room-code-input" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="AB2C3D" />
+              </label>
+              <button type="button" id="btn-join-room" class="btn-ghost btn-join-room">加入房間</button>
+            </div>
+            <p id="online-setup-status" class="range-hint" role="status" aria-live="polite">免註冊；暱稱與匿名重連憑證只用於這個房間。</p>
+          </div>
+
           <button type="button" id="btn-start" class="btn-primary">開始遊戲</button>
+        </div>
+      </section>
+
+      <!-- ONLINE ROOM -->
+      <section id="room-screen" class="screen room-screen" hidden>
+        <header class="room-heading">
+          <p class="brand-mark">ONLINE PAIR</p>
+          <h2 id="room-title" tabindex="-1">雙端線軸</h2>
+          <p id="room-status" role="status" aria-live="polite">正在接上房間…</p>
+        </header>
+
+        <div class="room-stage" id="room-stage" data-ready-count="0">
+          <article class="room-player room-player-p1" id="room-player-p1">
+            <span class="room-endpoint" aria-hidden="true"></span>
+            <span class="room-player-label">玩家 1 · 房主</span>
+            <strong class="room-player-name">等待連線</strong>
+            <span class="room-player-state">尚未準備</span>
+          </article>
+
+          <div class="room-cord" aria-hidden="true"><span></span></div>
+
+          <div class="room-midpoint">
+            <span class="room-code-label">房號</span>
+            <button type="button" id="btn-copy-invite" class="room-code" aria-label="複製邀請連結">------</button>
+            <span class="room-copy-hint">點一下複製邀請連結</span>
+          </div>
+
+          <article class="room-player room-player-p2" id="room-player-p2">
+            <span class="room-endpoint" aria-hidden="true"></span>
+            <span class="room-player-label">玩家 2 · 受邀者</span>
+            <strong class="room-player-name">等待加入</strong>
+            <span class="room-player-state">尚未連線</span>
+          </article>
+        </div>
+
+        <div class="room-lesson">
+          <span>這一局</span>
+          <strong id="room-lesson-summary">羅馬拼音 ↔ 平假名 · 8×4（16 組）</strong>
+        </div>
+
+        <div class="room-actions">
+          <button type="button" id="btn-room-leave" class="btn-ghost">離開房間</button>
+          <button type="button" id="btn-room-ready" class="btn-primary">我準備好了</button>
         </div>
       </section>
 
@@ -101,7 +162,8 @@
       <section id="game-screen" class="screen game" hidden>
         <header class="game-top">
           <button type="button" id="btn-menu" class="btn-ghost">選單</button>
-          <div id="turn-banner" class="turn-banner" role="status" aria-live="polite">玩家 1 的回合</div>
+          <div id="turn-banner" class="turn-banner" role="status" aria-live="polite" tabindex="-1">玩家 1 的回合</div>
+          <div id="online-connection" class="online-connection" role="status" aria-live="polite" hidden>已接線</div>
           <div id="mode-chip" class="mode-chip">羅馬拼音 ↔ 平假名</div>
           <button type="button" id="btn-settle" class="btn-settle" hidden>下一步：結算 →</button>
         </header>
@@ -142,7 +204,7 @@
       <section id="result-screen" class="screen result" hidden>
         <div class="result-card">
           <p class="result-kicker">GAME OVER</p>
-          <h2 id="result-title" class="result-title">獲勝</h2>
+          <h2 id="result-title" class="result-title" tabindex="-1">獲勝</h2>
 
           <div id="result-scoreboard" class="result-scoreboard" hidden>
             <div class="result-score-side is-p1">
@@ -239,6 +301,7 @@
     <script src="./js/kana.js"></script>
     <script src="./js/words.js"></script>
     <script src="./js/audio.js?v=word-voices-5"></script>
-    <script src="./js/game.js?v=kotoba-musubi-12"></script>
+    <script src="./js/online.js?v=online-room-1"></script>
+    <script src="./js/game.js?v=online-room-1"></script>
   </body>
 </html>

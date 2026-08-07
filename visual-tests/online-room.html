@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="night">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JP Match online room visual fixture</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body data-screen="room" data-players="2" data-play-mode="online" data-turn="0">
+    <main class="app">
+      <section id="room-screen" class="screen room-screen">
+        <header class="room-heading">
+          <p class="brand-mark">ONLINE PAIR</p>
+          <h2 id="room-title" tabindex="-1">雙端線軸</h2>
+          <p id="room-status" role="status">兩端都準備後，繩線會拉緊並展開盤面。</p>
+        </header>
+
+        <div class="room-stage is-connected" id="room-stage" data-ready-count="1" data-p1-ready="true" data-p2-ready="false">
+          <article class="room-player room-player-p1 is-connected is-ready" id="room-player-p1">
+            <span class="room-endpoint" aria-hidden="true"></span>
+            <span class="room-player-label">玩家 1 · 房主</span>
+            <strong class="room-player-name">小春</strong>
+            <span class="room-player-state">已準備 · 線軸鎖定</span>
+          </article>
+
+          <div class="room-cord" aria-hidden="true"><span></span></div>
+
+          <div class="room-midpoint">
+            <span class="room-code-label">房號</span>
+            <button type="button" id="btn-copy-invite" class="room-code" aria-label="房號 AB2C3D，複製邀請連結">AB · 2C · 3D</button>
+            <span class="room-copy-hint">點一下複製邀請連結</span>
+          </div>
+
+          <article class="room-player room-player-p2 is-connected" id="room-player-p2">
+            <span class="room-endpoint" aria-hidden="true"></span>
+            <span class="room-player-label">玩家 2 · 受邀者</span>
+            <strong class="room-player-name">太郎</strong>
+            <span class="room-player-state">已連線 · 尚未準備</span>
+          </article>
+        </div>
+
+        <div class="room-lesson">
+          <span>這一局</span>
+          <strong id="room-lesson-summary">羅馬拼音 ↔ 平假名 · 8×4（16 組） · あ行～わ行</strong>
+        </div>
+
+        <div class="room-actions">
+          <button type="button" class="btn-ghost">離開房間</button>
+          <button type="button" class="btn-primary">我準備好了</button>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

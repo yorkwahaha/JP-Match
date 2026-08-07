@@ -14,6 +14,18 @@ https://yorkwahaha.github.io/JP-Match/
 4. **配對失敗**：翻回背面，換下一個人。
 5. 配對組數較多者獲勝。
 
+## 免註冊線上雙人
+
+首頁選擇「線上雙人」後，可建立私人房間或輸入 6 碼房號加入。房主分享網址，對手只需填寫暫時暱稱，不需要帳號、Email 或密碼。
+
+- 兩端都按下準備後才會開局。
+- 牌序、回合、配對與分數由房間服務裁決。
+- 斷線後會使用保存在該瀏覽器的匿名憑證重新接線。
+- 房間閒置兩小時後自動清除；不保存聊天、排名或永久對戰紀錄。
+- 發音、音效和 BGM 仍由每位玩家的裝置播放。
+
+靜態前端預設連到 `https://jp-match-online.yorkwahaha.workers.dev`。房間服務尚未部署時，單人與同機雙人仍可正常使用，線上入口會顯示連線錯誤。
+
 ## 練習內容
 
 ### 五十音
@@ -74,6 +86,9 @@ python -m http.server 5173
 
 # 或 Node
 npx --yes serve -p 5173
+
+# 不下載套件的專案內建預覽
+npm run dev
 ```
 
 然後在瀏覽器或同網路的平板／手機開啟：
@@ -121,7 +136,9 @@ css/styles.css
 js/kana.js      五十音資料與牌組產生
 js/words.js     單字題庫與牌組產生
 js/audio.js     音訊路徑與播放
+js/online.js    匿名房間、WebSocket、重連與邀請連結
 js/game.js      遊戲流程與計分
+worker/         Cloudflare Worker + Durable Object 房間服務
 assets/audio/
 assets/audio/word-voices/fish-962b6d73/   Fish Audio S2.1 Pro 活力聲線（159 個單字）
 scripts/gen-fish-word-audio.mjs           Fish Audio 聲線包產生工具
