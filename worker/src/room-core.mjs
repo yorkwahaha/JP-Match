@@ -135,6 +135,7 @@ export function createRoomState({ roomCode, hostName, hostToken, config, deck, n
         ready: false,
         connected: false,
         disconnectedAt: null,
+        leftAt: null,
       },
       null,
     ],
@@ -170,6 +171,7 @@ export function joinRoom(room, { name, token, now = Date.now() }) {
     ready: false,
     connected: false,
     disconnectedAt: null,
+    leftAt: null,
   };
   bump(room, now);
   return { ok: true, seat: 1, reconnected: false };
@@ -180,8 +182,20 @@ export function setConnected(room, seat, connected, now = Date.now()) {
   if (!player) return false;
   player.connected = Boolean(connected);
   player.disconnectedAt = connected ? null : now;
+  if (connected) player.leftAt = null;
   bump(room, now);
   return true;
+}
+
+export function leaveRoom(room, seat, now = Date.now()) {
+  const player = room?.players?.[seat];
+  if (!player) return { ok: false, error: "INVALID_SESSION" };
+  player.connected = false;
+  player.ready = false;
+  player.disconnectedAt = now;
+  player.leftAt = now;
+  bump(room, now);
+  return { ok: true };
 }
 
 export function setReady(room, seat, ready, now = Date.now(), random = Math.random) {
@@ -189,6 +203,7 @@ export function setReady(room, seat, ready, now = Date.now(), random = Math.rand
   if (!player || (room.phase !== "lobby" && room.phase !== "complete")) {
     return { ok: false, error: "NOT_IN_READY_PHASE" };
   }
+  if (!player.connected || player.leftAt) return { ok: false, error: "PLAYER_NOT_CONNECTED" };
   player.ready = Boolean(ready);
   bump(room, now);
   if (room.players.every((entry) => entry?.ready && entry.connected)) {
@@ -202,6 +217,9 @@ export function setReady(room, seat, ready, now = Date.now(), random = Math.rand
 export function applyFlip(room, seat, index, now = Date.now()) {
   if (!room || room.phase !== "playing") return { ok: false, error: "GAME_NOT_ACTIVE" };
   if (seat !== room.currentPlayer) return { ok: false, error: "NOT_YOUR_TURN" };
+  if (!room.players.every((player) => player?.connected && !player.leftAt)) {
+    return { ok: false, error: "OPPONENT_UNAVAILABLE" };
+  }
   if (room.pending) return { ok: false, error: "BOARD_LOCKED" };
   if (!Number.isInteger(index) || index < 0 || index >= room.deck.length) {
     return { ok: false, error: "INVALID_CARD_INDEX" };
@@ -288,6 +306,7 @@ export function publicRoomState(room, forSeat = -1, now = Date.now()) {
       name: player.name,
       ready: player.ready,
       connected: player.connected,
+      left: Boolean(player.leftAt),
       reconnectRemainingMs: player.connected || !player.disconnectedAt
         ? null
         : Math.max(0, RECONNECT_GRACE_MS - (now - player.disconnectedAt)),

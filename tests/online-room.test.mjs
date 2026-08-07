@@ -6,6 +6,7 @@ import {
   applyFlip,
   createRoomState,
   joinRoom,
+  leaveRoom,
   publicRoomState,
   resolvePending,
   seatForToken,
@@ -116,6 +117,24 @@ test("stale, duplicate, and out-of-turn flips are rejected", () => {
   assert.equal(applyFlip(state, 1, 0, 1500).error, "NOT_YOUR_TURN");
   assert.equal(applyFlip(state, 0, 0, 1510).ok, true);
   assert.equal(applyFlip(state, 0, 0, 1520).error, "CARD_UNAVAILABLE");
+});
+
+test("an intentional departure is announced, pauses play, and clears on reconnect", () => {
+  const state = room();
+  joinRoom(state, { name: "太郎", token: "guest-token", now: 1100 });
+  setConnected(state, 0, true, 1200);
+  setConnected(state, 1, true, 1200);
+  setReady(state, 0, true, 1300);
+  setReady(state, 1, true, 1400, () => 0.999);
+
+  assert.equal(leaveRoom(state, 1, 1500).ok, true);
+  assert.equal(state.players[1].ready, false);
+  assert.equal(publicRoomState(state, 0, 1500).players[1].left, true);
+  assert.equal(applyFlip(state, 0, 0, 1510).error, "OPPONENT_UNAVAILABLE");
+
+  setConnected(state, 1, true, 1600);
+  assert.equal(publicRoomState(state, 0, 1600).players[1].left, false);
+  assert.equal(applyFlip(state, 0, 0, 1610).ok, true);
 });
 
 test("completion reveals the result and two rematch-ready seats start a clean round", () => {

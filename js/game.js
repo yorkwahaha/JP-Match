@@ -973,7 +973,9 @@
     name.textContent = player ? player.name : fallbackName;
     element.classList.toggle("is-connected", Boolean(player?.connected));
     element.classList.toggle("is-ready", Boolean(player?.ready));
+    element.classList.toggle("is-left", Boolean(player?.left));
     if (!player) status.textContent = "尚未加入";
+    else if (player.left) status.textContent = "已離開房間";
     else if (!player.connected) status.textContent = "連線中斷 · 保留座位";
     else if (player.ready) status.textContent = "已準備 · 線軸鎖定";
     else status.textContent = "已連線 · 尚未準備";
@@ -983,6 +985,8 @@
     const enteringRoom = state.screen !== "room";
     const players = snapshot.players || [];
     const me = players[snapshot.youSeat];
+    const opponent = players[snapshot.youSeat === 0 ? 1 : 0];
+    const opponentLeft = Boolean(opponent?.left);
     const readyCount = players.filter((player) => player?.ready).length;
     renderRoomPlayer(els.roomPlayerP1, players[0], "等待房主");
     renderRoomPlayer(els.roomPlayerP2, players[1], "等待加入");
@@ -991,6 +995,7 @@
     els.roomStage.dataset.p2Ready = String(Boolean(players[1]?.ready));
     els.roomStage.classList.toggle("is-connected", players.every((player) => player?.connected));
     els.roomStage.classList.toggle("is-both-ready", readyCount === 2);
+    els.roomStage.classList.toggle("has-departed", players.some((player) => player?.left));
     els.btnCopyInvite.textContent = snapshot.roomCode.match(/.{1,2}/g).join(" · ");
     els.btnCopyInvite.setAttribute(
       "aria-label",
@@ -1000,9 +1005,18 @@
     const content = config.kind === "words" ? config.wordCategoryLabel : config.rangeLabel;
     els.roomLessonSummary.textContent =
       [config.pairModeLabel, config.gridLabel, content].filter(Boolean).join(" · ");
-    els.btnRoomReady.disabled = !me?.connected;
-    els.btnRoomReady.textContent = me?.ready ? "取消準備" : snapshot.phase === "complete" ? "再玩一局" : "我準備好了";
-    if (snapshot.phase === "complete") {
+    const myConnectionReady = Boolean(me && (me.connected || state.onlineConnection === "connected"));
+    els.btnRoomReady.disabled = !myConnectionReady || opponentLeft;
+    els.btnRoomReady.textContent = opponentLeft
+      ? "對手已離開"
+      : me?.ready
+        ? "取消準備"
+        : snapshot.phase === "complete"
+          ? "再玩一局"
+          : "我準備好了";
+    if (opponentLeft) {
+      els.roomStatus.textContent = "對手已離開房間。請返回首頁後重新開房。";
+    } else if (snapshot.phase === "complete") {
       els.roomStatus.textContent = readyCount
         ? "等待另一端再次鎖定線軸…"
         : "雙方都確認後，會用同一份內容重新洗牌。";
@@ -1094,7 +1108,8 @@
         btn.dataset.matchLabel = matchAnchorLabel(card);
       }
       const myTurn = snapshot.youSeat === snapshot.currentPlayer;
-      btn.disabled = slot.state !== "down" || Boolean(snapshot.pending) || !myTurn;
+      const bothPlayersConnected = snapshot.players.every((player) => player?.connected && !player.left);
+      btn.disabled = slot.state !== "down" || Boolean(snapshot.pending) || !myTurn || !bothPlayersConnected;
       btn.setAttribute(
         "aria-label",
         revealed && slot.card
@@ -1107,6 +1122,7 @@
       Sound.playSfx(snapshot.pending.type === "match" ? "match" : "mismatch");
     }
     updateHud({ turnSwitched: previousTurn !== state.currentPlayer });
+    renderOnlineConnection();
     scheduleCordRender();
 
     if (snapshot.phase === "complete" && state.onlineResultShownForVersion == null) {
@@ -1137,19 +1153,37 @@
     applyOnlineGameState(snapshot, newRound ? null : previous);
   }
 
-  function handleOnlineConnection(info) {
-    state.onlineConnection = info.status;
-    const connected = info.status === "connected";
-    const reconnecting = info.status === "reconnecting" || info.status === "disconnected";
+  function renderOnlineConnection() {
+    const snapshot = state.onlineSnapshot;
+    const opponent = snapshot?.players?.[snapshot.youSeat === 0 ? 1 : 0];
+    const connected = state.onlineConnection === "connected";
+    const reconnecting = state.onlineConnection === "reconnecting" || state.onlineConnection === "disconnected";
+    const opponentLeft = connected && Boolean(opponent?.left);
+    const opponentDisconnected = connected && Boolean(opponent && !opponent.connected && !opponent.left);
     els.onlineConnection.hidden = state.playMode !== "online";
     els.onlineConnection.classList.toggle("is-reconnecting", reconnecting);
-    els.onlineConnection.textContent = connected
-      ? "已接線"
-      : reconnecting
-        ? "重新接線中…"
-        : info.status === "creating" || info.status === "joining"
-          ? "建立連線中…"
-          : "尚未接線";
+    els.onlineConnection.classList.toggle("is-opponent-away", opponentLeft || opponentDisconnected);
+    els.onlineConnection.setAttribute("aria-live", opponentLeft ? "assertive" : "polite");
+    els.onlineConnection.textContent = opponentLeft
+      ? "對手已離開房間 · 牌局已暫停，請從選單返回首頁"
+      : opponentDisconnected
+        ? "對手連線中斷 · 牌局暫停並保留座位"
+        : connected
+          ? "已接線"
+          : reconnecting
+            ? "重新接線中…"
+            : state.onlineConnection === "creating" || state.onlineConnection === "joining"
+              ? "建立連線中…"
+              : "尚未接線";
+  }
+
+  function handleOnlineConnection(info) {
+    state.onlineConnection = info.status;
+    const reconnecting = info.status === "reconnecting" || info.status === "disconnected";
+    renderOnlineConnection();
+    if (state.screen === "room" && info.status === "connected" && state.onlineSnapshot) {
+      renderOnlineRoom(state.onlineSnapshot);
+    }
     if (state.screen === "room" && reconnecting) {
       els.roomStatus.textContent = "連線暫時中斷，正在用匿名憑證重新接線…";
     }

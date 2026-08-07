@@ -1856,6 +1856,25 @@ html[data-theme="yuzu"] {
   border: 1px solid currentColor;
 }
 
+.room-player.is-left {
+  border-block-style: dashed;
+}
+
+.room-player.is-left .room-endpoint::before {
+  content: "×";
+  position: absolute;
+  inset: -7px;
+  display: grid;
+  place-items: center;
+  color: var(--page-fg);
+  font: 800 0.82rem/1 var(--font-body);
+  transform: rotate(-45deg);
+}
+
+.room-player-p2.is-left .room-endpoint::before {
+  transform: none;
+}
+
 .room-midpoint {
   position: relative;
   z-index: 3;
@@ -1920,6 +1939,23 @@ html[data-theme="yuzu"] {
 
 .online-connection.is-reconnecting {
   color: var(--accent);
+}
+
+.online-connection.is-opponent-away {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-block: 2px dashed var(--accent);
+  background: var(--ui-surface);
+  color: var(--page-fg);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  white-space: normal;
 }
 
 /* Game: tags hover above a persistent map of learned connections. */

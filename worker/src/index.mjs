@@ -4,6 +4,7 @@ import {
   applyFlip,
   createRoomState,
   joinRoom,
+  leaveRoom,
   publicRoomState,
   resolvePending,
   roomExpired,
@@ -169,6 +170,18 @@ export class RoomObject extends DurableObject {
       });
     }
 
+    if (url.pathname === "/leave" && request.method === "POST") {
+      const body = await readJson(request);
+      const seat = seatForToken(this.room, body.token);
+      if (seat < 0) return json({ error: "INVALID_SESSION" }, 401);
+      const result = leaveRoom(this.room, seat);
+      if (!result.ok) return json({ error: result.error }, 400);
+      await this.persist();
+      await this.scheduleAlarm();
+      this.broadcast();
+      return json({ ok: true, room: publicRoomState(this.room, seat) });
+    }
+
     if (url.pathname === "/ws" && request.headers.get("upgrade") === "websocket") {
       const token = url.searchParams.get("token") || "";
       const seat = seatForToken(this.room, token);
@@ -209,6 +222,11 @@ export class RoomObject extends DurableObject {
       return;
     }
 
+    if (command.type === "sync") {
+      this.send(ws, { type: "state", room: publicRoomState(this.room, seat) });
+      return;
+    }
+
     if (command.actionId && player.lastActionId === command.actionId) {
       this.send(ws, { type: "state", room: publicRoomState(this.room, seat) });
       return;
@@ -228,8 +246,7 @@ export class RoomObject extends DurableObject {
     } else if (command.type === "flip") {
       result = applyFlip(this.room, seat, Number(command.index));
     } else if (command.type === "leave") {
-      setConnected(this.room, seat, false);
-      result = { ok: true };
+      result = leaveRoom(this.room, seat);
     }
 
     if (!result.ok) {
@@ -339,6 +356,23 @@ export default {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ ...body, token: createToken() }),
+      });
+      return withCors(response, request, env);
+    }
+
+    const leaveMatch = url.pathname.match(/^\/rooms\/([A-Z2-9]{6})\/leave$/i);
+    if (leaveMatch && request.method === "POST") {
+      const roomCode = sanitizeRoomCode(leaveMatch[1]);
+      let body;
+      try {
+        body = await readJson(request);
+      } catch (error) {
+        return json({ error: error.message || "INVALID_JSON" }, 400, cors);
+      }
+      const response = await proxyRoomRequest(env, roomCode, "/leave", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ token: body.token }),
       });
       return withCors(response, request, env);
     }

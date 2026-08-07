@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="night">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JP Match opponent-left visual fixture</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body data-screen="game" data-players="2" data-play-mode="online" data-turn="0">
+    <main class="app">
+      <section class="screen game">
+        <header class="game-top">
+          <button type="button" class="btn-ghost">選單</button>
+          <div class="turn-banner" role="status">小春的回合</div>
+          <div class="online-connection is-opponent-away" role="status" aria-live="assertive">
+            對手已離開房間 · 牌局已暫停，請從選單返回首頁
+          </div>
+          <div class="mode-chip">羅馬拼音 ↔ 平假名</div>
+        </header>
+
+        <div class="hud-dual">
+          <div class="score-pill is-active"><span class="score-name">小春</span><span class="score-num">1</span></div>
+          <div class="remaining-wrap"><span class="remaining-label">剩餘</span><span class="remaining-num">5</span></div>
+          <div class="score-pill score-pill-flip"><span class="score-name">太郎</span><span class="score-num">0</span></div>
+        </div>
+
+        <p class="sr-only">對手已離開，所有卡牌暫停操作。</p>
+        <div class="board" role="group" aria-label="已暫停的配對卡牌盤面" style="--cols: 4; --rows: 3">
+          <svg class="pair-cords" aria-hidden="true"></svg>
+          <button type="button" class="card" disabled aria-label="卡牌 1"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+          <button type="button" class="card" disabled aria-label="卡牌 2"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+          <button type="button" class="card" disabled aria-label="卡牌 3"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+          <button type="button" class="card" disabled aria-label="卡牌 4"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+          <button type="button" class="card" disabled aria-label="卡牌 5"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+          <button type="button" class="card" disabled aria-label="卡牌 6"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+          <button type="button" class="card" disabled aria-label="卡牌 7"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+          <button type="button" class="card" disabled aria-label="卡牌 8"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+          <button type="button" class="card" disabled aria-label="卡牌 9"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+          <button type="button" class="card" disabled aria-label="卡牌 10"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+          <button type="button" class="card" disabled aria-label="卡牌 11"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+          <button type="button" class="card" disabled aria-label="卡牌 12"><span class="card-inner"><span class="card-face card-back" aria-hidden="true"><span class="card-back-pattern"></span><span class="seal"><span class="seal-ring"></span></span></span></span></button>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

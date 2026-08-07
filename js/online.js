@@ -31,6 +31,8 @@ window.JPMatchOnline = (() => {
     BOARD_LOCKED: "請等這兩張牌完成判定。",
     CARD_UNAVAILABLE: "這張牌目前不能翻開。",
     STALE_STATE: "盤面剛剛更新，已替你同步到最新狀態。",
+    PLAYER_NOT_CONNECTED: "連線尚未完成，請稍候再準備。",
+    OPPONENT_UNAVAILABLE: "對手目前不在線上，牌局已暫停。",
     ORIGIN_NOT_ALLOWED: "目前的網站來源尚未獲准使用線上房間。",
   };
 
@@ -132,8 +134,10 @@ window.JPMatchOnline = (() => {
     socket.addEventListener("open", () => {
       reconnectAttempts = 0;
       emitConnection("connected");
+      socket.send(JSON.stringify({ type: "sync" }));
     });
     socket.addEventListener("message", (event) => {
+      if (intentionalClose) return;
       let message;
       try {
         message = JSON.parse(event.data);
@@ -236,12 +240,31 @@ window.JPMatchOnline = (() => {
   }
 
   function leave(options = {}) {
-    if (socket?.readyState === WebSocket.OPEN && room) send("leave");
+    const activeSocket = socket;
+    const activeRoom = room;
+    const activeCode = roomCode;
+    const activeToken = token;
     intentionalClose = true;
     clearReconnectTimer();
-    if (socket) socket.close(1000, "Left room");
+    if (activeSocket?.readyState === WebSocket.OPEN && activeRoom) {
+      activeSocket.send(JSON.stringify({
+        type: "leave",
+        version: activeRoom.version,
+        actionId: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`,
+      }));
+    }
+    if (activeCode && activeToken) {
+      void request(`/rooms/${encodeURIComponent(activeCode)}/leave`, {
+        method: "POST",
+        body: JSON.stringify({ token: activeToken }),
+        keepalive: true,
+      }).catch(() => {});
+    }
+    if (activeSocket) {
+      window.setTimeout(() => activeSocket.close(1000, "Left room"), 160);
+    }
     socket = null;
-    if (options.forget !== false) forgetSession();
+    if (options.forget !== false) forgetSession(activeCode);
     room = null;
     token = "";
     roomCode = "";
