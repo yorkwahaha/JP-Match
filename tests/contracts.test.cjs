@@ -141,6 +141,12 @@ test("matched pair cords connect only the two cards", () => {
   assert.doesNotMatch(game, /" M " \+ mx \+ " " \+ my/);
 });
 
+test("matched word labels stay complete", () => {
+  const game = read("js/game.js");
+  assert.doesNotMatch(game, /chars\.slice\(0, 3\)/);
+  assert.match(game, /return String\(raw \|\| "結"\)/);
+});
+
 test("generator dependency and staging behavior are reproducible", () => {
   const pkg = JSON.parse(read("package.json"));
   const lock = JSON.parse(read("package-lock.json"));

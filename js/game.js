@@ -764,8 +764,7 @@
 
   function matchAnchorLabel(card) {
     const raw = card.side === "pic" ? card.label || "圖" : card.text;
-    const chars = Array.from(String(raw || "結"));
-    return chars.length > 3 ? chars.slice(0, 3).join("") + "…" : chars.join("");
+    return String(raw || "結");
   }
 
   function wait(ms) {

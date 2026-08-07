@@ -2261,7 +2261,7 @@ body.turn-switched .score-pill.is-active {
   z-index: 3;
   left: 50%;
   top: 50%;
-  width: clamp(28px, 46cqmin, 58px);
+  width: clamp(40px, 58cqmin, 72px);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -2269,8 +2269,11 @@ body.turn-switched .score-pill.is-active {
   color: var(--page-fg);
   border: 2px solid var(--thread-success);
   font-family: var(--font-display);
-  font-size: clamp(calc(0.58rem + 2px), calc(17cqmin + 2px), calc(0.92rem + 2px));
+  font-size: clamp(0.78rem, 19cqmin, 1.12rem);
   font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
   transform: translate(-50%, -50%);
   animation: knot-set 0.4s 0.22s ease both;
 }
