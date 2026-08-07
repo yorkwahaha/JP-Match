@@ -561,13 +561,9 @@
       const distance = Math.hypot(bx - ax, by - ay);
       const bend = Math.min(88, Math.max(20, distance * 0.18));
       const controlY = my + (trace.player === 0 ? -bend : bend);
-      const edgeX = trace.player === 0 ? 2 : boardRect.width - 2;
-      const edgeY = 2;
       const pairPath =
         "M " + ax + " " + ay +
-        " Q " + mx + " " + controlY + " " + bx + " " + by +
-        " M " + mx + " " + my +
-        " Q " + ((mx + edgeX) / 2) + " " + Math.max(8, my * 0.22) + " " + edgeX + " " + edgeY;
+        " Q " + mx + " " + controlY + " " + bx + " " + by;
       const ownerClass = trace.player === 0 ? "is-p1" : "is-p2";
       const ageClass = traceIndex === state.matchTraces.length - 1 ? " is-latest" : "";
       const path = createSvgElement("path", {

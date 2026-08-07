@@ -135,6 +135,12 @@ test("runtime fixes keep matched cards inert and audio failures bounded", () => 
   assert.match(generator, /function isMp3\(buffer\)/);
 });
 
+test("matched pair cords connect only the two cards", () => {
+  const game = read("js/game.js");
+  assert.doesNotMatch(game, /const edge[XY] =/);
+  assert.doesNotMatch(game, /" M " \+ mx \+ " " \+ my/);
+});
+
 test("generator dependency and staging behavior are reproducible", () => {
   const pkg = JSON.parse(read("package.json"));
   const lock = JSON.parse(read("package-lock.json"));
