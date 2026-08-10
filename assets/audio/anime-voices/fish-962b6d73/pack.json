@@ -1,0 +1,336 @@
+{
+  "id": "fish-962b6d73",
+  "provider": "Fish Audio",
+  "model": "s2.1-pro-free",
+  "referenceId": "962b6d7385574187bbf4b73bb1ec49f6",
+  "generatedAt": "2026-08-10T21:35:32.4451721Z",
+  "expectedEntries": 31,
+  "generatedFiles": 31,
+  "words": [
+    {
+      "key": "jjk_itadori",
+      "reading": "いたどりゆうじ",
+      "written": "虎杖悠仁",
+      "filename": "jjk_itadori.mp3",
+      "source": "generated-rerecord",
+      "bytes": 21732,
+      "status": "ok",
+      "prompt": "[日本語で「いたどりゆうじ」と読んで] 虎杖悠仁。"
+    },
+    {
+      "key": "jjk_fushiguro",
+      "reading": "ふしぐろめぐみ",
+      "written": "伏黒恵",
+      "filename": "jjk_fushiguro.mp3",
+      "source": "generated-rerecord",
+      "bytes": 22568,
+      "status": "ok",
+      "prompt": "[日本語で「ふしぐろめぐみ」と読んで] 伏黒恵。"
+    },
+    {
+      "key": "jjk_kugisaki",
+      "reading": "くぎさきのばら",
+      "written": "釘崎野薔薇",
+      "filename": "jjk_kugisaki.mp3",
+      "source": "generated-rerecord",
+      "bytes": 20479,
+      "status": "ok",
+      "prompt": "[日本語で「くぎさきのばら」と読んで] 釘崎野薔薇。"
+    },
+    {
+      "key": "jjk_gojou",
+      "reading": "ごじょうさとる",
+      "written": "五条悟",
+      "filename": "jjk_gojou.mp3",
+      "source": "generated-rerecord",
+      "bytes": 20479,
+      "status": "ok",
+      "prompt": "[日本語で「ごじょう さとる」と読んで] 五条悟。"
+    },
+    {
+      "key": "jjk_getou",
+      "reading": "げとうすぐる",
+      "written": "夏油傑",
+      "filename": "jjk_getou.mp3",
+      "source": "generated-rerecord",
+      "bytes": 25789,
+      "status": "ok",
+      "prompt": "[日本語で「げとう すぐる」と読んで] 夏油傑。"
+    },
+    {
+      "key": "jjk_sukuna",
+      "reading": "りょうめんすくな",
+      "written": "両面宿儺",
+      "filename": "jjk_sukuna.mp3",
+      "source": "generated-rerecord",
+      "bytes": 18807,
+      "status": "ok",
+      "prompt": "[日本語で「りょうめんすくな」と読んで] 両面宿儺。"
+    },
+    {
+      "key": "jjk_maki",
+      "reading": "ぜんいんまき",
+      "written": "禅院真希",
+      "filename": "jjk_maki.mp3",
+      "source": "generated-rerecord",
+      "bytes": 20479,
+      "status": "ok",
+      "prompt": "[日本語で「ぜんいん まき」と読んで] 禅院マキ。"
+    },
+    {
+      "key": "jjk_inumaki",
+      "reading": "いぬまきとげ",
+      "written": "狗巻棘",
+      "filename": "jjk_inumaki.mp3",
+      "source": "generated-rerecord",
+      "bytes": 19643,
+      "status": "ok",
+      "prompt": "[日本語で「いぬまき とげ」と読んで] いぬまき とげ。"
+    },
+    {
+      "key": "jjk_panda",
+      "reading": "パンダ",
+      "written": "パンダ",
+      "filename": "jjk_panda.mp3",
+      "source": "generated-rerecord",
+      "bytes": 10866,
+      "status": "ok",
+      "prompt": "[日本語で「パンダ」と読んで] パンダ。"
+    },
+    {
+      "key": "jjk_nanami",
+      "reading": "ななみけんと",
+      "written": "七海建人",
+      "filename": "jjk_nanami.mp3",
+      "source": "generated-rerecord",
+      "bytes": 20897,
+      "status": "ok",
+      "prompt": "[日本語で「ななみけんと」と読んで] 七海建人。"
+    },
+    {
+      "key": "jjk_toudou",
+      "reading": "とうどうあおい",
+      "written": "東堂葵",
+      "filename": "jjk_toudou.mp3",
+      "source": "generated-rerecord",
+      "bytes": 19643,
+      "status": "ok",
+      "prompt": "[日本語で「とうどう あおい」と読んで] 東堂葵。"
+    },
+    {
+      "key": "jjk_okkotsu",
+      "reading": "おっこつゆうた",
+      "written": "乙骨憂太",
+      "filename": "jjk_okkotsu.mp3",
+      "source": "generated-rerecord",
+      "bytes": 19643,
+      "status": "ok",
+      "prompt": "[日本語で「おっこつゆうた」と読んで] 乙骨憂太。"
+    },
+    {
+      "key": "jjk_rika",
+      "reading": "りか",
+      "written": "里香",
+      "filename": "jjk_rika.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12119,
+      "status": "ok",
+      "prompt": "[日本語で「りか」と読んで] 里香。"
+    },
+    {
+      "key": "jjk_meimei",
+      "reading": "めいめい",
+      "written": "冥冥",
+      "filename": "jjk_meimei.mp3",
+      "source": "generated-rerecord",
+      "bytes": 19643,
+      "status": "ok",
+      "prompt": "[日本語で「めいめい」と読んで] 冥冥。"
+    },
+    {
+      "key": "jjk_ieiri",
+      "reading": "いえいりしょうこ",
+      "written": "家入硝子",
+      "filename": "jjk_ieiri.mp3",
+      "source": "generated-rerecord",
+      "bytes": 24240,
+      "status": "ok",
+      "prompt": "[日本語で「いえいり しょうこ」と読んで] 家入 硝子。"
+    },
+    {
+      "key": "jjk_chousou",
+      "reading": "ちょうそう",
+      "written": "脹相",
+      "filename": "jjk_chousou.mp3",
+      "source": "generated-rerecord",
+      "bytes": 13791,
+      "status": "ok",
+      "prompt": "[日本語で「ちょうそう」と読んで] 脹相。"
+    },
+    {
+      "key": "jjk_mahito",
+      "reading": "まひと",
+      "written": "真人",
+      "filename": "jjk_mahito.mp3",
+      "source": "generated-rerecord",
+      "bytes": 14209,
+      "status": "ok",
+      "prompt": "[日本語で「まひと」と読んで] 真人。"
+    },
+    {
+      "key": "jjk_jougo",
+      "reading": "じょうご",
+      "written": "漏瑚",
+      "filename": "jjk_jougo.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15881,
+      "status": "ok",
+      "prompt": "[日本語で「じょうご」と読んで] 漏瑚。"
+    },
+    {
+      "key": "jjk_hanami",
+      "reading": "はなみ",
+      "written": "花御",
+      "filename": "jjk_hanami.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12955,
+      "status": "ok",
+      "prompt": "[日本語で「はなみ」と読んで] 花御。"
+    },
+    {
+      "key": "jjk_ryouiki",
+      "reading": "りょういきてんかい",
+      "written": "領域展開",
+      "filename": "jjk_ryouiki.mp3",
+      "source": "generated-rerecord",
+      "bytes": 22568,
+      "status": "ok",
+      "prompt": "[日本語で「りょういきてんかい」と読んで] 領域展開。"
+    },
+    {
+      "key": "jjk_muryoukuusho",
+      "reading": "むりょうくうしょ",
+      "written": "無量空処",
+      "filename": "jjk_muryoukuusho.mp3",
+      "source": "generated-rerecord",
+      "bytes": 19643,
+      "status": "ok",
+      "prompt": "[日本語で「むりょうくうしょ」と読んで] 無量空処。"
+    },
+    {
+      "key": "jjk_fukumamizushi",
+      "reading": "ふくまみづし",
+      "written": "伏魔御厨子",
+      "filename": "jjk_fukumamizushi.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17971,
+      "status": "ok",
+      "prompt": "[日本語で「ふくまみづし」と読んで] 伏魔御厨子。"
+    },
+    {
+      "key": "jjk_tokusa",
+      "reading": "とくさのかげぼうじゅつ",
+      "written": "十種影法術",
+      "filename": "jjk_tokusa.mp3",
+      "source": "generated-rerecord",
+      "bytes": 25494,
+      "status": "ok",
+      "prompt": "[日本語で「とくさのかげぼうじゅつ」と読んで] 十種影法術。"
+    },
+    {
+      "key": "jjk_kokusen",
+      "reading": "こくせん",
+      "written": "黒閃",
+      "filename": "jjk_kokusen.mp3",
+      "source": "generated-rerecord",
+      "bytes": 13791,
+      "status": "ok",
+      "prompt": "[日本語で「こくせん」と読んで] 黒閃。"
+    },
+    {
+      "key": "jjk_ao",
+      "reading": "あお",
+      "written": "蒼",
+      "filename": "jjk_ao.mp3",
+      "source": "generated-rerecord",
+      "bytes": 11283,
+      "status": "ok",
+      "prompt": "[日本語で「あお」と読んで] 青。"
+    },
+    {
+      "key": "jjk_aka",
+      "reading": "あか",
+      "written": "赫",
+      "filename": "jjk_aka.mp3",
+      "source": "generated-rerecord",
+      "bytes": 10030,
+      "status": "ok",
+      "prompt": "[日本語で「あか」と読んで] 赤。"
+    },
+    {
+      "key": "jjk_murasaki",
+      "reading": "むらさき",
+      "written": "茈",
+      "filename": "jjk_murasaki.mp3",
+      "source": "generated-rerecord",
+      "bytes": 37615,
+      "status": "ok",
+      "prompt": "[日本語で「むらさき」と読んで] 茈。"
+    },
+    {
+      "key": "jjk_toji",
+      "reading": "ふしぐろとうじ",
+      "written": "伏黒甚爾",
+      "filename": "jjk_toji.mp3",
+      "source": "generated-rerecord",
+      "bytes": 24658,
+      "status": "ok",
+      "prompt": "[日本語で「ふしぐろ とうじ」と読んで] ふしぐろ とうじ。"
+    },
+    {
+      "key": "jjk_higuruma",
+      "reading": "ひぐるまひろみ",
+      "written": "日車寛見",
+      "filename": "jjk_higuruma.mp3",
+      "source": "generated-rerecord",
+      "bytes": 18807,
+      "status": "ok",
+      "prompt": "[日本語で「ひぐるまひろみ」と読んで] 日車寛見。"
+    },
+    {
+      "key": "jjk_naoya",
+      "reading": "ぜんいんなおや",
+      "written": "禅院直哉",
+      "filename": "jjk_naoya.mp3",
+      "source": "generated-rerecord",
+      "bytes": 20479,
+      "status": "ok",
+      "prompt": "[日本語で「ぜんいん なおや」と読んで] 禅院直哉。"
+    },
+    {
+      "key": "jjk_tobari",
+      "reading": "とばり",
+      "written": "帳",
+      "filename": "jjk_tobari.mp3",
+      "source": "generated-rerecord",
+      "bytes": 10030,
+      "status": "ok",
+      "prompt": "[日本語で「とばり」と読んで] 帳。"
+    }
+  ],
+  "promotedCandidateKeys": [
+    "jjk_gojou",
+    "jjk_getou",
+    "jjk_maki",
+    "jjk_toudou",
+    "jjk_mahito",
+    "jjk_jougo",
+    "jjk_tokusa",
+    "jjk_ao",
+    "jjk_aka",
+    "jjk_naoya",
+    "jjk_toji",
+    "jjk_inumaki",
+    "jjk_ieiri"
+  ]
+}

@@ -9,11 +9,71 @@ import {
   joinRoom,
   leaveRoom,
   publicRoomState,
+  prepareDeck,
   resolvePending,
+  sanitizeConfig,
   seatForToken,
   setConnected,
   setReady,
 } from "../worker/src/room-core.mjs";
+
+test("anime room configuration and voice-pack metadata survive sanitization", () => {
+  assert.deepEqual(
+    sanitizeConfig({
+      kind: "anime",
+      pairMode: "pic-hira",
+      animeSeries: "jjk",
+      animeSeriesLabel: "咒術迴戰",
+      pairCount: 6,
+    }),
+    {
+      kind: "anime",
+      pairMode: "pic-hira",
+      pairModeLabel: "",
+      gridId: "",
+      gridLabel: "",
+      rowFrom: "",
+      rowTo: "",
+      rangeLabel: "",
+      wordCategory: "",
+      wordCategoryLabel: "",
+      animeSeries: "jjk",
+      animeSeriesLabel: "咒術迴戰",
+      pairCount: 6,
+    },
+  );
+
+  const animeDeck = Array.from({ length: 6 }, (_, index) => [
+    {
+      pairKey: `anime-${index}`,
+      side: "pic",
+      text: `assets/icons/anime/jjk/${index}.png`,
+      display: "img",
+      voicePack: "anime",
+    },
+    {
+      pairKey: `anime-${index}`,
+      side: "hira",
+      text: `かな${index}`,
+      voicePack: "anime",
+    },
+  ]).flat();
+  assert.ok(prepareDeck(animeDeck, () => 0.999).every((card) => card.voicePack === "anime"));
+});
+
+test("online decks reject traversal paths and unknown voice packs", () => {
+  const invalidAssetDeck = deck();
+  invalidAssetDeck[0] = {
+    ...invalidAssetDeck[0],
+    display: "img",
+    text: "assets/../../secret.png",
+  };
+  assert.throws(() => prepareDeck(invalidAssetDeck), /INVALID_CARD_ASSET/);
+
+  const invalidVoiceDeck = deck();
+  invalidVoiceDeck[0] = { ...invalidVoiceDeck[0], voicePack: "remote" };
+  assert.throws(() => prepareDeck(invalidVoiceDeck), /INVALID_CARD_VOICE_PACK/);
+});
 
 function deck() {
   return [

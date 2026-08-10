@@ -13,6 +13,7 @@ const ALLOWED_CARD_FIELDS = [
   "display",
   "voiceText",
   "voiceKey",
+  "voicePack",
   "audioKey",
   "label",
   "picSub",
@@ -32,7 +33,7 @@ export function sanitizeRoomCode(value) {
 }
 
 export function sanitizeConfig(input = {}) {
-  const kind = input.kind === "words" ? "words" : "kana";
+  const kind = input.kind === "words" ? "words" : input.kind === "anime" ? "anime" : "kana";
   return {
     kind,
     pairMode: cleanText(input.pairMode, 32),
@@ -44,6 +45,8 @@ export function sanitizeConfig(input = {}) {
     rangeLabel: cleanText(input.rangeLabel, 80),
     wordCategory: cleanText(input.wordCategory, 32),
     wordCategoryLabel: cleanText(input.wordCategoryLabel, 60),
+    animeSeries: cleanText(input.animeSeries, 32),
+    animeSeriesLabel: cleanText(input.animeSeriesLabel, 60),
     pairCount: Number(input.pairCount),
   };
 }
@@ -55,8 +58,14 @@ function sanitizeCard(input) {
     card[field] = cleanText(input[field]);
   }
   if (!card.pairKey || !card.side) throw new Error("INVALID_CARD");
-  if (card.display === "img" && !/^assets\/[a-z0-9_./-]+$/i.test(card.text || "")) {
+  if (
+    card.display === "img" &&
+    (!/^assets\/[a-z0-9_./-]+$/i.test(card.text || "") || card.text.includes(".."))
+  ) {
     throw new Error("INVALID_CARD_ASSET");
+  }
+  if (card.voicePack && !["words", "anime"].includes(card.voicePack)) {
+    throw new Error("INVALID_CARD_VOICE_PACK");
   }
   return card;
 }

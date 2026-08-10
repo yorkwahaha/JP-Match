@@ -35,6 +35,23 @@ window.JPMatchAudio = (() => {
     },
   };
 
+  const VOICE_PACKS = {
+    words: WORD_VOICES,
+    anime: {
+      classic: {
+        id: "classic",
+        label: "經典聲線",
+        dir: BASE + "/anime/",
+      },
+      lively: {
+        id: "lively",
+        label: "活力聲線",
+        dir: BASE + "/anime-voices/fish-962b6d73/",
+        revision: "anime-s2-1-reading-hint-r6",
+      },
+    },
+  };
+
   const PATHS = {
     sfx: {
       select: BASE + "/sfx/select.mp3",
@@ -366,7 +383,7 @@ window.JPMatchAudio = (() => {
     playLocalReading(src, settings.voiceVolume);
   }
 
-  function playWord(wordKey, fallbackText) {
+  function playWord(wordKey, fallbackText, voicePackId) {
     if (!settings.voice || !wordKey) {
       if (fallbackText) playReading(fallbackText);
       return;
@@ -374,7 +391,8 @@ window.JPMatchAudio = (() => {
     unlock();
     stopReading();
     const key = String(wordKey).toLowerCase();
-    const voice = WORD_VOICES[settings.wordVoice] || WORD_VOICES[DEFAULT_WORD_VOICE];
+    const pack = VOICE_PACKS[voicePackId] || VOICE_PACKS.words;
+    const voice = pack[settings.wordVoice] || pack[DEFAULT_WORD_VOICE] || WORD_VOICES[DEFAULT_WORD_VOICE];
     const src = voice.dir + key + ".mp3" + (voice.revision ? `?v=${voice.revision}` : "");
     const sessionId = readingSessionId;
     const onError = function () {
@@ -410,8 +428,9 @@ window.JPMatchAudio = (() => {
       .catch(onError);
   }
 
-  function preloadWords(wordKeys) {
-    const voice = WORD_VOICES[settings.wordVoice] || WORD_VOICES[DEFAULT_WORD_VOICE];
+  function preloadWords(wordKeys, voicePackId) {
+    const pack = VOICE_PACKS[voicePackId] || VOICE_PACKS.words;
+    const voice = pack[settings.wordVoice] || pack[DEFAULT_WORD_VOICE] || WORD_VOICES[DEFAULT_WORD_VOICE];
     const keys = Array.from(new Set(wordKeys || []));
     keys.forEach((wordKey) => {
       if (!wordKey) return;

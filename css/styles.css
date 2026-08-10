@@ -872,6 +872,12 @@ button {
     inset 0 0 0 3px rgba(126, 182, 217, 0.16);
 }
 
+.card-front[data-side="kanji"] {
+  box-shadow:
+    0 10px 22px var(--shadow),
+    inset 0 0 0 3px rgba(120, 60, 100, 0.14);
+}
+
 .card-emoji {
   position: relative;
   z-index: 2;
@@ -888,6 +894,14 @@ button {
   object-fit: contain;
   pointer-events: none;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.card-img-anime {
+  position: absolute;
+  inset: 7px;
+  width: calc(100% - 14px);
+  height: calc(100% - 14px);
+  object-fit: contain;
 }
 
 .card-symbol {
@@ -974,9 +988,48 @@ button {
   letter-spacing: -0.02em;
 }
 
+.card-text.is-long {
+  font-size: 18cqmin;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  max-width: 92%;
+  text-wrap: balance;
+  word-break: break-word;
+}
+
+.card-text.is-wrapped {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.08em;
+  max-width: 92%;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.card-text.is-wrapped.is-compact {
+  font-size: 24cqmin;
+}
+
+.card-text.is-wrapped.is-long {
+  font-size: 20cqmin;
+  letter-spacing: -0.03em;
+}
+
+.card-text-line {
+  display: block;
+}
+
 .card-front[data-side="romaji"] .card-text.is-compact {
   font-size: 26cqmin;
   letter-spacing: 0;
+}
+
+.card-front[data-side="romaji"] .card-text.is-long {
+  font-size: 14cqmin;
+  letter-spacing: -0.02em;
+  text-transform: none;
 }
 
 .card.is-matched {
@@ -1544,7 +1597,8 @@ html[data-theme="yuzu"] {
 }
 
 #field-kana-range,
-#field-word-category {
+#field-word-category,
+#field-anime-series {
   grid-column: 1 / -1;
 }
 
@@ -2230,6 +2284,7 @@ body.turn-switched .score-pill.is-active {
 .card-front[data-side="hira"]::after { content: "あ"; }
 .card-front[data-side="kata"]::after { content: "ア"; }
 .card-front[data-side="pic"]::after { content: "図"; }
+.card-front[data-side="kanji"]::after { content: "漢"; }
 
 .card-front-frame {
   inset: 6px;
@@ -2261,26 +2316,31 @@ body.turn-switched .score-pill.is-active {
   z-index: 3;
   left: 50%;
   top: 50%;
-  width: clamp(40px, 58cqmin, 72px);
+  width: clamp(44px, 62cqmin, 80px);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
+  box-sizing: border-box;
+  padding: 4px;
   background: var(--page-bg);
   color: var(--page-fg);
-  border: 2px solid var(--thread-success);
+  border: 2px solid #142033;
+  border-radius: 2px;
   font-family: var(--font-display);
-  font-size: clamp(0.78rem, 19cqmin, 1.12rem);
+  font-size: clamp(0.62rem, 15cqmin, 0.98rem);
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.05;
   letter-spacing: -0.04em;
-  white-space: nowrap;
+  text-align: center;
+  white-space: pre-line;
+  overflow: hidden;
   transform: translate(-50%, -50%);
   animation: knot-set 0.4s 0.22s ease both;
 }
 
 .card.is-matched[data-owner="0"]::after {
-  border-color: var(--thread-p1);
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  border-color: #142033;
+  border-style: solid;
 }
 
 .card.is-matched[data-owner="1"]::after {
@@ -2420,6 +2480,7 @@ body[data-turn="1"] {
 
   #field-kana-range,
   #field-word-category,
+  #field-anime-series,
   .setup-panel > .field-ui-theme,
   .setup-panel > .field-word-voice,
   .setup-panel > .field-online,

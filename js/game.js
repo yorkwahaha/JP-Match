@@ -19,6 +19,13 @@
     getWordsInCategory,
     buildDeck: buildWordDeck,
   } = window.JPMatchWords;
+  const {
+    SERIES: ANIME_SERIES,
+    DEFAULT_SERIES: DEFAULT_ANIME_SERIES,
+    PAIR_MODES: ANIME_PAIR_MODES,
+    getEntriesInSeries,
+    buildDeck: buildAnimeDeck,
+  } = window.JPMatchAnime;
   const Sound = window.JPMatchAudio;
   const Online = window.JPMatchOnline;
 
@@ -64,6 +71,7 @@
     rowTo: DEFAULT_ROW_TO,
     rangePreset: DEFAULT_RANGE_PRESET,
     wordCategory: DEFAULT_WORD_CATEGORY,
+    animeSeries: DEFAULT_ANIME_SERIES,
     theme: DEFAULT_THEME,
     deck: [],
     flipped: [],
@@ -122,14 +130,17 @@
     rowTo: document.getElementById("row-to"),
     rangeHint: document.getElementById("range-hint"),
     wordHint: document.getElementById("word-hint"),
+    animeHint: document.getElementById("anime-hint"),
     fieldKanaRange: document.getElementById("field-kana-range"),
     fieldWordCategory: document.getElementById("field-word-category"),
+    fieldAnimeSeries: document.getElementById("field-anime-series"),
     fieldUiTheme: document.querySelector(".field-ui-theme"),
     fieldWordVoice: document.querySelector(".field-word-voice"),
     selMode: document.getElementById("sel-mode"),
     selGrid: document.getElementById("sel-grid"),
     selRangePreset: document.getElementById("sel-range-preset"),
     selWordCategory: document.getElementById("sel-word-category"),
+    selAnimeSeries: document.getElementById("sel-anime-series"),
     selTheme: document.getElementById("sel-theme"),
     selWordVoice: document.getElementById("sel-word-voice"),
     btnStart: document.getElementById("btn-start"),
@@ -168,7 +179,9 @@
   }
 
   function currentModes() {
-    return state.kind === "words" ? WORD_PAIR_MODES : KANA_PAIR_MODES;
+    if (state.kind === "words") return WORD_PAIR_MODES;
+    if (state.kind === "anime") return ANIME_PAIR_MODES;
+    return KANA_PAIR_MODES;
   }
 
   function currentMode() {
@@ -190,6 +203,9 @@
   function poolSize() {
     if (state.kind === "words") {
       return getWordsInCategory(state.wordCategory).length;
+    }
+    if (state.kind === "anime") {
+      return getEntriesInSeries(state.animeSeries).length;
     }
     return getKanaInRange(state.rowFrom, state.rowTo).length;
   }
@@ -324,13 +340,16 @@
     if (els.selMode) els.selMode.value = state.pairMode;
     if (els.selGrid) els.selGrid.value = state.gridId;
     if (els.selWordCategory) els.selWordCategory.value = state.wordCategory;
+    if (els.selAnimeSeries) els.selAnimeSeries.value = state.animeSeries;
     if (els.selRangePreset) els.selRangePreset.value = state.rangePreset || "";
     if (els.rowFrom) els.rowFrom.value = state.rowFrom;
     if (els.rowTo) els.rowTo.value = state.rowTo;
 
     const isWords = state.kind === "words";
-    if (els.fieldKanaRange) els.fieldKanaRange.hidden = isWords;
+    const isAnime = state.kind === "anime";
+    if (els.fieldKanaRange) els.fieldKanaRange.hidden = isWords || isAnime;
     if (els.fieldWordCategory) els.fieldWordCategory.hidden = !isWords;
+    if (els.fieldAnimeSeries) els.fieldAnimeSeries.hidden = !isAnime;
     if (els.fieldOnline) els.fieldOnline.hidden = state.playMode !== "online" || configuringRematch;
     if (els.fieldUiTheme) els.fieldUiTheme.hidden = state.playMode === "online";
     if (els.fieldWordVoice) els.fieldWordVoice.hidden = state.playMode === "online";
@@ -350,13 +369,23 @@
     const size = poolSize();
     const need = pairCount();
     const ok = size >= need;
-    const hintEl = state.kind === "words" ? els.wordHint : els.rangeHint;
+    const hintEl =
+      state.kind === "words"
+        ? els.wordHint
+        : state.kind === "anime"
+          ? els.animeHint
+          : els.rangeHint;
     if (!els.btnStart) return;
 
     let text = "";
     if (state.kind === "words") {
       if (!ok) {
         text = "目前盤面需 " + need + " 組，請縮小盤面或選擇更多單字";
+      }
+    } else if (state.kind === "anime") {
+      text = "題池 " + size + " 組";
+      if (!ok) {
+        text += " · 目前盤面需 " + need + " 組，請縮小盤面";
       }
     } else {
       const range = normalizeRowRange(state.rowFrom, state.rowTo);
@@ -374,7 +403,8 @@
     }
     if (hintEl) {
       hintEl.textContent = text;
-      hintEl.hidden = state.kind === "words" && ok;
+      hintEl.hidden =
+        (state.kind === "words" || state.kind === "anime") && ok;
       hintEl.classList.toggle("is-warn", !ok);
     }
     if (els.rangeHint && hintEl !== els.rangeHint) {
@@ -382,6 +412,9 @@
     }
     if (els.wordHint && hintEl !== els.wordHint) {
       els.wordHint.classList.remove("is-warn");
+    }
+    if (els.animeHint && hintEl !== els.animeHint) {
+      els.animeHint.classList.remove("is-warn");
     }
     const onlineNameOk = state.playMode !== "online" || state.onlineRematchSetup || Boolean(els.onlineName.value.trim());
     els.btnStart.disabled = !ok || !onlineNameOk || state.onlineConfigPending;
@@ -395,6 +428,11 @@
     if (state.kind === "words") {
       return buildWordDeck(state.pairMode, pairCount(), {
         category: state.wordCategory,
+      });
+    }
+    if (state.kind === "anime") {
+      return buildAnimeDeck(state.pairMode, pairCount(), {
+        series: state.animeSeries,
       });
     }
     return buildKanaDeck(state.pairMode, pairCount(), {
@@ -421,8 +459,13 @@
     Sound.playSfx("start");
     const grid = getGrid();
     state.deck = buildCurrentDeck();
-    if (state.kind === "words" && Sound.preloadWords) {
-      Sound.preloadWords(state.deck.map((card) => card.voiceKey).filter(Boolean));
+    if (state.kind === "words" || state.kind === "anime") {
+      if (Sound.preloadWords) {
+        Sound.preloadWords(
+          state.deck.map((card) => card.voiceKey).filter(Boolean),
+          state.kind === "anime" ? "anime" : "words",
+        );
+      }
     }
     clearMismatchTimer();
     clearTurnSwitchFeedback();
@@ -460,6 +503,23 @@
     return "卡牌 " + (index + 1) + "（未翻開）";
   }
 
+  function wrapReadingLines(text, perLine) {
+    const value = String(text || "");
+    const size = Math.max(1, perLine || 4);
+    if (value.length <= size) return value;
+    const lines = [];
+    for (let i = 0; i < value.length; i += size) {
+      lines.push(value.slice(i, i + size));
+    }
+    return lines;
+  }
+
+  function cardTextClass(text) {
+    if (text.length > 6) return " is-long";
+    if (text.length > 1) return " is-compact";
+    return "";
+  }
+
   function cardContentHtml(card) {
     const isImg = card.display === "img";
     const isPic = card.display === "pic" || (card.side === "pic" && !isImg);
@@ -479,15 +539,29 @@
     if (isImg || isPic) {
       if (isImg) {
         const src = safeAssetSrc(card.text);
+        const imageClass = card.voicePack === "anime" ? "card-img card-img-anime" : "card-img";
         return src
-          ? '<img class="card-img" src="' + escapeHtml(src) + '" alt="" draggable="false" />'
+          ? '<img class="' + imageClass + '" src="' + escapeHtml(src) + '" alt="" draggable="false" />'
           : '<span class="card-text">?</span>';
       }
       return '<span class="card-emoji" aria-hidden="true">' + escapeHtml(card.text) + "</span>";
     }
+    const readingSides = card.side === "hira" || card.side === "kata" || card.side === "kanji";
+    const wrapped = readingSides ? wrapReadingLines(card.text, 4) : card.text;
+    if (Array.isArray(wrapped)) {
+      return (
+        '<span class="card-text is-wrapped' + cardTextClass(card.text) + '">' +
+        wrapped
+          .map(function (line) {
+            return '<span class="card-text-line">' + escapeHtml(line) + "</span>";
+          })
+          .join("") +
+        "</span>"
+      );
+    }
     return (
-      '<span class="card-text' + (card.text.length > 1 ? " is-compact" : "") + '">' +
-      escapeHtml(card.text) +
+      '<span class="card-text' + cardTextClass(String(wrapped)) + '">' +
+      escapeHtml(wrapped) +
       "</span>"
     );
   }
@@ -526,7 +600,7 @@
         '<span class="card-back-pattern"></span>' +
         '<span class="seal"><span class="seal-ring"></span></span>' +
         "</span>" +
-        '<span class="card-face card-front" data-side="' +
+        '<span class="card-face card-front" aria-hidden="true" hidden data-side="' +
         escapeHtml(card.side) +
         '">' +
         '<span class="card-front-frame"></span>' +
@@ -753,6 +827,11 @@
     const el = cardEl(index);
     const card = state.deck[index];
     if (el) {
+      const front = qs(".card-front", el);
+      if (front) {
+        front.hidden = false;
+        front.setAttribute("aria-hidden", "false");
+      }
       el.classList.add("is-flipped");
       const spoken =
         card.side === "pic" && card.label
@@ -762,7 +841,7 @@
     }
     Sound.playSfx("flip");
     if (!card) return;
-    if (card.voiceKey) Sound.playWord(card.voiceKey, card.voiceText);
+    if (card.voiceKey) Sound.playWord(card.voiceKey, card.voiceText, card.voicePack);
     else if (card.audioKey) Sound.playKana(card.audioKey);
   }
 
@@ -771,13 +850,20 @@
     if (el) {
       el.classList.remove("is-flipped");
       el.classList.remove("is-mismatch");
+      const front = qs(".card-front", el);
+      if (front) {
+        front.setAttribute("aria-hidden", "true");
+        front.hidden = true;
+      }
       el.setAttribute("aria-label", faceDownLabel(index));
     }
   }
 
   function matchAnchorLabel(card) {
     const raw = card.side === "pic" ? card.label || "圖" : card.text;
-    return String(raw || "結");
+    const text = String(raw || "結");
+    const wrapped = wrapReadingLines(text, 4);
+    return Array.isArray(wrapped) ? wrapped.join("\n") : wrapped;
   }
 
   function wait(ms) {
@@ -897,6 +983,7 @@
     const grid = getGrid();
     const mode = currentMode();
     const category = WORD_CATEGORIES.find((item) => item.id === state.wordCategory);
+    const series = ANIME_SERIES.find((item) => item.id === state.animeSeries);
     const range = normalizeRowRange(state.rowFrom, state.rowTo);
     const fromLabel = ROWS[range.from].label;
     const toLabel = ROWS[range.to].label;
@@ -911,12 +998,15 @@
       rangeLabel: fromLabel === toLabel ? fromLabel : fromLabel + "～" + toLabel,
       wordCategory: state.wordCategory,
       wordCategoryLabel: category ? category.label : "",
+      animeSeries: state.animeSeries,
+      animeSeriesLabel: series ? series.label : "",
       pairCount: pairCount(),
     };
   }
 
   function applyOnlineConfigToSetup(config = {}) {
-    state.kind = config.kind === "words" ? "words" : "kana";
+    state.kind =
+      config.kind === "words" ? "words" : config.kind === "anime" ? "anime" : "kana";
     renderModeOptions();
     if (config.pairMode && currentModes()[config.pairMode]) state.pairMode = config.pairMode;
     if (GRID_PRESETS.some((item) => item.id === config.gridId)) state.gridId = config.gridId;
@@ -924,6 +1014,9 @@
     if (ROWS.some((item) => item.id === config.rowTo)) state.rowTo = config.rowTo;
     if (WORD_CATEGORIES.some((item) => item.id === config.wordCategory)) {
       state.wordCategory = config.wordCategory;
+    }
+    if (ANIME_SERIES.some((item) => item.id === config.animeSeries)) {
+      state.animeSeries = config.animeSeries;
     }
     syncRangePresetFromRows();
   }
@@ -1054,7 +1147,12 @@
       "房號 " + snapshot.roomCode + "，複製邀請連結",
     );
     const config = snapshot.config || {};
-    const content = config.kind === "words" ? config.wordCategoryLabel : config.rangeLabel;
+    const content =
+      config.kind === "words"
+        ? config.wordCategoryLabel
+        : config.kind === "anime"
+          ? config.animeSeriesLabel
+          : config.rangeLabel;
     els.roomLessonSummary.textContent =
       [config.pairModeLabel, config.gridLabel, content].filter(Boolean).join(" · ");
     const myConnectionReady = Boolean(me && (me.connected || state.onlineConnection === "connected"));
@@ -1131,7 +1229,7 @@
 
   function playOnlineReveal(card) {
     Sound.playSfx("flip");
-    if (card.voiceKey) Sound.playWord(card.voiceKey, card.voiceText);
+    if (card.voiceKey) Sound.playWord(card.voiceKey, card.voiceText, card.voicePack);
     else if (card.audioKey) Sound.playKana(card.audioKey);
   }
 
@@ -1157,6 +1255,11 @@
       const wasDown = !previous || previous.deck[index]?.state === "down";
       const revealed = slot.state === "up" || slot.state === "matched";
       if (revealed && wasDown && slot.card) playOnlineReveal(slot.card);
+      const front = qs(".card-front", btn);
+      if (front) {
+        front.hidden = !revealed;
+        front.setAttribute("aria-hidden", revealed ? "false" : "true");
+      }
       btn.classList.toggle("is-flipped", revealed);
       btn.classList.toggle("is-matched", slot.state === "matched");
       btn.classList.toggle("is-mismatch", snapshot.pending?.type === "mismatch" && slot.state === "up");
@@ -1292,7 +1395,7 @@
   }
 
   function setKind(kind) {
-    if (kind !== "kana" && kind !== "words") return;
+    if (kind !== "kana" && kind !== "words" && kind !== "anime") return;
     if (state.kind === kind) return;
     state.kind = kind;
     const modes = currentModes();
@@ -1348,6 +1451,12 @@
       "change",
       onSelectChange(() => {
         state.wordCategory = els.selWordCategory.value;
+      })
+    );
+    els.selAnimeSeries.addEventListener(
+      "change",
+      onSelectChange(() => {
+        state.animeSeries = els.selAnimeSeries.value;
       })
     );
     els.selRangePreset.addEventListener(
@@ -1562,6 +1671,18 @@
       );
     }).join("");
     els.selWordCategory.value = state.wordCategory;
+
+    els.selAnimeSeries.innerHTML = ANIME_SERIES.map((series) => {
+      const count = getEntriesInSeries(series.id).length;
+      return (
+        '<option value="' +
+        escapeHtml(series.id) +
+        '">' +
+        escapeHtml(series.label + " × " + count) +
+        "</option>"
+      );
+    }).join("");
+    els.selAnimeSeries.value = state.animeSeries;
 
     els.selRangePreset.innerHTML =
       Object.keys(RANGE_PRESETS)

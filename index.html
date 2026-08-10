@@ -49,6 +49,7 @@
             <div class="opt-row" data-group="kind">
               <button type="button" class="opt is-active" data-value="kana">五十音</button>
               <button type="button" class="opt" data-value="words">單字</button>
+              <button type="button" class="opt" data-value="anime">動漫</button>
             </div>
           </div>
 
@@ -83,6 +84,12 @@
             <label class="field-label" for="sel-word-category">單字主題</label>
             <select id="sel-word-category" class="setup-select" aria-label="單字主題"></select>
             <p id="word-hint" class="range-hint" hidden></p>
+          </div>
+
+          <div class="field" id="field-anime-series" hidden>
+            <label class="field-label" for="sel-anime-series">動漫作品</label>
+            <select id="sel-anime-series" class="setup-select" aria-label="動漫作品"></select>
+            <p id="anime-hint" class="range-hint" hidden></p>
           </div>
 
           <div class="field field-ui-theme">
@@ -300,8 +307,9 @@
 
     <script src="./js/kana.js"></script>
     <script src="./js/words.js"></script>
-    <script src="./js/audio.js?v=word-voices-5"></script>
+    <script src="./js/anime.js?v=anime-jjk-1"></script>
+    <script src="./js/audio.js?v=anime-jjk-1"></script>
     <script src="./js/online.js?v=online-room-4"></script>
-    <script src="./js/game.js?v=online-room-4"></script>
+    <script src="./js/game.js?v=anime-jjk-1"></script>
   </body>
 </html>

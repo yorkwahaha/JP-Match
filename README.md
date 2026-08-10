@@ -8,7 +8,7 @@ https://yorkwahaha.github.io/JP-Match/
 
 ## 怎麼玩
 
-1. 選擇練習內容（五十音／單字）、人數、配對模式、盤面大小與範圍後開始。
+1. 選擇練習內容（五十音／單字／動漫）、人數、配對模式、盤面大小與範圍後開始。
 2. 每回合掀開兩張牌。
 3. **配對成功**：取走兩張，**同一人可繼續翻**。
 4. **配對失敗**：翻回背面，換下一個人。
@@ -61,6 +61,18 @@ https://yorkwahaha.github.io/JP-Match/
 - 全部
 
 翻牌時單字優先播放本地音檔（`assets/audio/words/`，Google Neural2 預先產生）；缺檔才走 Cloud TTS，再不行才退回瀏覽器語音。假名仍用 `assets/audio/kana/`。
+
+題池數量須 ≥ 盤面組數，否則會提示並無法開始。
+
+### 動漫
+
+以 **圖案 ↔ 假名**（或羅馬拼音、漢字名）練習知名角色與招式讀音。目前作品：
+
+- 咒術迴戰（人物＋招式，31 組）
+
+配對模式：圖案 ↔ 假名／圖案 ↔ 羅馬拼音／漢字名 ↔ 假名。
+
+圖示為 JP Match 使用的非官方學習插圖，與作品權利人無隸屬或背書關係。角色、名稱及作品相關權利歸原權利人所有。之後可再加其他作品。本地音檔在 `assets/audio/anime/`。
 
 題池數量須 ≥ 盤面組數，否則會提示並無法開始。
 
@@ -143,8 +155,9 @@ js/game.js      遊戲流程與計分
 worker/         Cloudflare Worker + Durable Object 房間服務
 assets/audio/
 assets/audio/word-voices/fish-962b6d73/   Fish Audio S2.1 Pro 活力聲線（159 個單字）
-scripts/gen-fish-word-audio.mjs           Fish Audio 聲線包產生工具
+assets/audio/anime-voices/fish-962b6d73/  Fish Audio S2.1 Pro 活力聲線（咒術迴戰 31 組）
+scripts/gen-fish-word-audio.mjs           Fish Audio 單字／動漫聲線包產生工具
 .github/workflows/pages.yml   推上 main 自動部署 GitHub Pages
 ```
 
-單字模式可在開局設定或遊戲內選單切換「經典聲線」與「活力聲線（Fish Audio）」。兩者都優先播放本地 MP3；若個別音檔缺漏，才會回退到既有的 Google Cloud TTS，再回退到瀏覽器語音。
+單字與動漫模式可在開局設定或遊戲內選單切換「經典聲線」與「活力聲線（Fish Audio）」。兩者都優先播放本地 MP3；若個別音檔缺漏，才會回退到既有的 Google Cloud TTS，再回退到瀏覽器語音。

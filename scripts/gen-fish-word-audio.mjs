@@ -2,16 +2,26 @@ import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
 
+// Generates either the beginner word pack (default) or the anime pack
+// (`--dataset=anime`) with the same approved Fish reference voice.
+
 const API_URL = "https://api.fish.audio/v1/tts";
 const API_KEY = process.env.FISH_AUDIO_API_KEY;
 const REFERENCE_ID = "962b6d7385574187bbf4b73bb1ec49f6";
 const PACK_ID = "fish-962b6d73";
+const datasetArg = process.argv.find((arg) => arg.startsWith("--dataset="));
+const DATASET = datasetArg ? datasetArg.slice("--dataset=".length) : "words";
+if (!new Set(["words", "anime"]).has(DATASET)) {
+  throw new Error(`Unknown dataset: ${DATASET}`);
+}
 const modelArg = process.argv.find((arg) => arg.startsWith("--model="));
 const MODEL = modelArg ? modelArg.slice("--model=".length) : "s2.1-pro-free";
 const outDirArg = process.argv.find((arg) => arg.startsWith("--out-dir="));
 const OUT_DIR = outDirArg
   ? path.resolve(outDirArg.slice("--out-dir=".length))
-  : path.join("assets", "audio", "word-voices", PACK_ID);
+  : DATASET === "anime"
+    ? path.join("assets", "audio", "anime-voices", PACK_ID)
+    : path.join("assets", "audio", "word-voices", PACK_ID);
 const keysArg = process.argv.find((arg) => arg.startsWith("--keys="));
 const REQUESTED_KEYS = new Set(
   keysArg
@@ -23,6 +33,16 @@ const REQUESTED_KEYS = new Set(
     : [],
 );
 const FORCE = process.argv.includes("--force");
+const PARTIAL_PACK = process.argv.includes("--partial-pack");
+const promptOverridesArg = process.argv.find((arg) => arg.startsWith("--prompt-overrides="));
+const PROMPT_OVERRIDES = promptOverridesArg
+  ? JSON.parse(
+      fs.readFileSync(
+        path.resolve(promptOverridesArg.slice("--prompt-overrides=".length)),
+        "utf8",
+      ),
+    )
+  : {};
 const limitArg = process.argv.find((arg) => arg.startsWith("--limit="));
 const LIMIT = limitArg ? Math.max(1, Number(limitArg.split("=")[1]) || 1) : Infinity;
 const DELAY_MS = 750;
@@ -30,12 +50,15 @@ const MAX_RETRIES = 4;
 
 if (!API_KEY) throw new Error("FISH_AUDIO_API_KEY is not set");
 
-function loadWords() {
-  const source = fs.readFileSync(path.join("js", "words.js"), "utf8");
+function loadItems() {
+  const filename = DATASET === "anime" ? "anime.js" : "words.js";
+  const source = fs.readFileSync(path.join("js", filename), "utf8");
   const sandbox = { window: {} };
   vm.createContext(sandbox);
   vm.runInContext(source, sandbox);
-  return sandbox.window.JPMatchWords.WORDS;
+  return DATASET === "anime"
+    ? sandbox.window.JPMatchAnime.ENTRIES
+    : sandbox.window.JPMatchWords.WORDS;
 }
 
 function sleep(ms) {
@@ -57,6 +80,23 @@ function hasValidExistingFile(filename) {
   } catch {
     return false;
   }
+}
+
+function writtenText(word) {
+  if (DATASET === "anime") return word.kanji || word.label || word.tts || word.hira;
+  return word.tts || word.hira;
+}
+
+function fishPrompt(word) {
+  if (PROMPT_OVERRIDES[word.key]) {
+    const prompt = String(PROMPT_OVERRIDES[word.key]).trim();
+    return /[。！？]$/.test(prompt) ? prompt : `${prompt}。`;
+  }
+  if (word.fishTts) return `${word.fishTts}。`;
+  if (DATASET === "anime") {
+    return `[日本語で「${word.hira}」と読んで] ${writtenText(word)}。`;
+  }
+  return `${word.tts || word.hira}。`;
 }
 
 function retryDelayMs(response, attempt) {
@@ -130,7 +170,7 @@ async function synthesize(text) {
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
-const words = loadWords();
+const words = loadItems();
 const uniqueWords = [];
 const seen = new Set();
 for (const word of words) {
@@ -150,8 +190,16 @@ if (REQUESTED_KEYS.size) {
   if (unknownKeys.length) throw new Error(`Unknown word keys: ${unknownKeys.join(", ")}`);
 }
 
+const knownPromptKeys = new Set(uniqueWords.map((word) => word.key));
+const unknownPromptKeys = Object.keys(PROMPT_OVERRIDES).filter(
+  (key) => !knownPromptKeys.has(key),
+);
+if (unknownPromptKeys.length) {
+  throw new Error(`Unknown prompt override keys: ${unknownPromptKeys.join(", ")}`);
+}
+
 process.stdout.write(
-  `pack=${PACK_ID} words=${uniqueWords.length} pending=${pending.length}${FORCE ? " force" : ""}\n`,
+  `pack=${PACK_ID} dataset=${DATASET} words=${uniqueWords.length} pending=${pending.length}${FORCE ? " force" : ""}\n`,
 );
 
 let completed = 0;
@@ -163,13 +211,13 @@ for (let index = 0; index < pending.length; index += 1) {
   const word = pending[index];
   const destination = path.join(OUT_DIR, `${word.key}.mp3`);
   try {
-    const spokenText = `${word.fishTts || word.tts || word.hira}。`;
+    const spokenText = fishPrompt(word);
     const audio = await synthesize(spokenText);
     fs.writeFileSync(destination, audio);
     generatedRecords.push({
       key: word.key,
       reading: word.hira,
-      written: word.tts || word.hira,
+      written: writtenText(word),
       prompt: spokenText,
       filename: `${word.key}.mp3`,
       source: "generated-rerecord",
@@ -211,20 +259,25 @@ const existingByKey = new Map(
     ? existingManifest.words.map((record) => [record.key, record])
     : [],
 );
-const manifestWords = uniqueWords.map((word) => {
+const manifestSourceWords = PARTIAL_PACK
+  ? uniqueWords.filter((word) => !REQUESTED_KEYS.size || REQUESTED_KEYS.has(word.key))
+  : uniqueWords;
+const manifestWords = manifestSourceWords.map((word) => {
   const filename = `${word.key}.mp3`;
-  return (
-    generatedByKey.get(word.key) ||
-    existingByKey.get(word.key) || {
-      key: word.key,
-      reading: word.hira,
-      written: word.tts || word.hira,
-      filename,
-      source: "existing-file",
-      bytes: fs.statSync(path.join(OUT_DIR, filename)).size,
-      status: "ok",
-    }
-  );
+  const fallback = {
+    key: word.key,
+    reading: word.hira,
+    written: writtenText(word),
+    filename,
+    source: "existing-file",
+    bytes: fs.statSync(path.join(OUT_DIR, filename)).size,
+    status: "ok",
+  };
+  return {
+    ...fallback,
+    ...(existingByKey.get(word.key) || {}),
+    ...(generatedByKey.get(word.key) || {}),
+  };
 });
 const manifest = {
   ...(existingManifest || {}),
@@ -233,7 +286,9 @@ const manifest = {
   model: MODEL,
   referenceId: REFERENCE_ID,
   generatedAt: new Date().toISOString(),
-  expectedWords: uniqueWords.length,
+  ...(DATASET === "anime"
+    ? { expectedEntries: manifestSourceWords.length }
+    : { expectedWords: manifestSourceWords.length }),
   generatedFiles: generatedFiles.length,
   words: manifestWords,
 };
