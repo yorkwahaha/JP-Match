@@ -126,6 +126,18 @@ window.JPMatchData = (() => {
       sides: ["romaji", "kata"],
       sideLabels: { romaji: "羅馬拼音", kata: "片假名" },
     },
+    "audio-hira": {
+      id: "audio-hira",
+      label: "純聲音 ↔ 平假名",
+      sides: ["audio", "hira"],
+      sideLabels: { audio: "純聲音卡", hira: "平假名" },
+    },
+    "audio-kata": {
+      id: "audio-kata",
+      label: "純聲音 ↔ 片假名",
+      sides: ["audio", "kata"],
+      sideLabels: { audio: "純聲音卡", kata: "片假名" },
+    },
   };
 
   const GRID_PRESETS = [
@@ -239,14 +251,14 @@ window.JPMatchData = (() => {
         pairKey: kana.key,
         audioKey: kana.romaji,
         side: sideA,
-        text: kana[sideA],
+        text: sideA === "audio" ? "" : kana[sideA],
         kindLabel: mode.sideLabels[sideA],
       });
       cards.push({
         pairKey: kana.key,
         audioKey: kana.romaji,
         side: sideB,
-        text: kana[sideB],
+        text: sideB === "audio" ? "" : kana[sideB],
         kindLabel: mode.sideLabels[sideB],
       });
     });
