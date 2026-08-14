@@ -203,6 +203,12 @@ window.JPMatchWords = (() => {
       sides: ["pic", "romaji"],
       sideLabels: { pic: "圖案", romaji: "羅馬拼音" },
     },
+    "audio-pic": {
+      id: "audio-pic",
+      label: "純聲音 ↔ 圖片",
+      sides: ["audio", "pic"],
+      sideLabels: { audio: "純聲音卡", pic: "圖片" },
+    },
   };
 
   function shuffle(array) {
@@ -245,7 +251,7 @@ window.JPMatchWords = (() => {
       cards.push({
         pairKey: word.key,
         side: sideA,
-        text: word[sideA],
+        text: sideA === "audio" ? "" : word[sideA],
         kindLabel: mode.sideLabels[sideA],
         display: sideA === "pic" ? picDisplay : "text",
         voiceText: word.hira,
@@ -256,7 +262,7 @@ window.JPMatchWords = (() => {
       cards.push({
         pairKey: word.key,
         side: sideB,
-        text: word[sideB],
+        text: sideB === "audio" ? "" : word[sideB],
         kindLabel: mode.sideLabels[sideB],
         display: sideB === "pic" ? picDisplay : "text",
         voiceText: word.hira,
