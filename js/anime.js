@@ -1,5 +1,5 @@
 /**
- * 動漫題庫（圖案 ↔ 假名／羅馬拼音／漢字名）
+ * 動漫題庫（圖案／純聲音 ↔ 假名／羅馬拼音／文字）
  * 作品：咒術迴戰、七龍珠、航海王。
  * 圖示為非官方學習插圖／暫用象徵圖，非官方立繪。
  */
@@ -365,7 +365,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_vegeta",
       series: "db",
-      hira: "べじーた",
+      hira: "ベジータ",
       romaji: "bejiita",
       pic: "assets/icons/anime/db/vegeta.webp",
       label: "達爾",
@@ -376,7 +376,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_bulma",
       series: "db",
-      hira: "ぶるま",
+      hira: "ブルマ",
       romaji: "buruma",
       pic: "assets/icons/anime/db/bulma.webp",
       label: "布瑪",
@@ -387,7 +387,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_piccolo",
       series: "db",
-      hira: "ぴっころ",
+      hira: "ピッコロ",
       romaji: "pikkoro",
       pic: "assets/icons/anime/db/piccolo.webp",
       label: "比克",
@@ -398,7 +398,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_kuririn",
       series: "db",
-      hira: "くりりん",
+      hira: "クリリン",
       romaji: "kuririn",
       pic: "assets/icons/anime/db/kuririn.webp",
       label: "克林",
@@ -409,7 +409,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_yamcha",
       series: "db",
-      hira: "やむちゃ",
+      hira: "ヤムチャ",
       romaji: "yamucha",
       pic: "assets/icons/anime/db/yamcha.webp",
       label: "亞姆查",
@@ -420,7 +420,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_tenshinhan",
       series: "db",
-      hira: "てんしんはん",
+      hira: "テンシンハン",
       romaji: "tenshinhan",
       pic: "assets/icons/anime/db/tenshinhan.webp",
       label: "天津飯",
@@ -453,7 +453,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_trunks",
       series: "db",
-      hira: "とらんくす",
+      hira: "トランクス",
       romaji: "torankusu",
       pic: "assets/icons/anime/db/trunks.webp",
       label: "特南克斯",
@@ -475,7 +475,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_videl",
       series: "db",
-      hira: "びーでる",
+      hira: "ビーデル",
       romaji: "biideru",
       pic: "assets/icons/anime/db/videl.webp",
       label: "比迪麗",
@@ -486,7 +486,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_chichi",
       series: "db",
-      hira: "ちち",
+      hira: "チチ",
       romaji: "chichi",
       pic: "assets/icons/anime/db/chichi.webp",
       label: "琪琪",
@@ -497,7 +497,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_kamesennin",
       series: "db",
-      hira: "かめせんにん",
+      hira: "カメセンニン",
       romaji: "kamesennin",
       pic: "assets/icons/anime/db/kamesennin.webp",
       label: "龜仙人",
@@ -508,7 +508,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_frieza",
       series: "db",
-      hira: "ふりーざ",
+      hira: "フリーザ",
       romaji: "furiiza",
       pic: "assets/icons/anime/db/frieza.webp",
       label: "弗利沙",
@@ -519,7 +519,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_cell",
       series: "db",
-      hira: "せる",
+      hira: "セル",
       romaji: "seru",
       pic: "assets/icons/anime/db/cell.webp",
       label: "賽魯",
@@ -530,7 +530,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_buu",
       series: "db",
-      hira: "まじんぶう",
+      hira: "マジンブウ",
       romaji: "majinbuu",
       pic: "assets/icons/anime/db/buu.webp",
       label: "魔人普烏",
@@ -541,7 +541,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_bardock",
       series: "db",
-      hira: "ばーだっく",
+      hira: "バーダック",
       romaji: "baadakku",
       pic: "assets/icons/anime/db/bardock.webp",
       label: "巴達克",
@@ -552,7 +552,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_raditz",
       series: "db",
-      hira: "らでぃっつ",
+      hira: "ラディッツ",
       romaji: "radittsu",
       pic: "assets/icons/anime/db/raditz.webp",
       label: "拉帝茲",
@@ -563,7 +563,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_nappa",
       series: "db",
-      hira: "なっぱ",
+      hira: "ナッパ",
       romaji: "nappa",
       pic: "assets/icons/anime/db/nappa.webp",
       label: "那巴",
@@ -574,7 +574,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_ginyu",
       series: "db",
-      hira: "ぎにゅー",
+      hira: "ギニュー",
       romaji: "ginyuu",
       pic: "assets/icons/anime/db/ginyu.webp",
       label: "基紐",
@@ -585,7 +585,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_android18",
       series: "db",
-      hira: "じゅうはちごう",
+      hira: "ジュウハチゴウ",
       romaji: "juuhachigou",
       pic: "assets/icons/anime/db/android18.webp",
       label: "人造人18號",
@@ -596,7 +596,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_beerus",
       series: "db",
-      hira: "びるす",
+      hira: "ビルス",
       romaji: "birusu",
       pic: "assets/icons/anime/db/beerus.webp",
       label: "比魯斯",
@@ -607,7 +607,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_whis",
       series: "db",
-      hira: "ういす",
+      hira: "ウイス",
       romaji: "uisu",
       pic: "assets/icons/anime/db/whis.webp",
       label: "維斯",
@@ -618,7 +618,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_broly",
       series: "db",
-      hira: "ぶろりー",
+      hira: "ブロリー",
       romaji: "burorii",
       pic: "assets/icons/anime/db/broly.webp",
       label: "布洛利",
@@ -631,7 +631,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_kaiou",
       series: "db",
-      hira: "かいおう",
+      hira: "カイオウ",
       romaji: "kaiou",
       pic: "assets/icons/anime/db/kaiou.webp",
       label: "界王",
@@ -642,7 +642,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_satan",
       series: "db",
-      hira: "みすたー・さたん",
+      hira: "ミスター・サタン",
       romaji: "misutaasatan",
       pic: "assets/icons/anime/db/satan.webp",
       label: "撒旦",
@@ -653,7 +653,7 @@ window.JPMatchAnime = (() => {
     {
       key: "db_supersaiyan",
       series: "db",
-      hira: "すーぱーさいやじん",
+      hira: "スーパーサイヤジン",
       romaji: "suupaasaiyajin",
       pic: "assets/icons/anime/db/supersaiyan.webp",
       label: "超級賽亞人",
@@ -1046,6 +1046,18 @@ window.JPMatchAnime = (() => {
       sides: ["kanji", "hira"],
       sideLabels: { kanji: "漢字名", hira: "假名" },
     },
+    "audio-pic": {
+      id: "audio-pic",
+      label: "純聲音 ↔ 圖片",
+      sides: ["audio", "pic"],
+      sideLabels: { audio: "純聲音卡", pic: "圖片" },
+    },
+    "audio-text": {
+      id: "audio-text",
+      label: "純聲音 ↔ 文字",
+      sides: ["audio", "kanji"],
+      sideLabels: { audio: "純聲音卡", kanji: "文字" },
+    },
   };
 
   function shuffle(array) {
@@ -1088,10 +1100,10 @@ window.JPMatchAnime = (() => {
       cards.push({
         pairKey: entry.key,
         side: sideA,
-        text: entry[sideA],
+        text: sideA === "audio" ? "" : entry[sideA],
         kindLabel: mode.sideLabels[sideA],
         display: sideA === "pic" ? picDisplay : "text",
-        voiceText: entry.hira,
+        voiceText: entry.tts || entry.hira,
         voiceKey: entry.key,
         voicePack: "anime",
         label: entry.label,
@@ -1100,10 +1112,10 @@ window.JPMatchAnime = (() => {
       cards.push({
         pairKey: entry.key,
         side: sideB,
-        text: entry[sideB],
+        text: sideB === "audio" ? "" : entry[sideB],
         kindLabel: mode.sideLabels[sideB],
         display: sideB === "pic" ? picDisplay : "text",
-        voiceText: entry.hira,
+        voiceText: entry.tts || entry.hira,
         voiceKey: entry.key,
         voicePack: "anime",
         label: entry.label,
