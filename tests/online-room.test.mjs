@@ -47,7 +47,7 @@ test("anime room configuration and voice-pack metadata survive sanitization", ()
     {
       pairKey: `anime-${index}`,
       side: "pic",
-      text: `assets/icons/anime/jjk/${index}.png`,
+      text: `assets/icons/anime/jjk/${index}.webp`,
       display: "img",
       voicePack: "anime",
     },

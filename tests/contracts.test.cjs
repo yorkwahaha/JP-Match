@@ -50,10 +50,39 @@ function assertValidMp3(relativePath) {
   assert.ok(buffer.length >= 500 && (hasId3 || hasFrameSync), relativePath);
 }
 
-function pngDimensions(relativePath) {
+function imageDimensions(relativePath) {
   const buffer = fs.readFileSync(path.join(ROOT, relativePath));
-  assert.equal(buffer.subarray(1, 4).toString("ascii"), "PNG", relativePath);
-  return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+  if (buffer.subarray(1, 4).toString("ascii") === "PNG") {
+    return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+  }
+  assert.equal(buffer.subarray(0, 4).toString("ascii"), "RIFF", relativePath);
+  assert.equal(buffer.subarray(8, 12).toString("ascii"), "WEBP", relativePath);
+  for (let offset = 12; offset + 8 <= buffer.length; ) {
+    const type = buffer.subarray(offset, offset + 4).toString("ascii");
+    const length = buffer.readUInt32LE(offset + 4);
+    const payload = offset + 8;
+    if (type === "VP8X") {
+      return {
+        width: 1 + buffer.readUIntLE(payload + 4, 3),
+        height: 1 + buffer.readUIntLE(payload + 7, 3),
+      };
+    }
+    if (type === "VP8L") {
+      const bits = buffer.readUInt32LE(payload + 1);
+      return {
+        width: 1 + (bits & 0x3fff),
+        height: 1 + ((bits >> 14) & 0x3fff),
+      };
+    }
+    if (type === "VP8 ") {
+      return {
+        width: buffer.readUInt16LE(payload + 6) & 0x3fff,
+        height: buffer.readUInt16LE(payload + 8) & 0x3fff,
+      };
+    }
+    offset = payload + length + (length % 2);
+  }
+  assert.fail(`unsupported WebP structure: ${relativePath}`);
 }
 
 test("all kana and word deck modes preserve pair invariants", () => {
@@ -65,8 +94,10 @@ test("all kana and word deck modes preserve pair invariants", () => {
     for (const mode of Object.keys(words.PAIR_MODES)) {
       assertDeck(words.buildDeck(mode, 25, { category: "all" }), 25);
     }
-    for (const mode of Object.keys(anime.PAIR_MODES)) {
-      assertDeck(anime.buildDeck(mode, 25, { series: "jjk" }), 25);
+    for (const series of anime.SERIES.map((item) => item.id)) {
+      for (const mode of Object.keys(anime.PAIR_MODES)) {
+        assertDeck(anime.buildDeck(mode, 25, { series }), 25);
+      }
     }
   }
 });
@@ -116,14 +147,19 @@ test("anime entries, icons, and voice packs stay aligned", () => {
   const { JPMatchAnime: animeApi } = loadData();
   const entries = animeApi.ENTRIES;
   const keys = new Set(entries.map((entry) => entry.key));
+  const seriesIds = new Set(animeApi.SERIES.map((item) => item.id));
   assert.equal(keys.size, entries.length);
-  assert.ok(entries.length >= 25);
-  assert.ok(entries.every((entry) => entry.series === "jjk"));
+  assert.deepEqual([...seriesIds].sort(), ["db", "jjk", "op"]);
+  for (const seriesId of seriesIds) {
+    const count = entries.filter((entry) => entry.series === seriesId).length;
+    assert.ok(count >= 25, `${seriesId} needs >= 25 entries`);
+  }
+  assert.ok(entries.every((entry) => seriesIds.has(entry.series)));
 
   for (const entry of entries) {
     assert.equal(entry.picKind, "img");
     assert.ok(fs.existsSync(path.join(ROOT, entry.pic)), entry.pic);
-    const dimensions = pngDimensions(entry.pic);
+    const dimensions = imageDimensions(entry.pic);
     assert.ok(dimensions.width <= 512 && dimensions.height <= 512, entry.pic);
   }
 
@@ -279,9 +315,9 @@ test("online room UI, transport, CSP, and Durable Object configuration stay conn
   assert.match(html, /<script src="\.\/js\/online\.js/);
   assert.match(html, /css\/styles\.css\?v=kotoba-musubi-10/);
   assert.match(html, /js\/online\.js\?v=online-room-4/);
-  assert.match(html, /js\/anime\.js\?v=anime-jjk-1/);
-  assert.match(html, /js\/audio\.js\?v=anime-jjk-1/);
-  assert.match(html, /js\/game\.js\?v=anime-jjk-1/);
+  assert.match(html, /js\/anime\.js\?v=anime-op-1/);
+  assert.match(html, /js\/audio\.js\?v=anime-op-1/);
+  assert.match(html, /js\/game\.js\?v=anime-op-1/);
   assert.match(game, /Online\.flip\(index\)/);
   assert.match(game, /Online\.resume\(invitedRoomCode\)/);
   assert.match(game, /對手已離開房間/);

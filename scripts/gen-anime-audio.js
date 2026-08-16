@@ -16,6 +16,16 @@ const OUT_DIR = path.join("assets", "audio", "anime");
 const DELAY_MS = 2200;
 const MAX_RATE_RETRIES = 5;
 const FORCE = process.argv.includes("--force");
+const keysArg = process.argv.find((arg) => arg.startsWith("--keys="));
+const REQUESTED_KEYS = new Set(
+  keysArg
+    ? keysArg
+        .slice("--keys=".length)
+        .split(",")
+        .map((key) => key.trim())
+        .filter(Boolean)
+    : [],
+);
 
 function loadEntries() {
   const src = fs.readFileSync(path.join("js", "anime.js"), "utf8");
@@ -84,6 +94,12 @@ async function main() {
     unique.push(entry);
   }
 
+  if (REQUESTED_KEYS.size) {
+    const knownKeys = new Set(unique.map((entry) => entry.key));
+    const unknownKeys = [...REQUESTED_KEYS].filter((key) => !knownKeys.has(key));
+    if (unknownKeys.length) throw new Error("unknown keys: " + unknownKeys.join(", "));
+  }
+
   const stagingDir = fs.mkdtempSync(path.join(os.tmpdir(), "jp-match-anime-audio-"));
   let tokenData = null;
   let done = 0;
@@ -93,7 +109,10 @@ async function main() {
     for (const entry of unique) {
       const currentPath = path.join(OUT_DIR, entry.key + ".mp3");
       const stagedPath = path.join(stagingDir, entry.key + ".mp3");
-      if (!FORCE && fs.existsSync(currentPath) && isMp3(fs.readFileSync(currentPath))) {
+      const shouldGenerate =
+        (!REQUESTED_KEYS.size || REQUESTED_KEYS.has(entry.key)) &&
+        (FORCE || !fs.existsSync(currentPath) || !isMp3(fs.readFileSync(currentPath)));
+      if (!shouldGenerate && fs.existsSync(currentPath) && isMp3(fs.readFileSync(currentPath))) {
         fs.copyFileSync(currentPath, stagedPath);
         skipped += 1;
         process.stdout.write("skip " + entry.key + "\n");

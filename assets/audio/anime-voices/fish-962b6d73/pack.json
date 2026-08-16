@@ -3,9 +3,9 @@
   "provider": "Fish Audio",
   "model": "s2.1-pro-free",
   "referenceId": "962b6d7385574187bbf4b73bb1ec49f6",
-  "generatedAt": "2026-08-10T21:35:32.4451721Z",
-  "expectedEntries": 31,
-  "generatedFiles": 31,
+  "generatedAt": "2026-08-16T07:01:02.669Z",
+  "expectedEntries": 91,
+  "generatedFiles": 91,
   "words": [
     {
       "key": "jjk_itadori",
@@ -273,7 +273,7 @@
       "written": "茈",
       "filename": "jjk_murasaki.mp3",
       "source": "generated-rerecord",
-      "bytes": 37615,
+      "bytes": 22027,
       "status": "ok",
       "prompt": "[日本語で「むらさき」と読んで] 茈。"
     },
@@ -316,6 +316,606 @@
       "bytes": 10030,
       "status": "ok",
       "prompt": "[日本語で「とばり」と読んで] 帳。"
+    },
+    {
+      "key": "db_goku",
+      "reading": "そんごくう",
+      "written": "孫悟空",
+      "filename": "db_goku.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15881,
+      "status": "ok",
+      "prompt": "[日本語で「そんごくう」と読んで] 孫悟空。"
+    },
+    {
+      "key": "db_vegeta",
+      "reading": "べじーた",
+      "written": "ベジータ",
+      "filename": "db_vegeta.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15045,
+      "status": "ok",
+      "prompt": "[日本語で「べじーた」と読んで] ベジータ。"
+    },
+    {
+      "key": "db_bulma",
+      "reading": "ぶるま",
+      "written": "ブルマ",
+      "filename": "db_bulma.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15045,
+      "status": "ok",
+      "prompt": "[日本語で「ぶるま」と読んで] ブルマ。"
+    },
+    {
+      "key": "db_piccolo",
+      "reading": "ぴっころ",
+      "written": "ピッコロ",
+      "filename": "db_piccolo.mp3",
+      "source": "generated-rerecord",
+      "bytes": 11283,
+      "status": "ok",
+      "prompt": "[日本語で「ぴっころ」と読んで] ピッコロ。"
+    },
+    {
+      "key": "db_kuririn",
+      "reading": "くりりん",
+      "written": "クリリン",
+      "filename": "db_kuririn.mp3",
+      "source": "generated-rerecord",
+      "bytes": 11283,
+      "status": "ok",
+      "prompt": "[日本語で「くりりん」と読んで] クリリン。"
+    },
+    {
+      "key": "db_yamcha",
+      "reading": "やむちゃ",
+      "written": "ヤムチャ",
+      "filename": "db_yamcha.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12955,
+      "status": "ok",
+      "prompt": "[日本語で「やむちゃ」と読んで] ヤムチャ。"
+    },
+    {
+      "key": "db_tenshinhan",
+      "reading": "てんしんはん",
+      "written": "天津飯",
+      "filename": "db_tenshinhan.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17971,
+      "status": "ok",
+      "prompt": "[日本語で「てんしんはん」と読んで] 天津飯。"
+    },
+    {
+      "key": "db_chaozu",
+      "reading": "チャオズ",
+      "written": "餃子",
+      "filename": "db_chaozu.mp3",
+      "source": "generated-rerecord",
+      "bytes": 14209,
+      "status": "ok",
+      "prompt": "[日本語で「チャオズ」と読んで] 餃子。"
+    },
+    {
+      "key": "db_gohan",
+      "reading": "そんごはん",
+      "written": "孫悟飯",
+      "filename": "db_gohan.mp3",
+      "source": "generated-rerecord",
+      "bytes": 16717,
+      "status": "ok",
+      "prompt": "[日本語で「そんごはん」と読んで] 孫悟飯。"
+    },
+    {
+      "key": "db_trunks",
+      "reading": "とらんくす",
+      "written": "トランクス",
+      "filename": "db_trunks.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15881,
+      "status": "ok",
+      "prompt": "[日本語で「とらんくす」と読んで] トランクス。"
+    },
+    {
+      "key": "db_goten",
+      "reading": "そんごてん",
+      "written": "孫悟天",
+      "filename": "db_goten.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15045,
+      "status": "ok",
+      "prompt": "[日本語で「そんごてん」と読んで] 孫悟天。"
+    },
+    {
+      "key": "db_videl",
+      "reading": "びーでる",
+      "written": "ビーデル",
+      "filename": "db_videl.mp3",
+      "source": "generated-rerecord",
+      "bytes": 10866,
+      "status": "ok",
+      "prompt": "[日本語で「びーでる」と読んで] ビーデル。"
+    },
+    {
+      "key": "db_chichi",
+      "reading": "ちち",
+      "written": "チチ",
+      "filename": "db_chichi.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12119,
+      "status": "ok",
+      "prompt": "[日本語で「ちち」と読んで] チチ。"
+    },
+    {
+      "key": "db_kamesennin",
+      "reading": "かめせんにん",
+      "written": "亀仙人",
+      "filename": "db_kamesennin.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17971,
+      "status": "ok",
+      "prompt": "[日本語で「かめせんにん」と読んで] 亀仙人。"
+    },
+    {
+      "key": "db_frieza",
+      "reading": "ふりーざ",
+      "written": "フリーザ",
+      "filename": "db_frieza.mp3",
+      "source": "generated-rerecord",
+      "bytes": 11283,
+      "status": "ok",
+      "prompt": "[日本語で「ふりーざ」と読んで] フリーザ。"
+    },
+    {
+      "key": "db_cell",
+      "reading": "せる",
+      "written": "セル",
+      "filename": "db_cell.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12955,
+      "status": "ok",
+      "prompt": "[日本語で「せる」と読んで] セル。"
+    },
+    {
+      "key": "db_buu",
+      "reading": "まじんぶう",
+      "written": "魔人ブウ",
+      "filename": "db_buu.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17971,
+      "status": "ok",
+      "prompt": "[日本語で「まじんぶう」と読んで] 魔人ブウ。"
+    },
+    {
+      "key": "db_bardock",
+      "reading": "ばーだっく",
+      "written": "バーダック",
+      "filename": "db_bardock.mp3",
+      "source": "generated-rerecord",
+      "bytes": 20479,
+      "status": "ok",
+      "prompt": "[日本語で「ばーだっく」と読んで] バーダック。"
+    },
+    {
+      "key": "db_raditz",
+      "reading": "らでぃっつ",
+      "written": "ラディッツ",
+      "filename": "db_raditz.mp3",
+      "source": "generated-rerecord",
+      "bytes": 16717,
+      "status": "ok",
+      "prompt": "[日本語で「らでぃっつ」と読んで] ラディッツ。"
+    },
+    {
+      "key": "db_nappa",
+      "reading": "なっぱ",
+      "written": "ナッパ",
+      "filename": "db_nappa.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12955,
+      "status": "ok",
+      "prompt": "[日本語で「なっぱ」と読んで] ナッパ。"
+    },
+    {
+      "key": "db_ginyu",
+      "reading": "ぎにゅー",
+      "written": "ギニュー",
+      "filename": "db_ginyu.mp3",
+      "source": "generated-rerecord",
+      "bytes": 14209,
+      "status": "ok",
+      "prompt": "[日本語で「ぎにゅー」と読んで] ギニュー。"
+    },
+    {
+      "key": "db_android18",
+      "reading": "じゅうはちごう",
+      "written": "十八号",
+      "filename": "db_android18.mp3",
+      "source": "generated-rerecord",
+      "bytes": 19643,
+      "status": "ok",
+      "prompt": "[日本語で「じゅうはちごう」と読んで] 十八号。"
+    },
+    {
+      "key": "db_beerus",
+      "reading": "びるす",
+      "written": "ビルス",
+      "filename": "db_beerus.mp3",
+      "source": "generated-rerecord",
+      "bytes": 14209,
+      "status": "ok",
+      "prompt": "[日本語で「びるす」と読んで] ビルス。"
+    },
+    {
+      "key": "db_whis",
+      "reading": "ういす",
+      "written": "ウイス",
+      "filename": "db_whis.mp3",
+      "source": "generated-rerecord",
+      "bytes": 10866,
+      "status": "ok",
+      "prompt": "[日本語で「ういす」と読んで] ウイス。"
+    },
+    {
+      "key": "db_broly",
+      "reading": "ぶろりー",
+      "written": "ブロリー",
+      "filename": "db_broly.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15045,
+      "status": "ok",
+      "prompt": "[日本語で「ぶろりー」と読んで] ブロリー。"
+    },
+    {
+      "key": "db_kaiou",
+      "reading": "かいおう",
+      "written": "界王",
+      "filename": "db_kaiou.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12955,
+      "status": "ok",
+      "prompt": "[日本語で「かいおう」と読んで] 界王。"
+    },
+    {
+      "key": "db_satan",
+      "reading": "みすたー・さたん",
+      "written": "ミスター・サタン",
+      "filename": "db_satan.mp3",
+      "source": "generated-rerecord",
+      "bytes": 23404,
+      "status": "ok",
+      "prompt": "[日本語で「みすたー・さたん」と読んで] ミスター・サタン。"
+    },
+    {
+      "key": "db_supersaiyan",
+      "reading": "すーぱーさいやじん",
+      "written": "スーパーサイヤ人",
+      "filename": "db_supersaiyan.mp3",
+      "source": "generated-rerecord",
+      "bytes": 25494,
+      "status": "ok",
+      "prompt": "[日本語で「すーぱーさいやじん」と読んで] スーパーサイヤ人。"
+    },
+    {
+      "key": "db_shenron",
+      "reading": "シェンロン",
+      "written": "神龍",
+      "filename": "db_shenron.mp3",
+      "source": "generated-rerecord",
+      "bytes": 16717,
+      "status": "ok",
+      "prompt": "[日本語で「シェンロン」と読んで] 神龍。"
+    },
+    {
+      "key": "db_dragonball",
+      "reading": "ドラゴンボール",
+      "written": "ドラゴンボール",
+      "filename": "db_dragonball.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17971,
+      "status": "ok",
+      "prompt": "[日本語で「ドラゴンボール」と読んで] ドラゴンボール。"
+    },
+    {
+      "key": "op_luffy",
+      "reading": "るふぃ",
+      "written": "ルフィ",
+      "filename": "op_luffy.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12955,
+      "status": "ok",
+      "prompt": "[日本語で「るふぃ」と読んで] ルフィ。"
+    },
+    {
+      "key": "op_zoro",
+      "reading": "ぞろ",
+      "written": "ゾロ",
+      "filename": "op_zoro.mp3",
+      "source": "generated-rerecord",
+      "bytes": 10866,
+      "status": "ok",
+      "prompt": "[日本語で「ぞろ」と読んで] ゾロ。"
+    },
+    {
+      "key": "op_nami",
+      "reading": "なみ",
+      "written": "ナミ",
+      "filename": "op_nami.mp3",
+      "source": "generated-rerecord",
+      "bytes": 11283,
+      "status": "ok",
+      "prompt": "[日本語で「なみ」と読んで] ナミ。"
+    },
+    {
+      "key": "op_usopp",
+      "reading": "うそっぷ",
+      "written": "ウソップ",
+      "filename": "op_usopp.mp3",
+      "source": "generated-rerecord",
+      "bytes": 16717,
+      "status": "ok",
+      "prompt": "[日本語で「うそっぷ」と読んで] ウソップ。"
+    },
+    {
+      "key": "op_sanji",
+      "reading": "さんじ",
+      "written": "サンジ",
+      "filename": "op_sanji.mp3",
+      "source": "generated-rerecord",
+      "bytes": 11283,
+      "status": "ok",
+      "prompt": "[日本語で「さんじ」と読んで] サンジ。"
+    },
+    {
+      "key": "op_chopper",
+      "reading": "ちょっぱー",
+      "written": "チョッパー",
+      "filename": "op_chopper.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12119,
+      "status": "ok",
+      "prompt": "[日本語で「ちょっぱー」と読んで] チョッパー。"
+    },
+    {
+      "key": "op_robin",
+      "reading": "ろびん",
+      "written": "ロビン",
+      "filename": "op_robin.mp3",
+      "source": "generated-rerecord",
+      "bytes": 10866,
+      "status": "ok",
+      "prompt": "[日本語で「ろびん」と読んで] ロビン。"
+    },
+    {
+      "key": "op_franky",
+      "reading": "ふらんきー",
+      "written": "フランキー",
+      "filename": "op_franky.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17553,
+      "status": "ok",
+      "prompt": "[日本語で「ふらんきー」と読んで] フランキー。"
+    },
+    {
+      "key": "op_brook",
+      "reading": "ぶるっく",
+      "written": "ブルック",
+      "filename": "op_brook.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12955,
+      "status": "ok",
+      "prompt": "[日本語で「ぶるっく」と読んで] ブルック。"
+    },
+    {
+      "key": "op_jinbe",
+      "reading": "じんべえ",
+      "written": "ジンベエ",
+      "filename": "op_jinbe.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17553,
+      "status": "ok",
+      "prompt": "[日本語で「じんべえ」と読んで] ジンベエ。"
+    },
+    {
+      "key": "op_shanks",
+      "reading": "しゃんくす",
+      "written": "シャンクス",
+      "filename": "op_shanks.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17553,
+      "status": "ok",
+      "prompt": "[日本語で「しゃんくす」と読んで] シャンクス。"
+    },
+    {
+      "key": "op_ace",
+      "reading": "えーす",
+      "written": "エース",
+      "filename": "op_ace.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15045,
+      "status": "ok",
+      "prompt": "[日本語で「えーす」と読んで] エース。"
+    },
+    {
+      "key": "op_sabo",
+      "reading": "さぼ",
+      "written": "サボ",
+      "filename": "op_sabo.mp3",
+      "source": "generated-rerecord",
+      "bytes": 10866,
+      "status": "ok",
+      "prompt": "[日本語で「さぼ」と読んで] サボ。"
+    },
+    {
+      "key": "op_law",
+      "reading": "ろー",
+      "written": "ロー",
+      "filename": "op_law.mp3",
+      "source": "generated-rerecord",
+      "bytes": 10030,
+      "status": "ok",
+      "prompt": "[日本語で「ろー」と読んで] ロー。"
+    },
+    {
+      "key": "op_hancock",
+      "reading": "はんこっく",
+      "written": "ハンコック",
+      "filename": "op_hancock.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15045,
+      "status": "ok",
+      "prompt": "[日本語で「はんこっく」と読んで] ハンコック。"
+    },
+    {
+      "key": "op_crocodile",
+      "reading": "くろこだいる",
+      "written": "クロコダイル",
+      "filename": "op_crocodile.mp3",
+      "source": "generated-rerecord",
+      "bytes": 16717,
+      "status": "ok",
+      "prompt": "[日本語で「くろこだいる」と読んで] クロコダイル。"
+    },
+    {
+      "key": "op_doflamingo",
+      "reading": "どふらみんご",
+      "written": "ドフラミンゴ",
+      "filename": "op_doflamingo.mp3",
+      "source": "generated-rerecord",
+      "bytes": 21732,
+      "status": "ok",
+      "prompt": "[日本語で「どふらみんご」と読んで] ドフラミンゴ。"
+    },
+    {
+      "key": "op_kaido",
+      "reading": "かいどう",
+      "written": "カイドウ",
+      "filename": "op_kaido.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17553,
+      "status": "ok",
+      "prompt": "[日本語で「かいどう」と読んで] カイドウ。"
+    },
+    {
+      "key": "op_bigmom",
+      "reading": "ビッグマム",
+      "written": "ビッグ・マム",
+      "filename": "op_bigmom.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17971,
+      "status": "ok",
+      "prompt": "[日本語で「ビッグマム」と読んで] ビッグ・マム。"
+    },
+    {
+      "key": "op_whitebeard",
+      "reading": "しろひげ",
+      "written": "白ひげ",
+      "filename": "op_whitebeard.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15881,
+      "status": "ok",
+      "prompt": "[日本語で「しろひげ」と読んで] 白ひげ。"
+    },
+    {
+      "key": "op_blackbeard",
+      "reading": "くろひげ",
+      "written": "黒ひげ",
+      "filename": "op_blackbeard.mp3",
+      "source": "generated-rerecord",
+      "bytes": 14209,
+      "status": "ok",
+      "prompt": "[日本語で「くろひげ」と読んで] 黒ひげ。"
+    },
+    {
+      "key": "op_mihawk",
+      "reading": "みほーく",
+      "written": "ミホーク",
+      "filename": "op_mihawk.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17553,
+      "status": "ok",
+      "prompt": "[日本語で「みほーく」と読んで] ミホーク。"
+    },
+    {
+      "key": "op_buggy",
+      "reading": "ばぎー",
+      "written": "バギー",
+      "filename": "op_buggy.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12955,
+      "status": "ok",
+      "prompt": "[日本語で「ばぎー」と読んで] バギー。"
+    },
+    {
+      "key": "op_rayleigh",
+      "reading": "れいりー",
+      "written": "レイリー",
+      "filename": "op_rayleigh.mp3",
+      "source": "generated-rerecord",
+      "bytes": 16717,
+      "status": "ok",
+      "prompt": "[日本語で「れいりー」と読んで] レイリー。"
+    },
+    {
+      "key": "op_garp",
+      "reading": "がーぷ",
+      "written": "ガープ",
+      "filename": "op_garp.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12955,
+      "status": "ok",
+      "prompt": "[日本語で「がーぷ」と読んで] ガープ。"
+    },
+    {
+      "key": "op_gomugomu",
+      "reading": "ごむごむのみ",
+      "written": "ゴムゴムの実",
+      "filename": "op_gomugomu.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17971,
+      "status": "ok",
+      "prompt": "[日本語で「ごむごむのみ」と読んで] ゴムゴムの実。"
+    },
+    {
+      "key": "op_gearsecond",
+      "reading": "ぎあせかんど",
+      "written": "ギア2",
+      "filename": "op_gearsecond.mp3",
+      "source": "generated-rerecord",
+      "bytes": 40541,
+      "status": "ok",
+      "prompt": "[日本語で「ぎあせかんど」と読んで] ギア2。"
+    },
+    {
+      "key": "op_santouryuu",
+      "reading": "さんとうりゅう",
+      "written": "三刀流",
+      "filename": "op_santouryuu.mp3",
+      "source": "generated-rerecord",
+      "bytes": 21732,
+      "status": "ok",
+      "prompt": "[日本語で「さんとうりゅう」と読んで] 三刀流。"
+    },
+    {
+      "key": "op_haki",
+      "reading": "はき",
+      "written": "覇気",
+      "filename": "op_haki.mp3",
+      "source": "generated-rerecord",
+      "bytes": 11283,
+      "status": "ok",
+      "prompt": "[日本語で「はき」と読んで] 覇気。"
+    },
+    {
+      "key": "op_thousandsunny",
+      "reading": "サウザンドサニーごう",
+      "written": "サウザンドサニー号",
+      "filename": "op_thousandsunny.mp3",
+      "source": "generated-rerecord",
+      "bytes": 25494,
+      "status": "ok",
+      "prompt": "[日本語で「サウザンドサニーごう」と読んで] サウザンドサニー号。"
     }
   ],
   "promotedCandidateKeys": [

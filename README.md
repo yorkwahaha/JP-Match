@@ -69,10 +69,12 @@ https://yorkwahaha.github.io/JP-Match/
 以 **圖案 ↔ 假名**（或羅馬拼音、漢字名）練習知名角色與招式讀音。目前作品：
 
 - 咒術迴戰（人物＋招式，31 組）
+- 七龍珠（人物＋招式／物件，30 組）
+- 航海王（人物＋招式／物件，30 組）
 
 配對模式：圖案 ↔ 假名／圖案 ↔ 羅馬拼音／漢字名 ↔ 假名。
 
-圖示為 JP Match 使用的非官方學習插圖，與作品權利人無隸屬或背書關係。角色、名稱及作品相關權利歸原權利人所有。之後可再加其他作品。本地音檔在 `assets/audio/anime/`。
+圖示為 JP Match 使用的非官方學習插圖（或暫用象徵圖），與作品權利人無隸屬或背書關係。角色、名稱及作品相關權利歸原權利人所有。之後可再加其他作品。本地音檔在 `assets/audio/anime/`。
 
 題池數量須 ≥ 盤面組數，否則會提示並無法開始。
 
@@ -155,7 +157,7 @@ js/game.js      遊戲流程與計分
 worker/         Cloudflare Worker + Durable Object 房間服務
 assets/audio/
 assets/audio/word-voices/fish-962b6d73/   Fish Audio S2.1 Pro 活力聲線（159 個單字）
-assets/audio/anime-voices/fish-962b6d73/  Fish Audio S2.1 Pro 活力聲線（咒術迴戰 31 組）
+assets/audio/anime-voices/fish-962b6d73/  Fish Audio S2.1 Pro 活力聲線（咒術／七龍珠／航海王）
 scripts/gen-fish-word-audio.mjs           Fish Audio 單字／動漫聲線包產生工具
 .github/workflows/pages.yml   推上 main 自動部署 GitHub Pages
 ```
