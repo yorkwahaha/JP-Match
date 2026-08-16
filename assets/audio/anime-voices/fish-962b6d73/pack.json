@@ -3,7 +3,7 @@
   "provider": "Fish Audio",
   "model": "s2.1-pro-free",
   "referenceId": "962b6d7385574187bbf4b73bb1ec49f6",
-  "generatedAt": "2026-08-16T07:01:02.669Z",
+  "generatedAt": "2026-08-16T15:13:29.224Z",
   "expectedEntries": 91,
   "generatedFiles": 91,
   "words": [
@@ -323,9 +323,9 @@
       "written": "孫悟空",
       "filename": "db_goku.mp3",
       "source": "generated-rerecord",
-      "bytes": 15881,
+      "bytes": 18807,
       "status": "ok",
-      "prompt": "[日本語で「そんごくう」と読んで] 孫悟空。"
+      "prompt": "[日本語で、明るく自然に『そんごくう』と一度だけ読んで] 孫悟空。"
     },
     {
       "key": "db_vegeta",
@@ -343,9 +343,9 @@
       "written": "ブルマ",
       "filename": "db_bulma.mp3",
       "source": "generated-rerecord",
-      "bytes": 15045,
+      "bytes": 12955,
       "status": "ok",
-      "prompt": "[日本語で「ぶるま」と読んで] ブルマ。"
+      "prompt": "[日本語で、快活で聞き取りやすく、名前だけを『ぶるま』と一度発音して] ブルマ。"
     },
     {
       "key": "db_piccolo",
@@ -373,9 +373,9 @@
       "written": "ヤムチャ",
       "filename": "db_yamcha.mp3",
       "source": "generated-rerecord",
-      "bytes": 12955,
+      "bytes": 15881,
       "status": "ok",
-      "prompt": "[日本語で「やむちゃ」と読んで] ヤムチャ。"
+      "prompt": "[日本語で、明るく自然に『やむちゃ』と一度だけ読んで] ヤムチャ。"
     },
     {
       "key": "db_tenshinhan",
@@ -403,9 +403,9 @@
       "written": "孫悟飯",
       "filename": "db_gohan.mp3",
       "source": "generated-rerecord",
-      "bytes": 16717,
+      "bytes": 21732,
       "status": "ok",
-      "prompt": "[日本語で「そんごはん」と読んで] 孫悟飯。"
+      "prompt": "[日本語で「そん、ごはん」と読んで]孫 悟飯。"
     },
     {
       "key": "db_trunks",
@@ -423,9 +423,9 @@
       "written": "孫悟天",
       "filename": "db_goten.mp3",
       "source": "generated-rerecord",
-      "bytes": 15045,
+      "bytes": 17553,
       "status": "ok",
-      "prompt": "[日本語で「そんごてん」と読んで] 孫悟天。"
+      "prompt": "[日本語で「そん、ごてん」と読んで]孫 悟天。"
     },
     {
       "key": "db_videl",
@@ -503,9 +503,9 @@
       "written": "ラディッツ",
       "filename": "db_raditz.mp3",
       "source": "generated-rerecord",
-      "bytes": 16717,
+      "bytes": 13791,
       "status": "ok",
-      "prompt": "[日本語で「らでぃっつ」と読んで] ラディッツ。"
+      "prompt": "[日本語で、明るく自然に『らでぃっつ』と一度だけ読んで] ラディッツ。"
     },
     {
       "key": "db_nappa",
@@ -523,9 +523,9 @@
       "written": "ギニュー",
       "filename": "db_ginyu.mp3",
       "source": "generated-rerecord",
-      "bytes": 14209,
+      "bytes": 12119,
       "status": "ok",
-      "prompt": "[日本語で「ぎにゅー」と読んで] ギニュー。"
+      "prompt": "<|phoneme_start|>gi1nyu0u0<|phoneme_end|>。"
     },
     {
       "key": "db_android18",
