@@ -42,6 +42,12 @@ test("Dragon Ball kana uses katakana except the Son family readings", () => {
   assert.equal(entries.find((entry) => entry.key === "db_shenron").hira, "シェンロン");
 });
 
+test("only Jujutsu Kaisen and Dragon Ball are visible while One Piece data stays available", () => {
+  const anime = loadAnime();
+  assert.equal(anime.SERIES.map((series) => series.id).join(","), "jjk,db");
+  assert.ok(anime.getEntriesInSeries("op").length >= 25);
+});
+
 test("anime audio-picture mode pairs a blank audio card with an image", () => {
   const anime = loadAnime();
   const deck = anime.buildDeck("audio-pic", 6, { series: "db" });
@@ -61,6 +67,7 @@ test("anime audio-picture mode pairs a blank audio card with an image", () => {
     assert.equal(audioCard.voiceKey, entry.key);
     assert.equal(audioCard.voicePack, "anime");
     assert.equal(audioCard.voiceText, entry.tts || entry.hira);
+    assert.equal(audioCard.matchLabel, entry.hira);
     assert.equal(pictureCard.text, entry.pic);
     assert.equal(pictureCard.kindLabel, "圖片");
     assert.equal(pictureCard.display, "img");
@@ -83,6 +90,7 @@ test("anime audio-text mode pairs a blank audio card with the written name", () 
     assert.equal(audioCard.text, "");
     assert.equal(audioCard.voiceKey, entry.key);
     assert.equal(audioCard.voicePack, "anime");
+    assert.equal(audioCard.matchLabel, entry.hira);
     assert.equal(textCard.text, entry.kanji);
     assert.equal(textCard.kindLabel, "文字");
     assert.equal(textCard.display, "text");

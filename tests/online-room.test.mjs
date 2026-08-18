@@ -56,9 +56,15 @@ test("anime room configuration and voice-pack metadata survive sanitization", ()
       side: "hira",
       text: `かな${index}`,
       voicePack: "anime",
+      matchLabel: `かな${index}`,
     },
   ]).flat();
-  assert.ok(prepareDeck(animeDeck, () => 0.999).every((card) => card.voicePack === "anime"));
+  const preparedAnimeDeck = prepareDeck(animeDeck, () => 0.999);
+  assert.ok(preparedAnimeDeck.every((card) => card.voicePack === "anime"));
+  assert.equal(
+    preparedAnimeDeck.find((card) => card.side === "hira").matchLabel,
+    "かな0",
+  );
 });
 
 test("online decks reject traversal paths and unknown voice packs", () => {

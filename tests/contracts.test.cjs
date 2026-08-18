@@ -149,12 +149,12 @@ test("anime entries, icons, and voice packs stay aligned", () => {
   const keys = new Set(entries.map((entry) => entry.key));
   const seriesIds = new Set(animeApi.SERIES.map((item) => item.id));
   assert.equal(keys.size, entries.length);
-  assert.deepEqual([...seriesIds].sort(), ["db", "jjk", "op"]);
+  assert.deepEqual([...seriesIds].sort(), ["db", "jjk"]);
   for (const seriesId of seriesIds) {
     const count = entries.filter((entry) => entry.series === seriesId).length;
     assert.ok(count >= 25, `${seriesId} needs >= 25 entries`);
   }
-  assert.ok(entries.every((entry) => seriesIds.has(entry.series)));
+  assert.ok(entries.some((entry) => entry.series === "op"));
 
   for (const entry of entries) {
     assert.equal(entry.picKind, "img");
@@ -243,6 +243,7 @@ test("matched pair cords connect only the two cards", () => {
 test("matched word labels stay complete", () => {
   const game = read("js/game.js");
   assert.doesNotMatch(game, /chars\.slice\(0, 3\)/);
+  assert.match(game, /card\.matchLabel \|\|/);
   assert.match(game, /const text = String\(raw \|\| "結"\)/);
   assert.match(game, /wrapReadingLines\(text, 4\)/);
 });

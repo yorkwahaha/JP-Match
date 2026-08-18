@@ -14,6 +14,7 @@ const ALLOWED_CARD_FIELDS = [
   "voiceText",
   "voiceKey",
   "voicePack",
+  "matchLabel",
   "audioKey",
   "label",
   "picSub",

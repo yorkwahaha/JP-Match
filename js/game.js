@@ -860,7 +860,7 @@
   }
 
   function matchAnchorLabel(card) {
-    const raw = card.side === "pic" ? card.label || "圖" : card.text;
+    const raw = card.matchLabel || (card.side === "pic" ? card.label || "圖" : card.text);
     const text = String(raw || "結");
     const wrapped = wrapReadingLines(text, 4);
     return Array.isArray(wrapped) ? wrapped.join("\n") : wrapped;

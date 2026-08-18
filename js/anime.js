@@ -1022,7 +1022,6 @@ window.JPMatchAnime = (() => {
   const SERIES = [
     { id: "jjk", label: "咒術迴戰" },
     { id: "db", label: "七龍珠" },
-    { id: "op", label: "航海王" },
   ];
 
   const DEFAULT_SERIES = "jjk";
@@ -1106,6 +1105,7 @@ window.JPMatchAnime = (() => {
         voiceText: entry.tts || entry.hira,
         voiceKey: entry.key,
         voicePack: "anime",
+        matchLabel: sideA === "audio" ? entry.hira : "",
         label: entry.label,
         picSub: sideA === "pic" ? entry.picSub || "" : "",
       });
@@ -1118,6 +1118,7 @@ window.JPMatchAnime = (() => {
         voiceText: entry.tts || entry.hira,
         voiceKey: entry.key,
         voicePack: "anime",
+        matchLabel: sideB === "audio" ? entry.hira : "",
         label: entry.label,
         picSub: sideB === "pic" ? entry.picSub || "" : "",
       });
