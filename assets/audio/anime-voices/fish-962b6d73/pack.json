@@ -4,8 +4,8 @@
   "model": "s2.1-pro-free",
   "referenceId": "962b6d7385574187bbf4b73bb1ec49f6",
   "generatedAt": "2026-08-16T15:13:29.224Z",
-  "expectedEntries": 91,
-  "generatedFiles": 91,
+  "expectedEntries": 120,
+  "generatedFiles": 120,
   "words": [
     {
       "key": "jjk_itadori",
@@ -616,6 +616,296 @@
       "bytes": 17971,
       "status": "ok",
       "prompt": "[日本語で「ドラゴンボール」と読んで] ドラゴンボール。"
+    },
+    {
+      "key": "frieren_frieren",
+      "reading": "ふりーれん",
+      "written": "フリーレン",
+      "filename": "frieren_frieren.mp3",
+      "source": "generated-rerecord",
+      "bytes": 16717,
+      "status": "ok",
+      "prompt": "[日本語で「ふりーれん」と読んで] フリーレン。"
+    },
+    {
+      "key": "frieren_himmel",
+      "reading": "ひんめる",
+      "written": "ヒンメル",
+      "filename": "frieren_himmel.mp3",
+      "source": "generated-rerecord",
+      "bytes": 13791,
+      "status": "ok",
+      "prompt": "[日本語で「ひんめる」と読んで] ヒンメル。"
+    },
+    {
+      "key": "frieren_heiter",
+      "reading": "はいたー",
+      "written": "ハイター",
+      "filename": "frieren_heiter.mp3",
+      "source": "generated-rerecord",
+      "bytes": 16717,
+      "status": "ok",
+      "prompt": "[日本語で「はいたー」と読んで] ハイター。"
+    },
+    {
+      "key": "frieren_eisen",
+      "reading": "あいぜん",
+      "written": "アイゼン",
+      "filename": "frieren_eisen.mp3",
+      "source": "generated-rerecord",
+      "bytes": 14209,
+      "status": "ok",
+      "prompt": "[日本語で「あいぜん」と読んで] アイゼン。"
+    },
+    {
+      "key": "frieren_fern",
+      "reading": "ふぇるん",
+      "written": "フェルン",
+      "filename": "frieren_fern.mp3",
+      "source": "generated-rerecord",
+      "bytes": 10866,
+      "status": "ok",
+      "prompt": "[日本語で「ふぇるん」と読んで] フェルン。"
+    },
+    {
+      "key": "frieren_stark",
+      "reading": "しゅたるく",
+      "written": "シュタルク",
+      "filename": "frieren_stark.mp3",
+      "source": "generated-rerecord",
+      "bytes": 16717,
+      "status": "ok",
+      "prompt": "[日本語で「しゅたるく」と読んで] シュタルク。"
+    },
+    {
+      "key": "frieren_sein",
+      "reading": "ざいん",
+      "written": "ザイン",
+      "filename": "frieren_sein.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12119,
+      "status": "ok",
+      "prompt": "[日本語で「ざいん」と読んで] ザイン。"
+    },
+    {
+      "key": "frieren_aura",
+      "reading": "あうら",
+      "written": "アウラ",
+      "filename": "frieren_aura.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12955,
+      "status": "ok",
+      "prompt": "[日本語で「あうら」と読んで] アウラ。"
+    },
+    {
+      "key": "frieren_lugner",
+      "reading": "りゅぐなー",
+      "written": "リュグナー",
+      "filename": "frieren_lugner.mp3",
+      "source": "generated-rerecord",
+      "bytes": 14209,
+      "status": "ok",
+      "prompt": "[日本語で「りゅぐなー」と読んで] リュグナー。"
+    },
+    {
+      "key": "frieren_linie",
+      "reading": "りーにえ",
+      "written": "リーニエ",
+      "filename": "frieren_linie.mp3",
+      "source": "generated-rerecord",
+      "bytes": 14209,
+      "status": "ok",
+      "prompt": "[日本語で「りーにえ」と読んで] リーニエ。"
+    },
+    {
+      "key": "frieren_draht",
+      "reading": "どらーと",
+      "written": "ドラート",
+      "filename": "frieren_draht.mp3",
+      "source": "generated-rerecord",
+      "bytes": 20897,
+      "status": "ok",
+      "prompt": "[日本語で「どらーと」と読んで] ドラート。"
+    },
+    {
+      "key": "frieren_serie",
+      "reading": "ぜーりえ",
+      "written": "ゼーリエ",
+      "filename": "frieren_serie.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17971,
+      "status": "ok",
+      "prompt": "[日本語で「ぜーりえ」と読んで] ゼーリエ。"
+    },
+    {
+      "key": "frieren_denken",
+      "reading": "でんけん",
+      "written": "デンケン",
+      "filename": "frieren_denken.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15881,
+      "status": "ok",
+      "prompt": "[日本語で「でんけん」と読んで] デンケン。"
+    },
+    {
+      "key": "frieren_ubel",
+      "reading": "ゆーべる",
+      "written": "ユーベル",
+      "filename": "frieren_ubel.mp3",
+      "source": "generated-rerecord",
+      "bytes": 14209,
+      "status": "ok",
+      "prompt": "[日本語で「ゆーべる」と読んで] ユーベル。"
+    },
+    {
+      "key": "frieren_land",
+      "reading": "らんと",
+      "written": "ラント",
+      "filename": "frieren_land.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12119,
+      "status": "ok",
+      "prompt": "[日本語で「らんと」と読んで] ラント。"
+    },
+    {
+      "key": "frieren_sense",
+      "reading": "ぜんせ",
+      "written": "ゼンセ",
+      "filename": "frieren_sense.mp3",
+      "source": "generated-rerecord",
+      "bytes": 12955,
+      "status": "ok",
+      "prompt": "[日本語で「ぜんせ」と読んで] ゼンセ。"
+    },
+    {
+      "key": "frieren_methode",
+      "reading": "めとーで",
+      "written": "メトーデ",
+      "filename": "frieren_methode.mp3",
+      "source": "generated-rerecord",
+      "bytes": 17553,
+      "status": "ok",
+      "prompt": "[日本語で「めとーで」と読んで] メトーデ。"
+    },
+    {
+      "key": "frieren_wirbel",
+      "reading": "ヴィアベル",
+      "written": "ヴィアベル",
+      "filename": "frieren_wirbel.mp3",
+      "source": "generated-rerecord",
+      "bytes": 16717,
+      "status": "ok",
+      "prompt": "[日本語で「ヴィアベル」と読んで] ヴィアベル。"
+    },
+    {
+      "key": "frieren_laufen",
+      "reading": "らおふぇん",
+      "written": "ラオフェン",
+      "filename": "frieren_laufen.mp3",
+      "source": "generated-rerecord",
+      "bytes": 16717,
+      "status": "ok",
+      "prompt": "[日本語で「らおふぇん」と読んで] ラオフェン。"
+    },
+    {
+      "key": "frieren_kanne",
+      "reading": "かねー",
+      "written": "カネー",
+      "filename": "frieren_kanne.mp3",
+      "source": "generated-rerecord",
+      "bytes": 13791,
+      "status": "ok",
+      "prompt": "[日本語で「かねー」と読んで] カネー。"
+    },
+    {
+      "key": "frieren_lawine",
+      "reading": "らゔぃね",
+      "written": "ラヴィネ",
+      "filename": "frieren_lawine.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15045,
+      "status": "ok",
+      "prompt": "[日本語で「らゔぃね」と読んで] ラヴィネ。"
+    },
+    {
+      "key": "frieren_genau",
+      "reading": "げなう",
+      "written": "ゲナウ",
+      "filename": "frieren_genau.mp3",
+      "source": "generated-rerecord",
+      "bytes": 14209,
+      "status": "ok",
+      "prompt": "[日本語で「げなう」と読んで] ゲナウ。"
+    },
+    {
+      "key": "frieren_scharf",
+      "reading": "しゃるふ",
+      "written": "シャルフ",
+      "filename": "frieren_scharf.mp3",
+      "source": "generated-rerecord",
+      "bytes": 10030,
+      "status": "ok",
+      "prompt": "[日本語で「しゃるふ」と読んで] シャルフ。"
+    },
+    {
+      "key": "frieren_ehre",
+      "reading": "えーれ",
+      "written": "エーレ",
+      "filename": "frieren_ehre.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15045,
+      "status": "ok",
+      "prompt": "[日本語で「えーれ」と読んで] エーレ。"
+    },
+    {
+      "key": "frieren_richter",
+      "reading": "りひたー",
+      "written": "リヒター",
+      "filename": "frieren_richter.mp3",
+      "source": "generated-rerecord",
+      "bytes": 14209,
+      "status": "ok",
+      "prompt": "[日本語で「りひたー」と読んで] リヒター。"
+    },
+    {
+      "key": "frieren_zoltraak",
+      "reading": "ぞるとらーく",
+      "written": "ゾルトラーク",
+      "filename": "frieren_zoltraak.mp3",
+      "source": "generated-rerecord",
+      "bytes": 21732,
+      "status": "ok",
+      "prompt": "[日本語で「ぞるとらーく」と読んで] ゾルトラーク。"
+    },
+    {
+      "key": "frieren_mistilteinn",
+      "reading": "みすてぃるていん",
+      "written": "ミスティルテイン",
+      "filename": "frieren_mistilteinn.mp3",
+      "source": "generated-rerecord",
+      "bytes": 21732,
+      "status": "ok",
+      "prompt": "[日本語で「みすてぃるていん」と読んで] ミスティルテイン。"
+    },
+    {
+      "key": "frieren_mimic",
+      "reading": "ミミック",
+      "written": "ミミック",
+      "filename": "frieren_mimic.mp3",
+      "source": "generated-rerecord",
+      "bytes": 11283,
+      "status": "ok",
+      "prompt": "[日本語で「ミミック」と読んで] ミミック。"
+    },
+    {
+      "key": "frieren_grimoire",
+      "reading": "まどうしょ",
+      "written": "魔導書",
+      "filename": "frieren_grimoire.mp3",
+      "source": "generated-rerecord",
+      "bytes": 15045,
+      "status": "ok",
+      "prompt": "[日本語で「まどうしょ」と読んで] 魔導書。"
     },
     {
       "key": "op_luffy",

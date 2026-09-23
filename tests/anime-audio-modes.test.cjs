@@ -42,10 +42,15 @@ test("Dragon Ball kana uses katakana except the Son family readings", () => {
   assert.equal(entries.find((entry) => entry.key === "db_shenron").hira, "シェンロン");
 });
 
-test("only Jujutsu Kaisen and Dragon Ball are visible while One Piece data stays available", () => {
+test("all documented anime series are visible and have a playable pool", () => {
   const anime = loadAnime();
-  assert.equal(anime.SERIES.map((series) => series.id).join(","), "jjk,db");
-  assert.ok(anime.getEntriesInSeries("op").length >= 25);
+  assert.equal(
+    anime.SERIES.map((series) => series.id).join(","),
+    "jjk,db,frieren,op",
+  );
+  for (const series of anime.SERIES) {
+    assert.ok(anime.getEntriesInSeries(series.id).length >= 25, `${series.id} needs >= 25 entries`);
+  }
 });
 
 test("anime audio-picture mode pairs a blank audio card with an image", () => {

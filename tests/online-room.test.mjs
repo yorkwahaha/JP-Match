@@ -3,13 +3,16 @@ import assert from "node:assert/strict";
 import {
   MATCH_HOLD_MS,
   MISMATCH_HOLD_MS,
+  RECONNECT_GRACE_MS,
   applyFlip,
   configureNextRound,
   createRoomState,
   joinRoom,
   leaveRoom,
+  nextRoomAlarmAt,
   publicRoomState,
   prepareDeck,
+  releaseExpiredDisconnectedPlayers,
   resolvePending,
   sanitizeConfig,
   seatForToken,
@@ -123,6 +126,52 @@ test("anonymous seats can join, reconnect, and start only when both are connecte
   assert.equal(setReady(state, 0, true, 1300).started, false);
   assert.equal(setReady(state, 1, true, 1400, () => 0.999).started, true);
   assert.equal(state.phase, "playing");
+});
+
+test("a disconnected seat is retained only until reconnect grace expires", () => {
+  const state = room();
+  joinRoom(state, { name: "太郎", token: "guest-token", now: 1100 });
+  setConnected(state, 0, true, 1200);
+  setConnected(state, 1, true, 1200);
+  setReady(state, 0, true, 1300);
+  setReady(state, 1, true, 1400, () => 0.999);
+
+  const disconnectedAt = 1500;
+  setConnected(state, 1, false, disconnectedAt);
+  assert.equal(nextRoomAlarmAt(state), disconnectedAt + RECONNECT_GRACE_MS);
+  assert.deepEqual(
+    releaseExpiredDisconnectedPlayers(state, disconnectedAt + RECONNECT_GRACE_MS - 1).releasedSeats,
+    [],
+  );
+  assert.ok(state.players[1]);
+  assert.equal(state.phase, "playing");
+
+  const released = releaseExpiredDisconnectedPlayers(
+    state,
+    disconnectedAt + RECONNECT_GRACE_MS,
+  );
+  assert.deepEqual(released.releasedSeats, [1]);
+  assert.equal(state.players[1], null);
+  assert.equal(state.hostSeat, 0);
+  assert.equal(state.phase, "lobby");
+});
+
+test("an expired disconnected host is released and the remaining player becomes host", () => {
+  const state = room();
+  joinRoom(state, { name: "太郎", token: "guest-token", now: 1100 });
+  setConnected(state, 0, true, 1200);
+  setConnected(state, 1, true, 1200);
+
+  const disconnectedAt = 1500;
+  setConnected(state, 0, false, disconnectedAt);
+  const released = releaseExpiredDisconnectedPlayers(
+    state,
+    disconnectedAt + RECONNECT_GRACE_MS,
+  );
+  assert.deepEqual(released.releasedSeats, [0]);
+  assert.equal(state.players[0], null);
+  assert.equal(state.hostSeat, 1);
+  assert.equal(state.phase, "lobby");
 });
 
 test("hidden cards stay secret until an authoritative reveal", () => {

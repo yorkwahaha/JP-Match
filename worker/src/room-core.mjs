@@ -237,6 +237,38 @@ export function leaveRoom(room, seat, now = Date.now()) {
   return { ok: true, releasedSeat: seat, hostSeat: room.hostSeat };
 }
 
+export function nextRoomAlarmAt(room) {
+  if (!room) return null;
+  const deadlines = [room.lastActiveAt + ROOM_TTL_MS];
+  if (room.pending?.dueAt != null) deadlines.push(room.pending.dueAt);
+  for (const player of room.players || []) {
+    if (player && !player.connected && player.disconnectedAt != null && !player.leftAt) {
+      deadlines.push(player.disconnectedAt + RECONNECT_GRACE_MS);
+    }
+  }
+  return Math.min(...deadlines);
+}
+
+export function releaseExpiredDisconnectedPlayers(room, now = Date.now()) {
+  if (!room) return { ok: false, releasedSeats: [] };
+  const releasedSeats = [];
+  for (let seat = 0; seat < room.players.length; seat += 1) {
+    const player = room.players[seat];
+    if (
+      player &&
+      !player.connected &&
+      player.disconnectedAt != null &&
+      now - player.disconnectedAt >= RECONNECT_GRACE_MS
+    ) {
+      releasedSeats.push(seat);
+    }
+  }
+  for (const seat of releasedSeats) {
+    if (room.players[seat]) leaveRoom(room, seat, now);
+  }
+  return { ok: true, releasedSeats };
+}
+
 export function setReady(room, seat, ready, now = Date.now(), random = Math.random) {
   const player = room?.players?.[seat];
   if (!player || room.phase !== "lobby") {

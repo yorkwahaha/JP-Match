@@ -15,6 +15,7 @@ const SERIES_FILTER = process.argv
 
 const PALETTE = {
   db: { bg: "#1a2744", accent: "#f0c040", ink: "#fff8e8" },
+  frieren: { bg: "#1e2a28", accent: "#8ec8b8", ink: "#f2f7f4" },
   jjk: { bg: "#2a2438", accent: "#c9a0ff", ink: "#f7f2ff" },
   op: { bg: "#162a44", accent: "#4aa8e8", ink: "#f0f7ff" },
 };

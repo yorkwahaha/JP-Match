@@ -1,12 +1,13 @@
 import { DurableObject } from "cloudflare:workers";
 import {
-  ROOM_TTL_MS,
   applyFlip,
   configureNextRound,
   createRoomState,
   joinRoom,
   leaveRoom,
+  nextRoomAlarmAt,
   publicRoomState,
+  releaseExpiredDisconnectedPlayers,
   resolvePending,
   roomExpired,
   sanitizeRoomCode,
@@ -104,8 +105,8 @@ export class RoomObject extends DurableObject {
 
   async scheduleAlarm() {
     if (!this.room) return;
-    const next = this.room.pending?.dueAt || this.room.lastActiveAt + ROOM_TTL_MS;
-    await this.ctx.storage.setAlarm(next);
+    const next = nextRoomAlarmAt(this.room);
+    if (next != null) await this.ctx.storage.setAlarm(next);
   }
 
   send(ws, payload) {
@@ -302,8 +303,13 @@ export class RoomObject extends DurableObject {
       await this.ctx.storage.deleteAll();
       return;
     }
+    let changed = false;
     if (this.room.pending?.dueAt <= now) {
-      resolvePending(this.room, now);
+      changed = resolvePending(this.room, now).ok || changed;
+    }
+    const expired = releaseExpiredDisconnectedPlayers(this.room, now);
+    if (expired.releasedSeats.length) changed = true;
+    if (changed) {
       await this.persist();
       this.broadcast();
     }

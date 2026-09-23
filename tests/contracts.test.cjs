@@ -149,12 +149,11 @@ test("anime entries, icons, and voice packs stay aligned", () => {
   const keys = new Set(entries.map((entry) => entry.key));
   const seriesIds = new Set(animeApi.SERIES.map((item) => item.id));
   assert.equal(keys.size, entries.length);
-  assert.deepEqual([...seriesIds].sort(), ["db", "jjk"]);
+  assert.deepEqual([...seriesIds].sort(), ["db", "frieren", "jjk", "op"]);
   for (const seriesId of seriesIds) {
     const count = entries.filter((entry) => entry.series === seriesId).length;
     assert.ok(count >= 25, `${seriesId} needs >= 25 entries`);
   }
-  assert.ok(entries.some((entry) => entry.series === "op"));
 
   for (const entry of entries) {
     assert.equal(entry.picKind, "img");
@@ -232,6 +231,8 @@ test("runtime fixes keep matched cards inert and audio failures bounded", () => 
   assert.match(generator, /function isMp3\(buffer\)/);
   assert.match(game, /card-face card-front" aria-hidden="true" hidden/);
   assert.match(game, /front\.hidden = !revealed/);
+  assert.match(game, /state\.lock = switchTurn/);
+  assert.match(game, /schedulePendingClose\(a, b, state\.runId, switchTurn\)/);
 });
 
 test("matched pair cords connect only the two cards", () => {
@@ -315,13 +316,15 @@ test("online room UI, transport, CSP, and Durable Object configuration stay conn
   assert.match(html, /wss:\/\/jp-match-online\.yorkwahaha\.workers\.dev/);
   assert.match(html, /<script src="\.\/js\/online\.js/);
   assert.match(html, /css\/styles\.css\?v=kotoba-musubi-10/);
-  assert.match(html, /js\/online\.js\?v=online-room-4/);
-  assert.match(html, /js\/anime\.js\?v=anime-op-1/);
-  assert.match(html, /js\/audio\.js\?v=anime-op-1/);
-  assert.match(html, /js\/game\.js\?v=anime-op-1/);
+  assert.match(html, /js\/online\.js\?v=online-room-5/);
+  assert.match(html, /js\/anime\.js\?v=anime-frieren-1/);
+  assert.match(html, /js\/audio\.js\?v=anime-frieren-1/);
+  assert.match(html, /js\/game\.js\?v=game-rules-1/);
   assert.match(game, /Online\.flip\(index\)/);
   assert.match(game, /Online\.resume\(invitedRoomCode\)/);
   assert.match(game, /對手已離開房間/);
+  assert.match(game, /等待房主設定下一局/);
+  assert.match(game, /snapshot\.phase === "complete"/);
   assert.match(online, /version: room\.version/);
   assert.match(online, /jp-match-online-session:/);
   assert.match(online, /type: "sync"/);

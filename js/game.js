@@ -775,7 +775,7 @@
     state.pendingClose = [];
   }
 
-  function schedulePendingClose(a, b, run) {
+  function schedulePendingClose(a, b, run, switchTurn) {
     clearMismatchTimer();
     state.pendingClose = [a, b];
     state.mismatchTimer = setTimeout(function () {
@@ -785,9 +785,13 @@
       flipClose(a);
       flipClose(b);
       state.pendingClose = [];
+      if (switchTurn) {
+        state.currentPlayer = 1 - state.currentPlayer;
+        state.lock = false;
+        updateHud({ turnSwitched: true });
+      }
     }, MISMATCH_HOLD_MS);
   }
-
   function onCardTap(index) {
     if (!els.menuOverlay.hidden) return;
     if (state.playMode === "online") {
@@ -921,17 +925,16 @@
     if (elA) elA.classList.add("is-mismatch");
     if (elB) elB.classList.add("is-mismatch");
     state.flipped = [];
-    state.lock = false;
-    // 失敗牌先保持翻開；滿 900ms 或下一張被翻開時才蓋回
-    schedulePendingClose(a, b, state.runId);
-    if (state.players === 2) {
-      state.currentPlayer = 1 - state.currentPlayer;
-      updateHud({ turnSwitched: true });
-      return;
+    const switchTurn = state.players === 2;
+    // 雙人失敗牌完整展示 900ms，期間鎖住盤面；蓋回後才正式換手。
+    // 單人仍可在下一次翻牌時提前蓋回上一組失敗牌。
+    state.lock = switchTurn;
+    schedulePendingClose(a, b, state.runId, switchTurn);
+    if (!switchTurn) {
+      state.lock = false;
+      updateHud();
     }
-    updateHud();
   }
-
   function endGame() {
     state.ended = true;
     Sound.stopBgm();
@@ -1160,22 +1163,26 @@
       snapshot.phase === "lobby" &&
       snapshot.youSeat === snapshot.hostSeat &&
       players.filter(Boolean).length < 2;
-    els.btnRoomReady.disabled = !myConnectionReady || opponentLeft;
+    const waitingForHostConfig =
+      snapshot.phase === "complete" && snapshot.youSeat !== snapshot.hostSeat;
+    els.btnRoomReady.disabled = !myConnectionReady || opponentLeft || waitingForHostConfig;
     els.btnRoomReady.textContent = opponentLeft
       ? "對手已離開"
-      : hostWaitingAlone
-        ? "修改題目設定"
-        : me?.ready
-          ? "取消準備"
-          : snapshot.phase === "complete"
-            ? "再玩一局"
-            : "我準備好了";
+      : waitingForHostConfig
+        ? "等待房主設定下一局"
+        : snapshot.phase === "complete"
+          ? "設定下一局"
+          : hostWaitingAlone
+            ? "修改題目設定"
+            : me?.ready
+              ? "取消準備"
+              : "我準備好了";
     if (opponentLeft) {
       els.roomStatus.textContent = "對手已離開房間。請返回首頁後重新開房。";
     } else if (snapshot.phase === "complete") {
-      els.roomStatus.textContent = readyCount
-        ? "等待另一端再次鎖定線軸…"
-        : "雙方都確認後，會用同一份內容重新洗牌。";
+      els.roomStatus.textContent = waitingForHostConfig
+        ? "等待房主設定下一局；設定完成後再重新準備。"
+        : "先設定下一局內容；套用後雙方再重新準備。";
     } else if (players.filter(Boolean).length < 2) {
       els.roomStatus.textContent = "把邀請連結傳給對手；座位不需要帳號。";
     } else if (!players.every((player) => player.connected)) {
@@ -1521,12 +1528,18 @@
         : "無法自動複製；請從瀏覽器網址列分享目前連結。";
     });
     els.btnRoomReady.addEventListener("click", () => {
-      const me = state.onlineSnapshot?.players?.[state.onlineSnapshot.youSeat];
+      const snapshot = state.onlineSnapshot;
+      if (!snapshot) return;
+      const me = snapshot.players?.[snapshot.youSeat];
       Sound.playSfx("select");
+      if (snapshot.phase === "complete") {
+        openOnlineRematchSetup();
+        return;
+      }
       if (
-        state.onlineSnapshot?.phase === "lobby" &&
-        state.onlineSnapshot.youSeat === state.onlineSnapshot.hostSeat &&
-        state.onlineSnapshot.players.filter(Boolean).length < 2
+        snapshot.phase === "lobby" &&
+        snapshot.youSeat === snapshot.hostSeat &&
+        snapshot.players.filter(Boolean).length < 2
       ) {
         openOnlineRematchSetup();
         return;
