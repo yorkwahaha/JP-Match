@@ -417,7 +417,11 @@ export function publicRoomState(room, forSeat = -1, now = Date.now()) {
     currentPlayer: room.currentPlayer,
     scores: room.scores,
     flipped: room.flipped,
-    pending: room.pending && { type: room.pending.type, dueAt: room.pending.dueAt },
+    pending: room.pending && {
+      type: room.pending.type,
+      dueAt: room.pending.dueAt,
+      remainingMs: Math.max(0, room.pending.dueAt - now),
+    },
     moves: room.moves,
     matchTraces: room.matchTraces,
     startedAt: room.startedAt,

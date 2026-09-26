@@ -95,7 +95,7 @@ https://yorkwahaha.github.io/JP-Match/
 
 ## 啟動方式
 
-用瀏覽器開啟 `index.html` 即可。若本機檔案有限制，可用任一靜態伺服器：
+用瀏覽器開啟 `index.html` 即可。若只是本機測試單人／同機雙人，可用任一靜態伺服器：
 
 ```bash
 # Python
@@ -108,9 +108,15 @@ npx --yes serve -p 5173
 npm run dev
 ```
 
-然後在瀏覽器或同網路的平板／手機開啟：
+本機請開 `http://localhost:5173`。
 
-`http://localhost:5173`（手機請改成電腦的區網 IP）
+若要用同網路的手機／平板測試**線上雙人**，請改用專案內建 LAN 預覽；它會只在開發伺服器送出的 HTML 中放行本機房間 Worker：
+
+```bash
+npm run dev:lan
+```
+
+接著在手機／平板開 `http://<電腦的區網 IP>:5173`。不要用 `python -m http.server` 或 `npx serve` 做 LAN 線上模式測試，因為正式 CSP 不會放行任意區網位址的 `:8787`。
 
 ## 開發與驗證
 

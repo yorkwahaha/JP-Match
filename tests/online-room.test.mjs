@@ -90,6 +90,7 @@ test("online decks reject traversal paths and unknown voice packs", () => {
   const invalidAudioKeyDeck = deck();
   invalidAudioKeyDeck[0] = { ...invalidAudioKeyDeck[0], audioKey: "..\\\\secret" };
   assert.throws(() => prepareDeck(invalidAudioKeyDeck), /INVALID_CARD_AUDIO_KEY/);
+
 });
 
 function deck() {
@@ -195,6 +196,22 @@ test("hidden cards stay secret until an authoritative reveal", () => {
   const after = publicRoomState(state, 0, 1500);
   assert.equal(after.deck[0].card.text, "a");
   assert.equal(after.deck[1].card, null);
+});
+
+test("pending snapshots expose server-relative remaining time", () => {
+  const state = room();
+  joinRoom(state, { name: "太郎", token: "guest-token", now: 1100 });
+  setConnected(state, 0, true, 1200);
+  setConnected(state, 1, true, 1200);
+  setReady(state, 0, true, 1300);
+  setReady(state, 1, true, 1400, () => 0.999);
+  applyFlip(state, 0, 0, 1500);
+  applyFlip(state, 0, 1, 1510);
+
+  const snapshot = publicRoomState(state, 0, 1600);
+  assert.equal(snapshot.pending.type, "match");
+  assert.equal(snapshot.pending.dueAt, 1510 + MATCH_HOLD_MS);
+  assert.equal(snapshot.pending.remainingMs, 1510 + MATCH_HOLD_MS - 1600);
 });
 
 test("a match scores for the active player and preserves the turn", () => {

@@ -252,7 +252,7 @@ test("matched word labels stay complete", () => {
   assert.match(game, /wrapReadingLines\(text, 4\)/);
 });
 
-test("audit regressions keep online sync, audio cues, mobile mode, and selection semantics", () => {
+test("static audit guards keep online sync, audio cues, mobile mode, and selection semantics wired", () => {
   const game = read("js/game.js");
   const css = read("css/styles.css");
   const html = read("index.html");
@@ -260,7 +260,9 @@ test("audit regressions keep online sync, audio cues, mobile mode, and selection
   const worker = read("worker/src/index.mjs");
   assert.doesNotMatch(game, /const wasDown = !previous \|\|/);
   assert.match(game, /previous\?\.deck\[index\]\?\.state === "down"/);
+  assert.match(game, /pending\?\.remainingMs/);
   assert.match(game, /scheduleOnlinePendingSync\(snapshot\)/);
+  assert.match(game, /spokenCardValue\(slot\.card\)/);
   assert.match(game, /lang="ja"/);
   assert.match(css, /data-side="audio"/);
   assert.match(css, /\.card-audio-cue/);
@@ -277,7 +279,14 @@ test("SFX and BGM assets stay present and valid", () => {
   assert.deepEqual(listMp3("assets/audio/sfx"), new Set(["select", "start", "flip", "match", "mismatch"]));
   assert.deepEqual(listMp3("assets/audio/bgm"), new Set(["area-1", "area-2", "area-3"]));
   for (const name of listMp3("assets/audio/sfx")) assertValidMp3(`assets/audio/sfx/${name}.mp3`);
-  for (const name of listMp3("assets/audio/bgm")) assertValidMp3(`assets/audio/bgm/${name}.mp3`);
+  for (const name of listMp3("assets/audio/bgm")) {
+    const relativePath = "assets/audio/bgm/" + name + ".mp3";
+    assertValidMp3(relativePath);
+    assert.ok(
+      fs.statSync(path.join(ROOT, relativePath)).size < 12 * 1024 * 1024,
+      relativePath + " is unexpectedly large",
+    );
+  }
 });
 
 test("generator dependency and staging behavior are reproducible", () => {
@@ -316,6 +325,15 @@ test("security policy and Pages workflow retain least privilege gates", () => {
     assert.match(csp[1], new RegExp(directive.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
   assert.match(html, /<meta name="referrer" content="no-referrer" \/>/);
+  assert.doesNotMatch(csp[1], /http:\/\/\*:8787|ws:\/\/\*:8787/);
+  const devServer = read("scripts/dev-server.mjs");
+  assert.match(devServer, /LAN_CSP_ANCHOR_MISMATCH/);
+  assert.match(devServer, /http:\/\/\*:8787/);
+  assert.match(devServer, /ws:\/\/\*:8787/);
+  assert.match(read("README.md"), /npm run dev:lan/);
+  assert.match(read("package.json"), /"dev:lan"/);
+  assert.match(read("css/styles.css"), /\.online-connection\.is-syncing\s*\{[^}]*var\(--ui-muted-strong\)/s);
+  assert.match(read("js/game.js"), /card\.display === "img"/);
   assert.match(workflow, /if: github\.ref == 'refs\/heads\/main'/);
   assert.match(workflow, /npm ci --ignore-scripts/);
   assert.match(workflow, /npm test/);

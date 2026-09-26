@@ -838,6 +838,7 @@
       if (Online.flip(index)) {
         state.onlineFlipPending = true;
         updateOnlineCardAvailability(snapshot);
+        renderOnlineConnection();
       }
       return;
     }
@@ -869,6 +870,13 @@
     }
   }
 
+  function spokenCardValue(card) {
+    if (card.display === "img" || card.side === "pic") {
+      return card.label || card.matchLabel || "圖片";
+    }
+    return card.text || card.matchLabel || card.label || "";
+  }
+
   function flipOpen(index) {
     const el = cardEl(index);
     const card = state.deck[index];
@@ -879,10 +887,7 @@
         front.setAttribute("aria-hidden", "false");
       }
       el.classList.add("is-flipped");
-      const spokenValue =
-        card.side === "pic" && card.label
-          ? card.label
-          : card.text || card.matchLabel || card.label || "";
+      const spokenValue = spokenCardValue(card);
       const spoken = card.kindLabel + (spokenValue ? " " + spokenValue : "");
       el.setAttribute("aria-label", spoken);
     }
@@ -1252,9 +1257,9 @@
 
   function scheduleOnlinePendingSync(snapshot) {
     clearOnlinePendingSync();
-    const dueAt = Number(snapshot?.pending?.dueAt);
-    if (!Number.isFinite(dueAt)) return;
-    const delay = Math.max(0, dueAt - Date.now() + 50);
+    const remainingMs = Number(snapshot?.pending?.remainingMs);
+    if (!Number.isFinite(remainingMs)) return;
+    const delay = Math.max(50, remainingMs + 50);
     state.onlinePendingSyncTimer = window.setTimeout(() => {
       state.onlinePendingSyncTimer = null;
       if (state.playMode === "online" && state.onlineSnapshot?.phase === "playing") {
@@ -1344,7 +1349,7 @@
       btn.setAttribute(
         "aria-label",
         revealed && slot.card
-          ? slot.card.kindLabel + " " + (slot.card.label || slot.card.text || slot.card.matchLabel || "")
+          ? slot.card.kindLabel + " " + spokenCardValue(slot.card)
           : faceDownLabel(index),
       );
     });
@@ -1404,15 +1409,18 @@
     els.onlineConnection.hidden = state.playMode !== "online";
     els.onlineConnection.classList.remove("is-error");
     els.onlineConnection.classList.toggle("is-reconnecting", reconnecting);
+    els.onlineConnection.classList.toggle("is-syncing", connected && state.onlineFlipPending && !opponentLeft && !opponentDisconnected);
     els.onlineConnection.classList.toggle("is-opponent-away", opponentLeft || opponentDisconnected);
     els.onlineConnection.setAttribute("aria-live", opponentLeft ? "assertive" : "polite");
     els.onlineConnection.textContent = opponentLeft
       ? "對手已離開房間 · 牌局已暫停，請從選單返回首頁"
       : opponentDisconnected
         ? "對手連線中斷 · 牌局暫停並保留座位"
-        : connected
-          ? "已接線"
-          : reconnecting
+        : connected && state.onlineFlipPending
+          ? "翻牌同步中…"
+          : connected
+            ? "已接線"
+            : reconnecting
             ? "重新接線中…"
             : state.onlineConnection === "creating" || state.onlineConnection === "joining"
               ? "建立連線中…"
@@ -1443,6 +1451,7 @@
     if (state.screen === "room") els.roomStatus.textContent = error.message;
     if (state.screen === "game" && state.playMode === "online") {
       els.onlineConnection.hidden = false;
+      els.onlineConnection.classList.remove("is-syncing");
       els.onlineConnection.classList.add("is-error");
       els.onlineConnection.setAttribute("aria-live", "assertive");
       els.onlineConnection.textContent = error.message;

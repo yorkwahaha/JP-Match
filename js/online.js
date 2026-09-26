@@ -14,6 +14,7 @@ window.JPMatchOnline = (() => {
   const SESSION_PREFIX = "jp-match-online-session:";
   const MAX_RECONNECT_DELAY_MS = 8000;
   const MAX_RECONNECT_ATTEMPTS = 8;
+  const FLIP_ACK_TIMEOUT_MS = 4000;
 
   let socket = null;
   let room = null;
@@ -22,6 +23,7 @@ window.JPMatchOnline = (() => {
   let reconnectTimer = null;
   let reconnectAttempts = 0;
   let flipInFlight = false;
+  let flipAckTimer = null;
   let intentionalClose = false;
   let handlers = {
     onState() {},
@@ -42,6 +44,7 @@ window.JPMatchOnline = (() => {
     ROUND_NOT_COMPLETE: "目前還不能調整下一局設定。",
     PLAYER_NOT_CONNECTED: "連線尚未完成，請稍候再準備。",
     OPPONENT_UNAVAILABLE: "對手目前不在線上，牌局已暫停。",
+    FLIP_TIMEOUT: "翻牌回應較久，已重新同步盤面。",
     ORIGIN_NOT_ALLOWED: "目前的網站來源尚未獲准使用線上房間。",
   };
 
@@ -130,6 +133,24 @@ window.JPMatchOnline = (() => {
     }, delay);
   }
 
+  function clearFlipAckTimer() {
+    if (flipAckTimer != null) {
+      window.clearTimeout(flipAckTimer);
+      flipAckTimer = null;
+    }
+  }
+
+  function armFlipAckTimer() {
+    clearFlipAckTimer();
+    flipAckTimer = window.setTimeout(() => {
+      flipAckTimer = null;
+      if (!flipInFlight) return;
+      flipInFlight = false;
+      sync();
+      emitError("FLIP_TIMEOUT");
+    }, FLIP_ACK_TIMEOUT_MS);
+  }
+
   function connect() {
     clearReconnectTimer();
     intentionalClose = false;
@@ -169,6 +190,7 @@ window.JPMatchOnline = (() => {
       if (message.room && (!room || message.room.version >= room.version)) {
         room = message.room;
         flipInFlight = false;
+        clearFlipAckTimer();
         handlers.onState(room);
       }
       if (message.type === "error" && message.code !== "STALE_STATE") {
@@ -179,6 +201,8 @@ window.JPMatchOnline = (() => {
       if (socket !== currentSocket) return;
       window.clearTimeout(openTimer);
       openTimer = null;
+      flipInFlight = false;
+      clearFlipAckTimer();
       socket = null;
       if (intentionalClose) {
         emitConnection("closed");
@@ -194,6 +218,8 @@ window.JPMatchOnline = (() => {
     });
     currentSocket.addEventListener("error", () => {
       if (socket !== currentSocket || intentionalClose) return;
+      flipInFlight = false;
+      clearFlipAckTimer();
       emitConnection("disconnected");
       window.setTimeout(() => {
         if (socket !== currentSocket || intentionalClose) return;
@@ -280,7 +306,10 @@ window.JPMatchOnline = (() => {
       version: room.version,
       actionId: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`,
     }));
-    if (type === "flip") flipInFlight = true;
+    if (type === "flip") {
+      flipInFlight = true;
+      armFlipAckTimer();
+    }
     return true;
   }
 
@@ -315,6 +344,7 @@ window.JPMatchOnline = (() => {
     roomCode = "";
     reconnectAttempts = 0;
     flipInFlight = false;
+    clearFlipAckTimer();
     const url = new URL(window.location.href);
     url.searchParams.delete("room");
     window.history.replaceState({}, "", url);

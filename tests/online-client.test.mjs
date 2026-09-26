@@ -81,6 +81,9 @@ function harness(locationHref = "https://example.test/?room=AB2C3D") {
       timers.delete(match[0]);
       match[1].callback();
     },
+    hasTimer(delay) {
+      return [...timers.values()].some((timer) => timer.delay === delay);
+    },
   };
 }
 
@@ -136,6 +139,48 @@ test("only one flip is sent until an authoritative state advances", () => {
   });
   assert.equal(online.flip(1), true);
   assert.equal(sockets[0].sent.at(-1).version, 8);
+});
+
+test("a missing flip acknowledgement resyncs and releases the transport lock", () => {
+  const { online, sockets, runTimer } = harness();
+  const errors = [];
+  online.init({ onError: (error) => errors.push(error) });
+  online.resume("AB2C3D");
+  sockets[0].emit("open");
+  sockets[0].emit("message", {
+    data: JSON.stringify({
+      type: "state",
+      room: { roomCode: "AB2C3D", version: 7, players: [{ connected: true }, { connected: true }] },
+    }),
+  });
+
+  assert.equal(online.flip(0), true);
+  runTimer(4000);
+
+  assert.deepEqual(sockets[0].sent.map((message) => message.type), ["sync", "flip", "sync"]);
+  assert.equal(errors.at(-1)?.code, "FLIP_TIMEOUT");
+  assert.equal(online.flip(1), true);
+});
+
+test("connection loss cancels the flip acknowledgement watchdog", () => {
+  for (const event of ["error", "close"]) {
+    const { online, sockets, hasTimer } = harness();
+    const errors = [];
+    online.init({ onError: (error) => errors.push(error) });
+    online.resume("AB2C3D");
+    sockets[0].emit("open");
+    sockets[0].emit("message", {
+      data: JSON.stringify({
+        type: "state",
+        room: { roomCode: "AB2C3D", version: 7, players: [{ connected: true }, { connected: true }] },
+      }),
+    });
+    assert.equal(online.flip(0), true);
+    assert.equal(hasTimer(4000), true);
+    sockets[0].emit(event, event === "close" ? { code: 1006, reason: "network lost" } : {});
+    assert.equal(hasTimer(4000), false);
+    assert.equal(errors.some((error) => error.code === "FLIP_TIMEOUT"), false);
+  }
 });
 
 test("LAN preview uses the same host for the local room worker", () => {

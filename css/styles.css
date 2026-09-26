@@ -2020,6 +2020,11 @@ html[data-theme="yuzu"] {
   color: var(--accent);
 }
 
+.online-connection.is-syncing {
+  color: var(--ui-muted-strong);
+  font-weight: 500;
+}
+
 .online-connection.is-error {
   color: var(--accent);
   font-weight: 700;
