@@ -49,7 +49,13 @@ test("audio-pic pairs one blank audio card with one picture card", () => {
     assert.equal(pictureCard.kindLabel, "圖片");
     assert.ok(["pic", "symbol", "img"].includes(pictureCard.display));
     assert.equal(pictureCard.voiceKey, audioCard.voiceKey);
+    assert.equal(pictureCard.label, entry.label);
   }
+});
+
+test("all word entries provide spoken labels", () => {
+  const words = loadWords();
+  assert.ok(words.WORDS.every((entry) => typeof entry.label === "string" && entry.label.trim()));
 });
 
 test("word deck rejects a requested pair count larger than its pool", () => {

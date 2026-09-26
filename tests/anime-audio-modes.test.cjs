@@ -53,6 +53,11 @@ test("all documented anime series are visible and have a playable pool", () => {
   }
 });
 
+test("all anime entries provide spoken labels", () => {
+  const anime = loadAnime();
+  assert.ok(anime.ENTRIES.every((entry) => typeof entry.label === "string" && entry.label.trim()));
+});
+
 test("anime deck rejects a requested pair count larger than its pool", () => {
   const anime = loadAnime();
   assert.throws(
@@ -84,6 +89,7 @@ test("anime audio-picture mode pairs a blank audio card with an image", () => {
     assert.equal(pictureCard.text, entry.pic);
     assert.equal(pictureCard.kindLabel, "圖片");
     assert.equal(pictureCard.display, "img");
+    assert.equal(pictureCard.label, entry.label);
   }
 });
 

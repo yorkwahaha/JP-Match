@@ -65,6 +65,9 @@ function sanitizeCard(input) {
   ) {
     throw new Error("INVALID_CARD_ASSET");
   }
+  if (card.display === "img" && !card.label) {
+    throw new Error("INVALID_CARD_LABEL");
+  }
   if (card.voicePack && !["words", "anime"].includes(card.voicePack)) {
     throw new Error("INVALID_CARD_VOICE_PACK");
   }

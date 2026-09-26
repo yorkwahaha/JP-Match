@@ -53,6 +53,7 @@ test("anime room configuration and voice-pack metadata survive sanitization", ()
       text: `assets/icons/anime/jjk/${index}.webp`,
       display: "img",
       voicePack: "anime",
+      label: `角色${index}`,
     },
     {
       pairKey: `anime-${index}`,
@@ -90,6 +91,15 @@ test("online decks reject traversal paths and unknown voice packs", () => {
   const invalidAudioKeyDeck = deck();
   invalidAudioKeyDeck[0] = { ...invalidAudioKeyDeck[0], audioKey: "..\\\\secret" };
   assert.throws(() => prepareDeck(invalidAudioKeyDeck), /INVALID_CARD_AUDIO_KEY/);
+
+  const missingImageLabelDeck = deck();
+  missingImageLabelDeck[0] = {
+    ...missingImageLabelDeck[0],
+    side: "pic",
+    display: "img",
+    text: "assets/icons/home/denki.png",
+  };
+  assert.throws(() => prepareDeck(missingImageLabelDeck), /INVALID_CARD_LABEL/);
 
 });
 
