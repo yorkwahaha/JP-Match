@@ -9,7 +9,7 @@
     <meta name="referrer" content="no-referrer" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' blob: data:; connect-src 'self' https://jpapp-tts-proxy.yorkwahaha.workers.dev https://jp-match-online.yorkwahaha.workers.dev wss://jp-match-online.yorkwahaha.workers.dev http://127.0.0.1:8787 ws://127.0.0.1:8787 http://localhost:8787 ws://localhost:8787; object-src 'none'; base-uri 'self'; form-action 'self'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' blob: data:; connect-src 'self' https://jpapp-tts-proxy.yorkwahaha.workers.dev https://jp-match-online.yorkwahaha.workers.dev wss://jp-match-online.yorkwahaha.workers.dev http://127.0.0.1:8787 ws://127.0.0.1:8787 http://localhost:8787 ws://localhost:8787 http://*:8787 ws://*:8787; object-src 'none'; base-uri 'self'; form-action 'self'"
     />
     <meta name="jp-match-online-api" content="https://jp-match-online.yorkwahaha.workers.dev" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -36,20 +36,20 @@
 
         <div class="setup-panel">
           <div class="field">
-            <span class="field-label">遊玩方式</span>
-            <div class="opt-row opt-row-three" data-group="play-mode">
-              <button type="button" class="opt" data-value="solo">單人</button>
-              <button type="button" class="opt is-active" data-value="local">同機雙人</button>
-              <button type="button" class="opt" data-value="online">線上雙人</button>
+            <span class="field-label" id="play-mode-label">遊玩方式</span>
+            <div class="opt-row opt-row-three" data-group="play-mode" role="group" aria-labelledby="play-mode-label">
+              <button type="button" class="opt" data-value="solo" aria-pressed="false">單人</button>
+              <button type="button" class="opt is-active" data-value="local" aria-pressed="true">同機雙人</button>
+              <button type="button" class="opt" data-value="online" aria-pressed="false">線上雙人</button>
             </div>
           </div>
 
           <div class="field">
-            <span class="field-label">練習內容</span>
-            <div class="opt-row" data-group="kind">
-              <button type="button" class="opt is-active" data-value="kana">五十音</button>
-              <button type="button" class="opt" data-value="words">單字</button>
-              <button type="button" class="opt" data-value="anime">動漫</button>
+            <span class="field-label" id="kind-label">練習內容</span>
+            <div class="opt-row" data-group="kind" role="group" aria-labelledby="kind-label">
+              <button type="button" class="opt is-active" data-value="kana" aria-pressed="true">五十音</button>
+              <button type="button" class="opt" data-value="words" aria-pressed="false">單字</button>
+              <button type="button" class="opt" data-value="anime" aria-pressed="false">動漫</button>
             </div>
           </div>
 
@@ -249,17 +249,17 @@
 
           <div class="menu-body">
             <div class="menu-theme">
-              <span class="menu-theme-label">介面配色</span>
-              <div class="opt-row opt-wrap" data-group="theme-menu">
-                <button type="button" class="opt theme-opt is-active" data-value="night">
+              <span class="menu-theme-label" id="theme-menu-label">介面配色</span>
+              <div class="opt-row opt-wrap" data-group="theme-menu" role="group" aria-labelledby="theme-menu-label">
+                <button type="button" class="opt theme-opt is-active" data-value="night" aria-pressed="true">
                   <span class="theme-swatch theme-swatch-night" aria-hidden="true"></span>
                   夜紺
                 </button>
-                <button type="button" class="opt theme-opt" data-value="mist">
+                <button type="button" class="opt theme-opt" data-value="mist" aria-pressed="false">
                   <span class="theme-swatch theme-swatch-mist" aria-hidden="true"></span>
                   水霧
                 </button>
-                <button type="button" class="opt theme-opt" data-value="yuzu">
+                <button type="button" class="opt theme-opt" data-value="yuzu" aria-pressed="false">
                   <span class="theme-swatch theme-swatch-yuzu" aria-hidden="true"></span>
                   柚香
                 </button>

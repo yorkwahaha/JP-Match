@@ -235,7 +235,10 @@ window.JPMatchWords = (() => {
     const pool = getWordsInCategory(opts.category || DEFAULT_CATEGORY);
     if (!pool.length) throw new Error("單字主題沒有可用單字");
 
-    const count = Math.min(Math.max(1, pairCount), pool.length);
+    const count = Number(pairCount);
+    if (!Number.isInteger(count) || count < 1 || count > pool.length) {
+      throw new Error("出題組數超出可用單字題池");
+    }
     const selected = shuffle(pool).slice(0, count);
     const sideA = mode.sides[0];
     const sideB = mode.sides[1];
@@ -256,6 +259,7 @@ window.JPMatchWords = (() => {
         display: sideA === "pic" ? picDisplay : "text",
         voiceText: word.hira,
         voiceKey: word.key,
+        matchLabel: sideA === "audio" ? word.hira : "",
         label: word.label,
         picSub: sideA === "pic" ? word.picSub || "" : "",
       });
@@ -267,6 +271,7 @@ window.JPMatchWords = (() => {
         display: sideB === "pic" ? picDisplay : "text",
         voiceText: word.hira,
         voiceKey: word.key,
+        matchLabel: sideB === "audio" ? word.hira : "",
         label: word.label,
         picSub: sideB === "pic" ? word.picSub || "" : "",
       });

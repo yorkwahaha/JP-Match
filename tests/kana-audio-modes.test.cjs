@@ -46,9 +46,18 @@ for (const [modeId, visibleSide, visibleField] of [
       const kanaCard = cards.find((card) => card.side === visibleSide);
       assert.equal(audioCard.text, "");
       assert.equal(audioCard.kindLabel, "純聲音卡");
+      assert.equal(audioCard.matchLabel, kanaCard.text);
       assert.ok(audioCard.audioKey);
       assert.equal(kanaCard.text, entries.get(kanaCard.pairKey)[visibleField]);
       assert.equal(kanaCard.audioKey, audioCard.audioKey);
     }
   });
 }
+
+test("kana deck rejects a requested pair count larger than its pool", () => {
+  const kana = loadKana();
+  assert.throws(
+    () => kana.buildDeck("audio-hira", 11, { fromRow: "a", toRow: "ka" }),
+    /出題組數超出/,
+  );
+});

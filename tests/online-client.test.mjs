@@ -5,7 +5,7 @@ import vm from "node:vm";
 
 const source = fs.readFileSync(new URL("../js/online.js", import.meta.url), "utf8");
 
-function harness() {
+function harness(locationHref = "https://example.test/?room=AB2C3D") {
   const sockets = [];
   const timers = new Map();
   let timerId = 0;
@@ -44,7 +44,7 @@ function harness() {
   const localStorage = new Map([
     ["jp-match-online-session:AB2C3D", JSON.stringify({ roomCode: "AB2C3D", token: "host-token", playerName: "Host" })],
   ]);
-  const location = new URL("https://example.test/?room=AB2C3D");
+  const location = new URL(locationHref);
   const window = {
     location,
     history: { replaceState() {} },
@@ -111,4 +111,36 @@ test("a websocket error without close schedules a replacement connection", () =>
   runTimer(250);
   runTimer(500);
   assert.equal(sockets.length, 2);
+});
+
+test("only one flip is sent until an authoritative state advances", () => {
+  const { online, sockets } = harness();
+  online.resume("AB2C3D");
+  sockets[0].emit("open");
+  sockets[0].emit("message", {
+    data: JSON.stringify({
+      type: "state",
+      room: { roomCode: "AB2C3D", version: 7, players: [{ connected: true }, { connected: true }] },
+    }),
+  });
+  assert.equal(online.flip(0), true);
+  assert.equal(online.flip(1), false);
+  assert.deepEqual(sockets[0].sent.map((message) => message.type), ["sync", "flip"]);
+  assert.equal(sockets[0].sent[1].version, 7);
+
+  sockets[0].emit("message", {
+    data: JSON.stringify({
+      type: "state",
+      room: { roomCode: "AB2C3D", version: 8, players: [{ connected: true }, { connected: true }] },
+    }),
+  });
+  assert.equal(online.flip(1), true);
+  assert.equal(sockets[0].sent.at(-1).version, 8);
+});
+
+test("LAN preview uses the same host for the local room worker", () => {
+  const { online, sockets } = harness("http://192.168.1.20:5173/?room=AB2C3D");
+  assert.equal(online.apiBase, "http://192.168.1.20:8787");
+  online.resume("AB2C3D");
+  assert.match(sockets[0].url, /^ws:\/\/192\.168\.1\.20:8787\//);
 });

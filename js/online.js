@@ -1,8 +1,14 @@
 window.JPMatchOnline = (() => {
   const meta = document.querySelector('meta[name="jp-match-online-api"]');
-  const localHost = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+  const host = window.location.hostname;
+  const localHost =
+    /^(localhost|127\.0\.0\.1|::1)$/.test(host) ||
+    /^10\./.test(host) ||
+    /^192\.168\./.test(host) ||
+    /^172\.(1[6-9]|2\d|3[01])\./.test(host);
+  const localApiHost = host.includes(":") ? `[${host}]` : host;
   const API_BASE = String(
-    (localHost ? "http://127.0.0.1:8787" : meta?.content) ||
+    (localHost ? `http://${localApiHost}:8787` : meta?.content) ||
       "https://jp-match-online.yorkwahaha.workers.dev",
   ).replace(/\/$/, "");
   const SESSION_PREFIX = "jp-match-online-session:";
@@ -15,6 +21,7 @@ window.JPMatchOnline = (() => {
   let roomCode = "";
   let reconnectTimer = null;
   let reconnectAttempts = 0;
+  let flipInFlight = false;
   let intentionalClose = false;
   let handlers = {
     onState() {},
@@ -161,6 +168,7 @@ window.JPMatchOnline = (() => {
       }
       if (message.room && (!room || message.room.version >= room.version)) {
         room = message.room;
+        flipInFlight = false;
         handlers.onState(room);
       }
       if (message.type === "error" && message.code !== "STALE_STATE") {
@@ -254,7 +262,14 @@ window.JPMatchOnline = (() => {
     return true;
   }
 
+  function sync() {
+    if (!socket || socket.readyState !== WebSocket.OPEN) return false;
+    socket.send(JSON.stringify({ type: "sync" }));
+    return true;
+  }
+
   function send(type, payload = {}) {
+    if (type === "flip" && flipInFlight) return false;
     if (!socket || socket.readyState !== WebSocket.OPEN || !room) {
       emitError("NETWORK_UNAVAILABLE", "尚未接上房間，請稍候。 ");
       return false;
@@ -265,6 +280,7 @@ window.JPMatchOnline = (() => {
       version: room.version,
       actionId: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`,
     }));
+    if (type === "flip") flipInFlight = true;
     return true;
   }
 
@@ -298,6 +314,7 @@ window.JPMatchOnline = (() => {
     token = "";
     roomCode = "";
     reconnectAttempts = 0;
+    flipInFlight = false;
     const url = new URL(window.location.href);
     url.searchParams.delete("room");
     window.history.replaceState({}, "", url);
@@ -324,6 +341,7 @@ window.JPMatchOnline = (() => {
     create,
     join,
     resume,
+    sync,
     ready(ready = true) {
       return send("ready", { ready });
     },

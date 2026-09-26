@@ -82,6 +82,14 @@ test("online decks reject traversal paths and unknown voice packs", () => {
   const invalidVoiceDeck = deck();
   invalidVoiceDeck[0] = { ...invalidVoiceDeck[0], voicePack: "remote" };
   assert.throws(() => prepareDeck(invalidVoiceDeck), /INVALID_CARD_VOICE_PACK/);
+
+  const invalidVoiceKeyDeck = deck();
+  invalidVoiceKeyDeck[0] = { ...invalidVoiceKeyDeck[0], voiceKey: "../../secret" };
+  assert.throws(() => prepareDeck(invalidVoiceKeyDeck), /INVALID_CARD_AUDIO_KEY/);
+
+  const invalidAudioKeyDeck = deck();
+  invalidAudioKeyDeck[0] = { ...invalidAudioKeyDeck[0], audioKey: "..\\\\secret" };
+  assert.throws(() => prepareDeck(invalidAudioKeyDeck), /INVALID_CARD_AUDIO_KEY/);
 });
 
 function deck() {

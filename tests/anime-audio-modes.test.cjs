@@ -53,6 +53,14 @@ test("all documented anime series are visible and have a playable pool", () => {
   }
 });
 
+test("anime deck rejects a requested pair count larger than its pool", () => {
+  const anime = loadAnime();
+  assert.throws(
+    () => anime.buildDeck("audio-pic", 999, { series: "db" }),
+    /出題組數超出/,
+  );
+});
+
 test("anime audio-picture mode pairs a blank audio card with an image", () => {
   const anime = loadAnime();
   const deck = anime.buildDeck("audio-pic", 6, { series: "db" });

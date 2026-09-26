@@ -93,6 +93,8 @@
     onlineRematchSetup: false,
     onlineConfigPending: false,
     onlineReadyAfterConfig: false,
+    onlineFlipPending: false,
+    onlinePendingSyncTimer: null,
     // 每次開局遞增；async 流程 await 回來須比對，避免舊局殘留的回呼污染新局
     runId: 0,
   };
@@ -238,7 +240,9 @@
 
   function syncThemeUI() {
     qsa('[data-group="theme-menu"] .opt').forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.value === state.theme);
+      const active = btn.dataset.value === state.theme;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
     });
     if (els.selTheme) els.selTheme.value = state.theme;
   }
@@ -331,11 +335,15 @@
   function syncSetupUI() {
     const configuringRematch = state.onlineRematchSetup && state.playMode === "online";
     qsa('[data-group="play-mode"] .opt').forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.value === state.playMode);
+      const active = btn.dataset.value === state.playMode;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
       btn.disabled = configuringRematch;
     });
     qsa('[data-group="kind"] .opt').forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.value === state.kind);
+      const active = btn.dataset.value === state.kind;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
     });
     if (els.selMode) els.selMode.value = state.pairMode;
     if (els.selGrid) els.selGrid.value = state.gridId;
@@ -481,6 +489,9 @@
     state.completedAt = null;
     state.ended = false;
     state.runId += 1;
+    state.onlineFlipPending = false;
+    clearOnlinePendingSync();
+    renderOnlineConnection();
 
     els.btnSettle.hidden = true;
     els.modeChip.hidden = false;
@@ -524,6 +535,9 @@
     const isImg = card.display === "img";
     const isPic = card.display === "pic" || (card.side === "pic" && !isImg);
     const isSymbol = card.display === "symbol";
+    if (card.side === "audio") {
+      return '<span class="card-audio-cue" aria-hidden="true">聽</span>';
+    }
     if (isSymbol) {
       const compact = card.text.length > 2 ? " is-compact" : "";
       const stacked = card.picSub ? " is-stacked" : "";
@@ -550,7 +564,7 @@
     const wrapped = readingSides ? wrapReadingLines(card.text, 4) : card.text;
     if (Array.isArray(wrapped)) {
       return (
-        '<span class="card-text is-wrapped' + cardTextClass(card.text) + '">' +
+        '<span class="card-text is-wrapped' + cardTextClass(card.text) + '" lang="ja">' +
         wrapped
           .map(function (line) {
             return '<span class="card-text-line">' + escapeHtml(line) + "</span>";
@@ -560,7 +574,7 @@
       );
     }
     return (
-      '<span class="card-text' + cardTextClass(String(wrapped)) + '">' +
+      '<span class="card-text' + cardTextClass(String(wrapped)) + '"' + (readingSides ? ' lang="ja"' : '') + '>' +
       escapeHtml(wrapped) +
       "</span>"
     );
@@ -591,6 +605,7 @@
       btn.dataset.index = String(index);
       btn.dataset.side = card.side;
       btn.setAttribute("aria-label", faceDownLabel(index));
+      btn.setAttribute("aria-disabled", "false");
 
       const contentHtml = cardContentHtml(card);
 
@@ -792,11 +807,38 @@
       }
     }, MISMATCH_HOLD_MS);
   }
+  function updateOnlineCardAvailability(snapshot = state.onlineSnapshot) {
+    if (!snapshot) return;
+    const myTurn = snapshot.youSeat === snapshot.currentPlayer;
+    const bothPlayersConnected = snapshot.players.every((player) => player?.connected && !player.left);
+    qsa(".card", els.board).forEach((btn) => {
+      const slot = snapshot.deck[Number(btn.dataset.index)];
+      if (!slot) return;
+      const unavailable =
+        slot.state !== "down" ||
+        Boolean(snapshot.pending) ||
+        state.onlineFlipPending ||
+        !myTurn ||
+        !bothPlayersConnected;
+      const reviewableMatch = slot.state === "matched";
+      btn.disabled = unavailable && !reviewableMatch;
+      btn.setAttribute("aria-disabled", unavailable ? "true" : "false");
+    });
+  }
+
   function onCardTap(index) {
     if (!els.menuOverlay.hidden) return;
     if (state.playMode === "online") {
-      if (!state.onlineSnapshot || state.onlineSnapshot.phase !== "playing") return;
-      Online.flip(index);
+      const snapshot = state.onlineSnapshot;
+      if (!snapshot || snapshot.phase !== "playing" || state.onlineFlipPending) return;
+      const slot = snapshot.deck[index];
+      if (!slot || slot.state !== "down" || snapshot.pending) return;
+      if (snapshot.youSeat !== snapshot.currentPlayer) return;
+      if (!snapshot.players.every((player) => player?.connected && !player.left)) return;
+      if (Online.flip(index)) {
+        state.onlineFlipPending = true;
+        updateOnlineCardAvailability(snapshot);
+      }
       return;
     }
     if (state.lock || state.ended) return;
@@ -837,16 +879,17 @@
         front.setAttribute("aria-hidden", "false");
       }
       el.classList.add("is-flipped");
-      const spoken =
+      const spokenValue =
         card.side === "pic" && card.label
-          ? card.kindLabel + " " + card.label
-          : card.kindLabel + " " + card.text;
+          ? card.label
+          : card.text || card.matchLabel || card.label || "";
+      const spoken = card.kindLabel + (spokenValue ? " " + spokenValue : "");
       el.setAttribute("aria-label", spoken);
     }
     Sound.playSfx("flip");
     if (!card) return;
     if (card.voiceKey) Sound.playWord(card.voiceKey, card.voiceText, card.voicePack);
-    else if (card.audioKey) Sound.playKana(card.audioKey);
+    else if (card.audioKey) Sound.playKana(card.audioKey, card.matchLabel || card.text || card.label || "");
   }
 
   function flipClose(index) {
@@ -884,8 +927,8 @@
     const elB = cardEl(b);
     if (elA) elA.classList.add("is-matched");
     if (elB) elB.classList.add("is-matched");
-    if (elA) elA.disabled = true;
-    if (elB) elB.disabled = true;
+    if (elA) elA.setAttribute("aria-disabled", "true");
+    if (elB) elB.setAttribute("aria-disabled", "true");
     if (elA) elA.dataset.owner = String(state.currentPlayer);
     if (elB) elB.dataset.owner = String(state.currentPlayer);
     if (elA) elA.dataset.matchLabel = matchAnchorLabel(state.deck[a]);
@@ -1200,6 +1243,26 @@
     return { pairKey: "", side: "hidden", text: "", kindLabel: "卡牌" };
   }
 
+  function clearOnlinePendingSync() {
+    if (state.onlinePendingSyncTimer != null) {
+      window.clearTimeout(state.onlinePendingSyncTimer);
+      state.onlinePendingSyncTimer = null;
+    }
+  }
+
+  function scheduleOnlinePendingSync(snapshot) {
+    clearOnlinePendingSync();
+    const dueAt = Number(snapshot?.pending?.dueAt);
+    if (!Number.isFinite(dueAt)) return;
+    const delay = Math.max(0, dueAt - Date.now() + 50);
+    state.onlinePendingSyncTimer = window.setTimeout(() => {
+      state.onlinePendingSyncTimer = null;
+      if (state.playMode === "online" && state.onlineSnapshot?.phase === "playing") {
+        Online.sync();
+      }
+    }, delay);
+  }
+
   function initializeOnlineGame(snapshot) {
     const grid = GRID_PRESETS.find((item) => item.id === snapshot.config.gridId) || getGrid();
     state.players = 2;
@@ -1218,6 +1281,8 @@
     state.ended = false;
     state.runId += 1;
     state.onlineResultShownForVersion = null;
+    state.onlineFlipPending = false;
+    clearOnlinePendingSync();
     document.body.dataset.players = "2";
     document.body.dataset.turn = String(state.currentPlayer);
     els.board.style.setProperty("--cols", String(grid.cols));
@@ -1237,7 +1302,7 @@
   function playOnlineReveal(card) {
     Sound.playSfx("flip");
     if (card.voiceKey) Sound.playWord(card.voiceKey, card.voiceText, card.voicePack);
-    else if (card.audioKey) Sound.playKana(card.audioKey);
+    else if (card.audioKey) Sound.playKana(card.audioKey, card.matchLabel || card.text || card.label || "");
   }
 
   function applyOnlineGameState(snapshot, previous) {
@@ -1259,7 +1324,7 @@
         fillCardFront(btn, slot.card);
       }
       const card = state.deck[index];
-      const wasDown = !previous || previous.deck[index]?.state === "down";
+      const wasDown = previous?.deck[index]?.state === "down";
       const revealed = slot.state === "up" || slot.state === "matched";
       if (revealed && wasDown && slot.card) playOnlineReveal(slot.card);
       const front = qs(".card-front", btn);
@@ -1275,18 +1340,17 @@
         btn.dataset.owner = String(slot.owner);
         btn.dataset.matchLabel = matchAnchorLabel(card);
       }
-      const myTurn = snapshot.youSeat === snapshot.currentPlayer;
-      const bothPlayersConnected = snapshot.players.every((player) => player?.connected && !player.left);
-      btn.disabled = slot.state !== "down" || Boolean(snapshot.pending) || !myTurn || !bothPlayersConnected;
+
       btn.setAttribute(
         "aria-label",
         revealed && slot.card
-          ? slot.card.kindLabel + " " + (slot.card.label || slot.card.text)
+          ? slot.card.kindLabel + " " + (slot.card.label || slot.card.text || slot.card.matchLabel || "")
           : faceDownLabel(index),
       );
     });
+    updateOnlineCardAvailability(snapshot);
 
-    if (!previous?.pending && snapshot.pending) {
+    if (previous && !previous.pending && snapshot.pending) {
       Sound.playSfx(snapshot.pending.type === "match" ? "match" : "mismatch");
     }
     updateHud({ turnSwitched: previousTurn !== state.currentPlayer });
@@ -1304,10 +1368,12 @@
   function handleOnlineState(snapshot) {
     const previous = state.onlineSnapshot;
     state.onlineSnapshot = snapshot;
+    state.onlineFlipPending = false;
     state.playerNames = snapshot.players.map((player, index) => player?.name || PLAYER_NAMES[index]);
     if (snapshot.phase === "lobby") {
       state.onlineRematchSetup = false;
       state.onlineConfigPending = false;
+      clearOnlinePendingSync();
       renderOnlineRoom(snapshot);
       if (state.onlineReadyAfterConfig && snapshot.youSeat === snapshot.hostSeat) {
         state.onlineReadyAfterConfig = false;
@@ -1325,6 +1391,7 @@
       state.startedAt !== snapshot.startedAt;
     if (newRound) initializeOnlineGame(snapshot);
     applyOnlineGameState(snapshot, newRound ? null : previous);
+    scheduleOnlinePendingSync(snapshot);
   }
 
   function renderOnlineConnection() {
@@ -1335,6 +1402,7 @@
     const opponentLeft = connected && Boolean(opponent?.left);
     const opponentDisconnected = connected && Boolean(opponent && !opponent.connected && !opponent.left);
     els.onlineConnection.hidden = state.playMode !== "online";
+    els.onlineConnection.classList.remove("is-error");
     els.onlineConnection.classList.toggle("is-reconnecting", reconnecting);
     els.onlineConnection.classList.toggle("is-opponent-away", opponentLeft || opponentDisconnected);
     els.onlineConnection.setAttribute("aria-live", opponentLeft ? "assertive" : "polite");
@@ -1369,8 +1437,16 @@
       state.onlineReadyAfterConfig = false;
       syncSetupUI();
     }
+    state.onlineFlipPending = false;
+    updateOnlineCardAvailability();
     setOnlineSetupStatus(error.message, true);
     if (state.screen === "room") els.roomStatus.textContent = error.message;
+    if (state.screen === "game" && state.playMode === "online") {
+      els.onlineConnection.hidden = false;
+      els.onlineConnection.classList.add("is-error");
+      els.onlineConnection.setAttribute("aria-live", "assertive");
+      els.onlineConnection.textContent = error.message;
+    }
   }
 
   function leaveOnlineRoom() {
@@ -1380,6 +1456,8 @@
     state.onlineRematchSetup = false;
     state.onlineConfigPending = false;
     state.onlineReadyAfterConfig = false;
+    state.onlineFlipPending = false;
+    clearOnlinePendingSync();
     state.playerNames = PLAYER_NAMES.slice();
     showScreen("setup");
     syncSetupUI();
@@ -1505,10 +1583,14 @@
     });
     els.optBgmVolume.addEventListener("input", syncAudioSettings);
 
-    els.onlineName.addEventListener("input", syncPoolHint);
+    els.onlineName.addEventListener("input", () => {
+      setOnlineSetupStatus("免註冊；暱稱與匿名重連憑證只用於這個房間。", false);
+      syncPoolHint();
+    });
     els.onlineRoomCode.addEventListener("input", () => {
       const cleaned = els.onlineRoomCode.value.toUpperCase().replace(/[^A-Z2-9]/g, "");
       if (els.onlineRoomCode.value !== cleaned) els.onlineRoomCode.value = cleaned;
+      setOnlineSetupStatus("免註冊；暱稱與匿名重連憑證只用於這個房間。", false);
       syncPoolHint();
     });
     els.onlineRoomCode.addEventListener("keydown", (event) => {

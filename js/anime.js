@@ -1408,7 +1408,10 @@ window.JPMatchAnime = (() => {
     const pool = getEntriesInSeries(opts.series || DEFAULT_SERIES);
     if (!pool.length) throw new Error("動漫作品沒有可用題目");
 
-    const count = Math.min(Math.max(1, pairCount), pool.length);
+    const count = Number(pairCount);
+    if (!Number.isInteger(count) || count < 1 || count > pool.length) {
+      throw new Error("出題組數超出可用動漫題池");
+    }
     const selected = shuffle(pool).slice(0, count);
     const sideA = mode.sides[0];
     const sideB = mode.sides[1];

@@ -51,10 +51,30 @@ function allowedOrigins(env) {
     .filter(Boolean);
 }
 
+function isPrivateDevHost(hostname) {
+  return (
+    /^(localhost|127\.0\.0\.1|::1)$/.test(hostname) ||
+    /^10\./.test(hostname) ||
+    /^192\.168\./.test(hostname) ||
+    /^172\.(1[6-9]|2\d|3[01])\./.test(hostname)
+  );
+}
+
 function originAllowed(request, env) {
   const origin = request.headers.get("origin");
   if (!origin) return true;
-  return allowedOrigins(env).includes(origin);
+  if (allowedOrigins(env).includes(origin)) return true;
+  try {
+    const originUrl = new URL(origin);
+    const requestUrl = new URL(request.url);
+    return (
+      isPrivateDevHost(originUrl.hostname) &&
+      isPrivateDevHost(requestUrl.hostname) &&
+      (originUrl.port === "5173" || originUrl.port === "")
+    );
+  } catch (_) {
+    return false;
+  }
 }
 
 function corsHeaders(request, env) {
@@ -215,6 +235,16 @@ export class RoomObject extends DurableObject {
     const { seat } = ws.deserializeAttachment() || {};
     const player = this.room.players[seat];
     if (!player) return;
+
+    const now = Date.now();
+    if (this.room.pending?.dueAt <= now) {
+      const settled = resolvePending(this.room, now);
+      if (settled.ok) {
+        await this.persist();
+        await this.scheduleAlarm();
+        this.broadcast();
+      }
+    }
 
     let command;
     try {

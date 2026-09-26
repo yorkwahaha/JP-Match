@@ -240,7 +240,10 @@ window.JPMatchData = (() => {
     );
     if (!pool.length) throw new Error("出題範圍沒有可用假名");
 
-    const count = Math.min(Math.max(1, pairCount), pool.length);
+    const count = Number(pairCount);
+    if (!Number.isInteger(count) || count < 1 || count > pool.length) {
+      throw new Error("出題組數超出可用假名題池");
+    }
     const selected = shuffle(pool).slice(0, count);
     const sideA = mode.sides[0];
     const sideB = mode.sides[1];
@@ -253,6 +256,7 @@ window.JPMatchData = (() => {
         side: sideA,
         text: sideA === "audio" ? "" : kana[sideA],
         kindLabel: mode.sideLabels[sideA],
+        matchLabel: sideA === "audio" ? kana[sideB] : "",
       });
       cards.push({
         pairKey: kana.key,
@@ -260,6 +264,7 @@ window.JPMatchData = (() => {
         side: sideB,
         text: sideB === "audio" ? "" : kana[sideB],
         kindLabel: mode.sideLabels[sideB],
+        matchLabel: sideB === "audio" ? kana[sideA] : "",
       });
     });
 

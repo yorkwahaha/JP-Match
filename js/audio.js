@@ -375,12 +375,16 @@ window.JPMatchAudio = (() => {
     }
   }
 
-  function playKana(romajiKey) {
+  function playKana(romajiKey, fallbackText) {
     if (!settings.voice || !romajiKey) return;
     stopReading();
     const key = String(romajiKey).toLowerCase();
     const src = PATHS.kanaDir + key + ".mp3";
-    playLocalReading(src, settings.voiceVolume);
+    const onError = function (error) {
+      reportAudioIssue("kana " + src, error);
+      if (fallbackText) playReading(fallbackText);
+    };
+    playLocalReading(src, settings.voiceVolume, onError);
   }
 
   function playWord(wordKey, fallbackText, voicePackId) {
@@ -584,11 +588,8 @@ window.JPMatchAudio = (() => {
 
   function pickBgm() {
     if (!PATHS.bgm.length) return null;
-    let next = Math.floor(Math.random() * PATHS.bgm.length);
-    if (PATHS.bgm.length > 1 && next === bgmIndex) {
-      next = (next + 1) % PATHS.bgm.length;
-    }
-    bgmIndex = next;
+    if (bgmIndex >= 0 && PATHS.bgm[bgmIndex]) return PATHS.bgm[bgmIndex];
+    bgmIndex = Math.floor(Math.random() * PATHS.bgm.length);
     return PATHS.bgm[bgmIndex];
   }
 
@@ -604,7 +605,7 @@ window.JPMatchAudio = (() => {
     if (!bgmEl) {
       bgmEl = new Audio();
       bgmEl.loop = true;
-      bgmEl.preload = "auto";
+      bgmEl.preload = "metadata";
     }
     if (bgmEl.dataset.src !== src) {
       bgmEl.src = src;

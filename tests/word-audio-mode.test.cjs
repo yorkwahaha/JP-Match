@@ -44,9 +44,18 @@ test("audio-pic pairs one blank audio card with one picture card", () => {
     assert.equal(audioCard.display, "text");
     assert.equal(audioCard.voiceKey, entry.key);
     assert.equal(audioCard.voiceText, entry.hira);
+    assert.equal(audioCard.matchLabel, entry.hira);
     assert.equal(pictureCard.text, entry.pic);
     assert.equal(pictureCard.kindLabel, "圖片");
     assert.ok(["pic", "symbol", "img"].includes(pictureCard.display));
     assert.equal(pictureCard.voiceKey, audioCard.voiceKey);
   }
+});
+
+test("word deck rejects a requested pair count larger than its pool", () => {
+  const words = loadWords();
+  assert.throws(
+    () => words.buildDeck("audio-pic", 999, { category: "animals" }),
+    /出題組數超出/,
+  );
 });

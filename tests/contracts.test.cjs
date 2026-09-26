@@ -223,10 +223,13 @@ test("runtime fixes keep matched cards inert and audio failures bounded", () => 
   const audio = read("js/audio.js");
   const generator = read("scripts/gen-word-audio.js");
   assert.doesNotMatch(game, /else if \(card\.voiceText\)/);
-  assert.match(game, /elA\.disabled = true/);
-  assert.match(game, /elB\.disabled = true/);
+  assert.match(game, /elA\.setAttribute\("aria-disabled", "true"\)/);
+  assert.match(game, /elB\.setAttribute\("aria-disabled", "true"\)/);
+  assert.doesNotMatch(game, /el[AB]\.disabled = true/);
   assert.match(audio, /MAX_VOICE_BUFFER_CACHE = 64/);
   assert.match(audio, /reportAudioIssue\("Cloud TTS request"/);
+  assert.match(audio, /function playKana\(romajiKey, fallbackText\)/);
+  assert.match(audio, /bgmEl\.preload = "metadata"/);
   assert.match(generator, /MAX_RATE_RETRIES = 5/);
   assert.match(generator, /function isMp3\(buffer\)/);
   assert.match(game, /card-face card-front" aria-hidden="true" hidden/);
@@ -247,6 +250,34 @@ test("matched word labels stay complete", () => {
   assert.match(game, /card\.matchLabel \|\|/);
   assert.match(game, /const text = String\(raw \|\| "結"\)/);
   assert.match(game, /wrapReadingLines\(text, 4\)/);
+});
+
+test("audit regressions keep online sync, audio cues, mobile mode, and selection semantics", () => {
+  const game = read("js/game.js");
+  const css = read("css/styles.css");
+  const html = read("index.html");
+  const online = read("js/online.js");
+  const worker = read("worker/src/index.mjs");
+  assert.doesNotMatch(game, /const wasDown = !previous \|\|/);
+  assert.match(game, /previous\?\.deck\[index\]\?\.state === "down"/);
+  assert.match(game, /scheduleOnlinePendingSync\(snapshot\)/);
+  assert.match(game, /lang="ja"/);
+  assert.match(css, /data-side="audio"/);
+  assert.match(css, /\.card-audio-cue/);
+  assert.doesNotMatch(css, /\.mode-chip\s*\{\s*display:\s*none/);
+  assert.match(html, /data-group="play-mode" role="group"/);
+  assert.match(html, /aria-pressed="true"/);
+  assert.match(online, /flipInFlight/);
+  assert.match(online, /function sync\(\)/);
+  assert.match(worker, /this\.room\.pending\?\.dueAt <= now/);
+  assert.match(worker, /function isPrivateDevHost\(hostname\)/);
+});
+
+test("SFX and BGM assets stay present and valid", () => {
+  assert.deepEqual(listMp3("assets/audio/sfx"), new Set(["select", "start", "flip", "match", "mismatch"]));
+  assert.deepEqual(listMp3("assets/audio/bgm"), new Set(["area-1", "area-2", "area-3"]));
+  for (const name of listMp3("assets/audio/sfx")) assertValidMp3(`assets/audio/sfx/${name}.mp3`);
+  for (const name of listMp3("assets/audio/bgm")) assertValidMp3(`assets/audio/bgm/${name}.mp3`);
 });
 
 test("generator dependency and staging behavior are reproducible", () => {

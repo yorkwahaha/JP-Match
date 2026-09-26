@@ -68,6 +68,11 @@ function sanitizeCard(input) {
   if (card.voicePack && !["words", "anime"].includes(card.voicePack)) {
     throw new Error("INVALID_CARD_VOICE_PACK");
   }
+  for (const field of ["voiceKey", "audioKey"]) {
+    if (card[field] && !/^[a-z0-9_-]+$/i.test(card[field])) {
+      throw new Error("INVALID_CARD_AUDIO_KEY");
+    }
+  }
   return card;
 }
 
