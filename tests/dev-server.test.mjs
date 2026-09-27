@@ -58,6 +58,10 @@ test("local preview preserves production CSP and serves visual fixtures", async 
 
   const fixture = await fetch(urlFor(server, "/visual-tests/online-room.html"));
   assert.equal(fixture.status, 200);
+
+  const webp = await fetch(urlFor(server, "/assets/icons/anime/db/goku.webp"), { method: "HEAD" });
+  assert.equal(webp.status, 200);
+  assert.equal(webp.headers.get("content-type"), "image/webp");
   assert.deepEqual(server.errors, []);
 });
 

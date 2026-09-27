@@ -1,4 +1,5 @@
 const fs = require("node:fs");
+const { createHash } = require("node:crypto");
 const path = require("node:path");
 const test = require("node:test");
 const assert = require("node:assert/strict");
@@ -364,11 +365,31 @@ test("online room UI, transport, CSP, and Durable Object configuration stay conn
   assert.match(html, /https:\/\/jp-match-online\.yorkwahaha\.workers\.dev/);
   assert.match(html, /wss:\/\/jp-match-online\.yorkwahaha\.workers\.dev/);
   assert.match(html, /<script src="\.\/js\/online\.js/);
-  assert.match(html, /css\/styles\.css\?v=kotoba-musubi-10/);
-  assert.match(html, /js\/online\.js\?v=online-room-5/);
-  assert.match(html, /js\/anime\.js\?v=anime-frieren-1/);
-  assert.match(html, /js\/audio\.js\?v=anime-frieren-1/);
-  assert.match(html, /js\/game\.js\?v=game-rules-1/);
+  const localAssetPattern =
+    /<script\b[^>]*\bsrc="(\.\/[^"]+)"[^>]*><\/script>|<link\b(?=[^>]*\brel="stylesheet")[^>]*\bhref="(\.\/[^"]+)"[^>]*>/g;
+  const browserAssets = [...html.matchAll(localAssetPattern)].map((match) => {
+    const reference = match[1] || match[2];
+    const parsed = /^\.\/([^"?]+)\?v=([^"]+)$/.exec(reference);
+    assert.ok(parsed, `local browser asset must include a non-empty ?v=: ${reference}`);
+    return { asset: parsed[1], version: parsed[2] };
+  });
+  assert.ok(browserAssets.length > 0, "index.html must load at least one local browser asset");
+
+  const bundleHash = createHash("sha256");
+  for (const { asset } of browserAssets) {
+    bundleHash.update(asset);
+    bundleHash.update("\0");
+    bundleHash.update(read(asset).replace(/\r\n/g, "\n"));
+    bundleHash.update("\0");
+  }
+  const expectedAssetVersion = bundleHash.digest("hex").slice(0, 12);
+  for (const { asset, version } of browserAssets) {
+    assert.equal(
+      version,
+      expectedAssetVersion,
+      `${asset} cache version must be ${expectedAssetVersion} (computed from ${browserAssets.length} browser assets)`,
+    );
+  }
   assert.match(game, /Online\.flip\(index\)/);
   assert.match(game, /Online\.resume\(invitedRoomCode\)/);
   assert.match(game, /對手已離開房間/);

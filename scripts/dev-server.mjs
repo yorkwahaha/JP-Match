@@ -17,6 +17,7 @@ const MIME = {
   ".mp3": "audio/mpeg",
   ".png": "image/png",
   ".svg": "image/svg+xml",
+  ".webp": "image/webp",
 };
 const PUBLIC_ROOTS = new Set(["assets", "css", "js", "visual-tests"]);
 
