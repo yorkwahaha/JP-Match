@@ -20,6 +20,7 @@ window.JPMatchAudio = (() => {
   const DEFAULT_TTS_VOICE = "ja-JP-Neural2-B";
   const DEFAULT_WORD_VOICE = "lively";
   const MAX_VOICE_BUFFER_CACHE = 64;
+  const PRELOAD_CONCURRENCY = 4;
 
   const WORD_VOICES = {
     classic: {
@@ -75,10 +76,13 @@ window.JPMatchAudio = (() => {
   let bgmEl = null;
   let bgmIndex = -1;
   let bgmPausedByHide = false;
+  // 對局畫面要求 BGM 時為 true；選單中途開關 BGM 依此決定是否首次開播
+  let bgmActive = false;
   let unlocked = false;
 
   let sessionTokenData = null;
   let readingSessionId = 0;
+  let preloadBatchId = 0;
   let localReadingAudio = null;
   let readingAudio = null;
   let readingObjectUrl = null;
@@ -217,7 +221,8 @@ window.JPMatchAudio = (() => {
     let peak = 0;
     for (let channel = 0; channel < buffer.numberOfChannels; channel += 1) {
       const data = buffer.getChannelData(channel);
-      for (let index = 0; index < data.length; index += 1) {
+      const stride = Math.max(1, Math.floor(data.length / 12000));
+      for (let index = 0; index < data.length; index += stride) {
         peak = Math.max(peak, Math.abs(data[index]));
       }
     }
@@ -380,7 +385,14 @@ window.JPMatchAudio = (() => {
     stopReading();
     const key = String(romajiKey).toLowerCase();
     const src = PATHS.kanaDir + key + ".mp3";
+    const sessionId = readingSessionId;
+    let fellBack = false;
     const onError = function (error) {
+      // 換下一張牌時舊的 play() 會以 AbortError 結束；onerror 與 play().catch 也可能各觸發一次
+      if (sessionId !== readingSessionId || fellBack) return;
+      if (error && error.name === "AbortError") return;
+      fellBack = true;
+      if (localReadingAudio) localReadingAudio.onerror = null;
       reportAudioIssue("kana " + src, error);
       if (fallbackText) playReading(fallbackText);
     };
@@ -399,9 +411,12 @@ window.JPMatchAudio = (() => {
     const voice = pack[settings.wordVoice] || pack[DEFAULT_WORD_VOICE] || WORD_VOICES[DEFAULT_WORD_VOICE];
     const src = voice.dir + key + ".mp3" + (voice.revision ? `?v=${voice.revision}` : "");
     const sessionId = readingSessionId;
-    const onError = function () {
+    let fellBack = false;
+    const onError = function (error) {
+      if (sessionId !== readingSessionId || fellBack) return;
+      if (error && error.name === "AbortError") return;
+      fellBack = true;
       if (localReadingAudio) localReadingAudio.onerror = null;
-      if (sessionId !== readingSessionId) return;
       if (fallbackText) playReading(fallbackText);
     };
     const context = getLowLatencyContext();
@@ -435,13 +450,18 @@ window.JPMatchAudio = (() => {
   function preloadWords(wordKeys, voicePackId) {
     const pack = VOICE_PACKS[voicePackId] || VOICE_PACKS.words;
     const voice = pack[settings.wordVoice] || pack[DEFAULT_WORD_VOICE] || WORD_VOICES[DEFAULT_WORD_VOICE];
-    const keys = Array.from(new Set(wordKeys || []));
-    keys.forEach((wordKey) => {
-      if (!wordKey) return;
-      const key = String(wordKey).toLowerCase();
+    const keys = Array.from(new Set(wordKeys || [])).filter(Boolean);
+    const batch = (preloadBatchId += 1);
+    let cursor = 0;
+    // 最多同時 4 個 fetch + decode，避免開局時一次塞滿主執行緒；新的一副牌開始後放棄舊佇列
+    function next() {
+      if (batch !== preloadBatchId || cursor >= keys.length) return Promise.resolve();
+      const key = String(keys[cursor]).toLowerCase();
+      cursor += 1;
       const src = voice.dir + key + ".mp3" + (voice.revision ? `?v=${voice.revision}` : "");
-      loadAudioBuffer(src, true).catch(function () {});
-    });
+      return loadAudioBuffer(src, true).catch(function () {}).then(next);
+    }
+    for (let lane = 0; lane < PRELOAD_CONCURRENCY; lane += 1) next();
   }
 
   async function getSessionToken() {
@@ -594,8 +614,9 @@ window.JPMatchAudio = (() => {
   }
 
   function startBgm() {
+    bgmActive = true;
     if (!settings.bgm) {
-      stopBgm();
+      haltBgm();
       return;
     }
     unlock();
@@ -622,6 +643,11 @@ window.JPMatchAudio = (() => {
   }
 
   function stopBgm() {
+    bgmActive = false;
+    haltBgm();
+  }
+
+  function haltBgm() {
     bgmPausedByHide = false;
     if (!bgmEl) return;
     bgmEl.pause();
@@ -680,20 +706,13 @@ window.JPMatchAudio = (() => {
   function setBgm(on) {
     settings.bgm = !!on;
     if (!on) {
-      stopBgm();
+      haltBgm();
       return;
     }
-    // 僅在已有曲目時恢復播放；首次開播由 startBgm() 負責
-    if (bgmEl && bgmEl.dataset.src && !document.hidden) {
-      bgmPausedByHide = false;
-      bgmEl.volume = settings.bgmVolume;
-      const p = bgmEl.play();
-      if (p && p.catch) {
-        p.catch(function (error) {
-          reportAudioIssue("enable BGM", error);
-        });
-      }
-    }
+    if (!bgmActive || document.hidden) return;
+    if (bgmEl && !bgmEl.paused) return;
+    // 開局時 BGM 若是關的，bgmEl 尚未建立；對局中再打開時由這裡首次開播
+    startBgm();
   }
 
   function setSfx(on) {

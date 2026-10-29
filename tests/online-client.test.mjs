@@ -47,7 +47,11 @@ function harness(locationHref = "https://example.test/?room=AB2C3D") {
   const location = new URL(locationHref);
   const window = {
     location,
-    history: { replaceState() {} },
+    history: {
+      replaceState(_state, _title, url) {
+        location.href = String(url);
+      },
+    },
     localStorage: {
       getItem: (key) => localStorage.get(key) || null,
       setItem: (key, value) => localStorage.set(key, value),
@@ -75,6 +79,8 @@ function harness(locationHref = "https://example.test/?room=AB2C3D") {
   return {
     online: window.JPMatchOnline,
     sockets,
+    localStorage,
+    location,
     runTimer(delay) {
       const match = [...timers.entries()].find(([, timer]) => timer.delay === delay);
       assert.ok(match, `missing ${delay}ms timer`);
@@ -188,4 +194,50 @@ test("LAN preview uses the same host for the local room worker", () => {
   assert.equal(online.apiBase, "http://192.168.1.20:8787");
   online.resume("AB2C3D");
   assert.match(sockets[0].url, /^ws:\/\/192\.168\.1\.20:8787\//);
+});
+
+test("an expired room (4000) forgets the stale credential and the room link", () => {
+  const { online, sockets, localStorage, location } = harness();
+  online.resume("AB2C3D");
+  sockets[0].emit("close", { code: 4000, reason: "Room expired" });
+  assert.equal(localStorage.has("jp-match-online-session:AB2C3D"), false);
+  assert.equal(location.searchParams.get("room"), null);
+});
+
+test("another tab taking over (4001) keeps the credential and stops reconnecting", () => {
+  const { online, sockets, localStorage, hasTimer } = harness();
+  const errors = [];
+  online.init({ onError: (error) => errors.push(error) });
+  online.resume("AB2C3D");
+  sockets[0].emit("close", { code: 4001, reason: "Reconnected from another tab" });
+  assert.equal(localStorage.has("jp-match-online-session:AB2C3D"), true);
+  assert.equal(hasTimer(500), false);
+  assert.equal(errors.at(-1)?.code, "SESSION_TAKEN_OVER");
+});
+
+test("a credential that never connects is dropped after reconnect attempts run out", () => {
+  const { online, sockets, localStorage, location, runTimer } = harness();
+  online.resume("AB2C3D");
+  const delays = [500, 1000, 2000, 4000, 8000, 8000, 8000, 8000];
+  for (let attempt = 0; attempt < delays.length; attempt += 1) {
+    sockets.at(-1).emit("close", { code: 1006, reason: "" });
+    runTimer(delays[attempt]);
+  }
+  assert.equal(sockets.length, 9);
+  sockets.at(-1).emit("close", { code: 1006, reason: "" });
+  assert.equal(localStorage.has("jp-match-online-session:AB2C3D"), false);
+  assert.equal(location.searchParams.get("room"), null);
+});
+
+test("a credential that already connected survives a long network outage", () => {
+  const { online, sockets, localStorage, runTimer } = harness();
+  online.resume("AB2C3D");
+  sockets[0].emit("open");
+  const delays = [500, 1000, 2000, 4000, 8000, 8000, 8000, 8000];
+  for (let attempt = 0; attempt < delays.length; attempt += 1) {
+    sockets.at(-1).emit("close", { code: 1006, reason: "" });
+    runTimer(delays[attempt]);
+  }
+  sockets.at(-1).emit("close", { code: 1006, reason: "" });
+  assert.equal(localStorage.has("jp-match-online-session:AB2C3D"), true);
 });

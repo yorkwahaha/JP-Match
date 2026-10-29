@@ -25,6 +25,8 @@ window.JPMatchOnline = (() => {
   let flipInFlight = false;
   let flipAckTimer = null;
   let intentionalClose = false;
+  // 這組憑證在本次頁面中是否曾成功接上；從未接上就重試用盡，多半是座位已被釋放
+  let sessionOpened = false;
   let handlers = {
     onState() {},
     onConnection() {},
@@ -36,6 +38,7 @@ window.JPMatchOnline = (() => {
     ROOM_FULL: "這個房間已經有兩位玩家。",
     ROOM_ALREADY_STARTED: "這局已經開始，無法加入。",
     INVALID_SESSION: "匿名連線憑證已失效，請重新加入房間。",
+    SESSION_TAKEN_OVER: "這個座位已在另一個分頁或裝置接上，本頁已停止連線。",
     NOT_YOUR_TURN: "現在是對手的回合。",
     BOARD_LOCKED: "請等這兩張牌完成判定。",
     CARD_UNAVAILABLE: "這張牌目前不能翻開。",
@@ -84,6 +87,15 @@ window.JPMatchOnline = (() => {
     } catch (_) {}
   }
 
+  function dropStaleSession() {
+    forgetSession(roomCode);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("room");
+      window.history.replaceState({}, "", url);
+    } catch (_) {}
+  }
+
   function requestUrl(path) {
     return API_BASE + path;
   }
@@ -121,6 +133,7 @@ window.JPMatchOnline = (() => {
     reconnectAttempts += 1;
     if (reconnectAttempts > MAX_RECONNECT_ATTEMPTS) {
       intentionalClose = true;
+      if (!sessionOpened) dropStaleSession();
       emitConnection("closed");
       emitError("INVALID_SESSION", "多次重新接線仍失敗，請回到首頁重新加入房間。");
       return;
@@ -176,6 +189,7 @@ window.JPMatchOnline = (() => {
       window.clearTimeout(openTimer);
       openTimer = null;
       reconnectAttempts = 0;
+      sessionOpened = true;
       emitConnection("connected");
       currentSocket.send(JSON.stringify({ type: "sync" }));
     });
@@ -210,8 +224,10 @@ window.JPMatchOnline = (() => {
       }
       if (event.code === 4000 || event.code === 4001) {
         intentionalClose = true;
+        // 4000 = 房間已過期，憑證不會再有效；4001 = 另一分頁接走，憑證仍有效只停止本頁
+        if (event.code === 4000) dropStaleSession();
         emitConnection("closed");
-        emitError(event.code === 4000 ? "ROOM_NOT_FOUND" : "INVALID_SESSION", event.reason);
+        emitError(event.code === 4000 ? "ROOM_NOT_FOUND" : "SESSION_TAKEN_OVER", event.reason);
         return;
       }
       scheduleReconnect();
@@ -238,8 +254,12 @@ window.JPMatchOnline = (() => {
     room = data.room;
     roomCode = data.room.roomCode;
     token = data.token;
+    sessionOpened = false;
+    reconnectAttempts = 0;
     saveSession(playerName);
     handlers.onState(room);
+    // onState 可能因為使用者已切到本地模式而呼叫 leave()；此時不要再接線
+    if (roomCode !== data.room.roomCode || token !== data.token) return null;
     connect();
     const url = new URL(window.location.href);
     url.searchParams.set("room", roomCode);
@@ -284,6 +304,8 @@ window.JPMatchOnline = (() => {
     roomCode = saved.roomCode;
     token = saved.token;
     room = null;
+    sessionOpened = false;
+    reconnectAttempts = 0;
     connect();
     return true;
   }

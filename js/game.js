@@ -35,6 +35,7 @@
   const THEME_STORAGE_KEY = "jp-match-theme";
   const WORD_VOICE_STORAGE_KEY = "jp-match-word-voice";
   const ONLINE_NAME_STORAGE_KEY = "jp-match-online-name";
+  const AUDIO_STORAGE_KEY = "jp-match-audio";
   const THEMES = {
     night: { id: "night", label: "夜紺", meta: "#142033" },
     mist: { id: "mist", label: "水霧", meta: "#8fb4c8" },
@@ -95,6 +96,9 @@
     onlineReadyAfterConfig: false,
     onlineFlipPending: false,
     onlinePendingSyncTimer: null,
+    onlineResultTimer: null,
+    // 建立或加入房間的請求尚未回來
+    onlineRequestPending: false,
     // 每次開局遞增；async 流程 await 回來須比對，避免舊局殘留的回呼污染新局
     runId: 0,
   };
@@ -278,6 +282,36 @@
     Sound.setSfx(els.optSfx.checked);
     Sound.setBgmVolume(Number(els.optBgmVolume.value) / 100);
     Sound.setBgm(els.optBgm.checked);
+    try {
+      window.localStorage.setItem(
+        AUDIO_STORAGE_KEY,
+        JSON.stringify({
+          voice: els.optVoice.checked,
+          sfx: els.optSfx.checked,
+          bgm: els.optBgm.checked,
+          bgmVolume: Number(els.optBgmVolume.value),
+        }),
+      );
+    } catch (err) {
+      /* ignore */
+    }
+  }
+
+  function restoreAudioSettings() {
+    let saved = null;
+    try {
+      saved = JSON.parse(window.localStorage.getItem(AUDIO_STORAGE_KEY) || "null");
+    } catch (err) {
+      saved = null;
+    }
+    if (!saved || typeof saved !== "object") return;
+    if (typeof saved.voice === "boolean") els.optVoice.checked = saved.voice;
+    if (typeof saved.sfx === "boolean") els.optSfx.checked = saved.sfx;
+    if (typeof saved.bgm === "boolean") els.optBgm.checked = saved.bgm;
+    const volume = Number(saved.bgmVolume);
+    if (Number.isFinite(volume) && volume >= 0 && volume <= 100) {
+      els.optBgmVolume.value = String(Math.round(volume));
+    }
   }
 
   function syncMenuUI() {
@@ -338,7 +372,7 @@
       const active = btn.dataset.value === state.playMode;
       btn.classList.toggle("is-active", active);
       btn.setAttribute("aria-pressed", active ? "true" : "false");
-      btn.disabled = configuringRematch;
+      btn.disabled = configuringRematch || state.onlineRequestPending;
     });
     qsa('[data-group="kind"] .opt').forEach((btn) => {
       const active = btn.dataset.value === state.kind;
@@ -425,10 +459,10 @@
       els.animeHint.classList.remove("is-warn");
     }
     const onlineNameOk = state.playMode !== "online" || state.onlineRematchSetup || Boolean(els.onlineName.value.trim());
-    els.btnStart.disabled = !ok || !onlineNameOk || state.onlineConfigPending;
+    els.btnStart.disabled = !ok || !onlineNameOk || state.onlineConfigPending || state.onlineRequestPending;
     if (els.btnJoinRoom) {
       const roomCode = els.onlineRoomCode.value.toUpperCase().replace(/[^A-Z2-9]/g, "");
-      els.btnJoinRoom.disabled = !onlineNameOk || roomCode.length !== 6;
+      els.btnJoinRoom.disabled = !onlineNameOk || roomCode.length !== 6 || state.onlineRequestPending;
     }
   }
 
@@ -1101,6 +1135,18 @@
     }
   }
 
+  // 房號欄可直接貼上整段邀請連結：先讀網址上的 room，否則取第一段 6 碼 A-Z2-9
+  function extractRoomCode(raw) {
+    const text = String(raw || "").trim();
+    if (/^https?:\/\//i.test(text)) {
+      try {
+        const fromUrl = new URL(text).searchParams.get("room");
+        if (fromUrl) return fromUrl.toUpperCase().replace(/[^A-Z2-9]/g, "").slice(0, 6);
+      } catch (_) {}
+    }
+    return text.toUpperCase().replace(/[^A-Z2-9]/g, "").slice(0, 6);
+  }
+
   function saveOnlineName(name) {
     try {
       window.localStorage.setItem(ONLINE_NAME_STORAGE_KEY, name);
@@ -1124,8 +1170,8 @@
     }
     saveOnlineName(playerName);
     setOnlineSetupStatus("正在建立私人房間…", false);
-    els.btnStart.disabled = true;
-    els.btnJoinRoom.disabled = true;
+    state.onlineRequestPending = true;
+    syncSetupUI();
     try {
       await Online.create({
         playerName,
@@ -1136,7 +1182,8 @@
     } catch (_) {
       setOnlineSetupStatus("建立失敗。請確認線上服務已啟用，再重新嘗試。", true);
     } finally {
-      syncPoolHint();
+      state.onlineRequestPending = false;
+      syncSetupUI();
     }
   }
 
@@ -1149,15 +1196,16 @@
     }
     saveOnlineName(playerName);
     setOnlineSetupStatus("正在接上房間 " + code + "…", false);
-    els.btnStart.disabled = true;
-    els.btnJoinRoom.disabled = true;
+    state.onlineRequestPending = true;
+    syncSetupUI();
     try {
       await Online.join({ playerName, code });
       Sound.playSfx("start");
     } catch (_) {
       setOnlineSetupStatus("加入失敗。請確認房號、房間狀態與網路連線。", true);
     } finally {
-      syncPoolHint();
+      state.onlineRequestPending = false;
+      syncSetupUI();
     }
   }
 
@@ -1255,6 +1303,13 @@
     }
   }
 
+  function clearOnlineResultTimer() {
+    if (state.onlineResultTimer != null) {
+      window.clearTimeout(state.onlineResultTimer);
+      state.onlineResultTimer = null;
+    }
+  }
+
   function scheduleOnlinePendingSync(snapshot) {
     clearOnlinePendingSync();
     const remainingMs = Number(snapshot?.pending?.remainingMs);
@@ -1270,6 +1325,7 @@
 
   function initializeOnlineGame(snapshot) {
     const grid = GRID_PRESETS.find((item) => item.id === snapshot.config.gridId) || getGrid();
+    state.playMode = "online";
     state.players = 2;
     state.playerNames = snapshot.players.map((player, index) => player?.name || PLAYER_NAMES[index]);
     state.deck = snapshot.deck.map((slot) => slot.card || hiddenOnlineCard());
@@ -1364,13 +1420,20 @@
 
     if (snapshot.phase === "complete" && state.onlineResultShownForVersion == null) {
       state.onlineResultShownForVersion = snapshot.version;
-      window.setTimeout(() => {
+      clearOnlineResultTimer();
+      state.onlineResultTimer = window.setTimeout(() => {
+        state.onlineResultTimer = null;
         if (state.onlineSnapshot?.phase === "complete") endGame();
       }, 520);
     }
   }
 
   function handleOnlineState(snapshot) {
+    if (state.playMode !== "online") {
+      // 使用者已切回本地或單人；不要讓遲到的房間狀態把畫面拉進線上流程
+      Online.leave();
+      return;
+    }
     const previous = state.onlineSnapshot;
     state.onlineSnapshot = snapshot;
     state.onlineFlipPending = false;
@@ -1379,7 +1442,19 @@
       state.onlineRematchSetup = false;
       state.onlineConfigPending = false;
       clearOnlinePendingSync();
+      clearOnlineResultTimer();
       renderOnlineRoom(snapshot);
+      const opponentSeat = snapshot.youSeat === 0 ? 1 : 0;
+      if (
+        previous &&
+        (previous.phase === "playing" || previous.phase === "complete") &&
+        previous.players?.[opponentSeat] &&
+        !snapshot.players?.[opponentSeat]
+      ) {
+        // 伺服器在對手離開或斷線逾時後會釋出座位並退回大廳，player.left 不會出現
+        Sound.stopBgm();
+        els.roomStatus.textContent = "對手已離開，本局已結束、座位已釋放；可以把邀請連結傳給新的對手。";
+      }
       if (state.onlineReadyAfterConfig && snapshot.youSeat === snapshot.hostSeat) {
         state.onlineReadyAfterConfig = false;
         Online.ready(true);
@@ -1458,6 +1533,18 @@
     }
   }
 
+  function abandonLocalGame() {
+    // 讓 280ms 配對與 900ms 蓋牌的回呼看到新的 runId 後放棄，不再改分數或搶焦點
+    state.runId += 1;
+    clearMismatchTimer();
+    clearTurnSwitchFeedback();
+    state.pendingClose = [];
+    state.flipped = [];
+    state.lock = false;
+    showScreen("setup");
+    syncSetupUI();
+  }
+
   function leaveOnlineRoom() {
     Online.leave();
     state.onlineSnapshot = null;
@@ -1467,6 +1554,7 @@
     state.onlineReadyAfterConfig = false;
     state.onlineFlipPending = false;
     clearOnlinePendingSync();
+    clearOnlineResultTimer();
     state.playerNames = PLAYER_NAMES.slice();
     showScreen("setup");
     syncSetupUI();
@@ -1513,6 +1601,7 @@
         return;
       }
       if (group === "play-mode") {
+        if (state.onlineRequestPending || btn.disabled) return;
         state.playMode = value;
         state.players = value === "solo" ? 1 : 2;
       }
@@ -1597,7 +1686,7 @@
       syncPoolHint();
     });
     els.onlineRoomCode.addEventListener("input", () => {
-      const cleaned = els.onlineRoomCode.value.toUpperCase().replace(/[^A-Z2-9]/g, "");
+      const cleaned = extractRoomCode(els.onlineRoomCode.value);
       if (els.onlineRoomCode.value !== cleaned) els.onlineRoomCode.value = cleaned;
       setOnlineSetupStatus("免註冊；暱稱與匿名重連憑證只用於這個房間。", false);
       syncPoolHint();
@@ -1656,8 +1745,7 @@
         return;
       }
       Sound.playSfx("select");
-      showScreen("setup");
-      syncSetupUI();
+      abandonLocalGame();
     });
 
     qs("#btn-menu").addEventListener("click", () => {
@@ -1682,8 +1770,7 @@
         leaveOnlineRoom();
         return;
       }
-      showScreen("setup");
-      syncSetupUI();
+      abandonLocalGame();
     });
     els.menuOverlay.addEventListener("click", (event) => {
       if (event.target === els.menuOverlay) {
@@ -1848,6 +1935,7 @@
     onError: handleOnlineError,
   });
   window.addEventListener("resize", scheduleCordRender);
+  restoreAudioSettings();
   syncAudioSettings();
   syncSetupUI();
   const invitedRoomCode = new URL(window.location.href).searchParams
